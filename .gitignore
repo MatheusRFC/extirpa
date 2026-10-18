@@ -1,0 +1,14 @@
+# saídas de build
+/build/
+/dist/
+*.obj
+*.o
+*.exe
+*.lib
+*.res
+!assets/*.res
+# cache do Python
+__pycache__/
+
+# notas locais do Claude Code
+CLAUDE.local.md
