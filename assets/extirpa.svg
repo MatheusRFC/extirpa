@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- EXTIRPA: o programa arrancado do chão com as raízes (trilhas de circuito). Mesmas medidas de tools/gerar_icones.py -->
+  <rect x="0" y="0" width="128" height="128" rx="28" fill="#d64545"/>
+  <g fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M64 46 V92"/>
+    <path d="M50 46 V64 L38 76 V90"/>
+    <path d="M78 46 V64 L90 76 V90"/>
+  </g>
+  <g fill="#ffffff">
+    <circle cx="64" cy="96" r="7"/>
+    <circle cx="38" cy="94" r="7"/>
+    <circle cx="90" cy="94" r="7"/>
+  </g>
+  <g fill="#d64545">
+    <circle cx="64" cy="96" r="3"/>
+    <circle cx="38" cy="94" r="3"/>
+    <circle cx="90" cy="94" r="3"/>
+  </g>
+  <rect x="34" y="12" width="60" height="38" rx="9" fill="#ffffff"/>
+  <path d="M52 37 L64 25 L76 37" fill="none" stroke="#d64545" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <g stroke="#ffffff" stroke-width="6" stroke-linecap="round">
+    <path d="M16 112 H44"/>
+    <path d="M84 112 H112"/>
+  </g>
+</svg>

@@ -650,6 +650,12 @@ static void test_fmt(void) {
     CHECK(!parse_install_date(u"20261318", &y, &m, &d));
     CHECK(!parse_install_date(u"abc", &y, &m, &d));
     CHECK(!parse_install_date(NULL, &y, &m, &d));
+    CHECK_WEQ_FREE(wfmt(u"%s tem %d itens (%u, %U) 100%% %x", u"Lista", -42, 7u, (uint64_t)1 << 40), u"Lista tem -42 itens (7, 1099511627776) 100% %x");
+    CHECK_WEQ_FREE(wfmt(u"%s|%s", NULL, u"b"), u"|b");
+    CHECK_WEQ_FREE(base64_utf16le(u"dir"), u"ZABpAHIA");
+    CHECK_WEQ_FREE(base64_utf16le(u"a"), u"YQA=");
+    CHECK_WEQ_FREE(base64_utf16le(u""), u"");
+    CHECK_WEQ_FREE(base64_utf16le(u"ação"), u"YQDnAOMAbwA=");
 }
 
 int main(void) {

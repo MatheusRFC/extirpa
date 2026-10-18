@@ -22,9 +22,9 @@ WCHAR *wcat(const WCHAR *a, const WCHAR *b) { return wcat3(a, b, NULL); }
 WCHAR *wcat3(const WCHAR *a, const WCHAR *b, const WCHAR *c) {
     size_t la = wlen(a), lb = wlen(b), lc = wlen(c);
     WCHAR *r = xalloc((la + lb + lc + 1) * sizeof(WCHAR));
-    if (la) mem_copy(r, a, la * sizeof(WCHAR));
-    if (lb) mem_copy(r + la, b, lb * sizeof(WCHAR));
-    if (lc) mem_copy(r + la + lb, c, lc * sizeof(WCHAR));
+    if (a && la) mem_copy(r, a, la * sizeof(WCHAR));
+    if (b && lb) mem_copy(r + la, b, lb * sizeof(WCHAR));
+    if (c && lc) mem_copy(r + la + lb, c, lc * sizeof(WCHAR));
     return r;
 }
 
@@ -185,7 +185,11 @@ void sb_add_hex(StrBuf *b, uint64_t v, int digits) {
 }
 
 const WCHAR *sb_str(StrBuf *b) {
-    if (!b->p) sb_grow(b, 0), b->p[0] = 0;
+    if (!b->p) {
+        b->cap = 64;
+        b->len = 0;
+        b->p = xalloc(b->cap * sizeof(WCHAR));
+    }
     return b->p;
 }
 

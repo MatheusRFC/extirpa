@@ -43,7 +43,11 @@ typedef struct {
     WCHAR *detail;  // informação extra para o usuário (o comando que apontava para o programa...)
     bool checked;
     uint64_t size;  // pastas e arquivos (0 = desconhecido)
+    int status;     // LS_* (preenchido na exclusão)
+    uint32_t error; // código de erro do Windows quando status == LS_FAILED
 } Leftover;
+
+enum { LS_PENDING = 0, LS_DELETED = 1, LS_FAILED = 2, LS_KEPT = 3 /* "se ficar vazia" e não ficou */ };
 
 typedef struct {
     PtrVec items;  // Leftover*
