@@ -1,0 +1,133 @@
+===== instalado =====
+--- Registro com 'gridcraft' (HKCU e HKLM\SOFTWARE)
+
+HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\UFH\SHC
+    64    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GridCraft.lnk\0C:\Program 
+Files\GridCraft\gridcraft.exe
+End of search: 1 match(es) found.
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.csv\OpenWithProgids
+    GridCraft.TextData    REG_SZ    GridCraft.TextData
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.ods\OpenWithProgids
+    GridCraft.Workbook    REG_SZ    GridCraft.Workbook
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.tsv\OpenWithProgids
+    GridCraft.TextData    REG_SZ    GridCraft.TextData
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.xlsb\OpenWithProgids
+    GridCraft.Workbook    REG_SZ    GridCraft.Workbook
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.xlsm\OpenWithProgids
+    GridCraft.Workbook    REG_SZ    GridCraft.Workbook
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.xlsx\OpenWithProgids
+    GridCraft.Workbook    REG_SZ    GridCraft.Workbook
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\GridCraft.TextData
+    (Default)    REG_SZ    GridCraft Text Data
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\GridCraft.TextData\DefaultIcon
+    (Default)    REG_SZ    "C:\Program Files\GridCraft\gridcraft.exe",0
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\GridCraft.TextData\shell\open\command
+    (Default)    REG_SZ    "C:\Program Files\GridCraft\gridcraft.exe" "%1"
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\GridCraft.Workbook
+    (Default)    REG_SZ    GridCraft Workbook
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\GridCraft.Workbook\DefaultIcon
+    (Default)    REG_SZ    "C:\Program Files\GridCraft\gridcraft.exe",0
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\GridCraft.Workbook\shell\open\command
+    (Default)    REG_SZ    "C:\Program Files\GridCraft\gridcraft.exe" "%1"
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Installer\Products\5B99A329ED230724BAEC2006910B1CF2
+    ProductName    REG_SZ    GridCraft
+    ProductIcon    REG_SZ    C:\Windows\Installer\{923A99B5-32DE-4270-ABCE-026019B0C12F}\GridcraftIcon.ico
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Installer\Products\5B99A329ED230724BAEC2006910B1CF2\SourceList
+    PackageName    REG_SZ    gridcraft.msi
+HKEY_LOCAL_MACHINE\SOFTWARE\GridCraft
+HKEY_LOCAL_MACHINE\SOFTWARE\GridCraft\Capabilities
+    ApplicationName    REG_SZ    GridCraft
+HKEY_LOCAL_MACHINE\SOFTWARE\GridCraft\Capabilities\FileAssociations
+    .xlsx    REG_SZ    GridCraft.Workbook
+    .xlsm    REG_SZ    GridCraft.Workbook
+    .csv    REG_SZ    GridCraft.TextData
+    .tsv    REG_SZ    GridCraft.TextData
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\gridcraft.exe
+    (Default)    REG_SZ    C:\Program Files\GridCraft\gridcraft.exe
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\Folders
+    C:\Program Files\GridCraft\    REG_SZ    
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\55136EFD4D4B08055AA
+CA66AB2029FE9
+    5B99A329ED230724BAEC2006910B1CF2    REG_SZ    C:\Program Files\GridCraft\gridcraft-cli.exe
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\6B4D7050FF212884481
+E9580E3474ABE
+    5B99A329ED230724BAEC2006910B1CF2    REG_SZ    C:\Program Files\GridCraft\gridcraft.exe
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\AF3D7C0EA1BAA015A86
+8441C6DAD907E
+    5B99A329ED230724BAEC2006910B1CF2    REG_SZ    22:\Software\GridCraft\Installer\DesktopShortcut
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products\5B99A329ED230724BAEC2
+006910B1CF2\InstallProperties
+    URLInfoAbout    REG_SZ    https://getartcraft.com/apps/gridcraft
+    URLUpdateInfo    REG_SZ    https://getartcraft.com/apps/gridcraft
+    DisplayName    REG_SZ    GridCraft
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{923A99B5-32DE-4270-ABCE-026019B0C12F}
+    URLInfoAbout    REG_SZ    https://getartcraft.com/apps/gridcraft
+    URLUpdateInfo    REG_SZ    https://getartcraft.com/apps/gridcraft
+    DisplayName    REG_SZ    GridCraft
+HKEY_LOCAL_MACHINE\SOFTWARE\RegisteredApplications
+    GridCraft    REG_SZ    Software\GridCraft\Capabilities
+HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\App Paths\gridcraft.exe
+    (Default)    REG_SZ    C:\Program Files\GridCraft\gridcraft.exe
+HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\RegisteredApplications
+    GridCraft    REG_SZ    Software\GridCraft\Capabilities
+End of search: 39 match(es) found.
+--- Registro com o código compactado do produto
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Installer\Features\5B99A329ED230724BAEC2006910B1CF2
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Installer\Products\5B99A329ED230724BAEC2006910B1CF2
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Installer\UpgradeCodes\B7231155503FEB14290DBE4849E4C7D4
+    5B99A329ED230724BAEC2006910B1CF2    REG_SZ    
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UpgradeCodes\B7231155503FEB14290DBE4849E4C7D4
+    5B99A329ED230724BAEC2006910B1CF2    REG_SZ    
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\55136EFD4D4B08055AA
+CA66AB2029FE9
+    5B99A329ED230724BAEC2006910B1CF2    REG_SZ    C:\Program Files\GridCraft\gridcraft-cli.exe
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\6B4D7050FF212884481
+E9580E3474ABE
+    5B99A329ED230724BAEC2006910B1CF2    REG_SZ    C:\Program Files\GridCraft\gridcraft.exe
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\98AC8716F44705E5A92
+7EAA901F3C364
+    5B99A329ED230724BAEC2006910B1CF2    REG_SZ    
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\AF3D7C0EA1BAA015A86
+8441C6DAD907E
+    5B99A329ED230724BAEC2006910B1CF2    REG_SZ    22:\Software\GridCraft\Installer\DesktopShortcut
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products\5B99A329ED230724BAEC2
+006910B1CF2
+End of search: 9 match(es) found.
+End of search: 0 match(es) found.
+--- Registro com o código do produto
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Installer\Products\5B99A329ED230724BAEC2006910B1CF2
+    ProductIcon    REG_SZ    C:\Windows\Installer\{923A99B5-32DE-4270-ABCE-026019B0C12F}\GridcraftIcon.ico
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\Folders
+    C:\Windows\Installer\{923A99B5-32DE-4270-ABCE-026019B0C12F}\    REG_SZ    
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products\5B99A329ED230724BAEC2
+006910B1CF2\InstallProperties
+    ModifyPath    REG_EXPAND_SZ    MsiExec.exe /I{923A99B5-32DE-4270-ABCE-026019B0C12F}
+    UninstallString    REG_EXPAND_SZ    MsiExec.exe /I{923A99B5-32DE-4270-ABCE-026019B0C12F}
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\UFH\ARP
+    0    REG_MULTI_SZ    
+Software\Microsoft\Windows\CurrentVersion\Uninstall\0{923A99B5-32DE-4270-ABCE-026019B0C12F}\0MsiExec.exe 
+/I{923A99B5-32DE-4270-ABCE-026019B0C12F}
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{923A99B5-32DE-4270-ABCE-026019B0C12F}
+    ModifyPath    REG_EXPAND_SZ    MsiExec.exe /I{923A99B5-32DE-4270-ABCE-026019B0C12F}
+    UninstallString    REG_EXPAND_SZ    MsiExec.exe /I{923A99B5-32DE-4270-ABCE-026019B0C12F}
+End of search: 8 match(es) found.
+--- UFH\SHC
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\UFH\SHC
+    64    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GridCraft.lnk\0C:\Program 
+Files\GridCraft\gridcraft.exe
+--- Disco
+EXISTE C:\Program Files\GridCraft
+    C:\Program Files\GridCraft\gridcraft-cli.exe
+    C:\Program Files\GridCraft\gridcraft.exe
+EXISTE C:\Users\runneradmin\AppData\Roaming\GridCraft
+    C:\Users\runneradmin\AppData\Roaming\GridCraft\logs
+    C:\Users\runneradmin\AppData\Roaming\GridCraft\prefs.json
+    C:\Users\runneradmin\AppData\Roaming\GridCraft\ui.json
+    C:\Users\runneradmin\AppData\Roaming\GridCraft\logs\gridcraft.1.log
+    C:\Users\runneradmin\AppData\Roaming\GridCraft\logs\gridcraft.log
+EXISTE C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GridCraft.lnk
+EXISTE (nome parecido) C:\Users\runneradmin\AppData\Roaming\GridCraft
+INSTALLER C:\Windows\Installer\{923A99B5-32DE-4270-ABCE-026019B0C12F} 10/21/2026 17:26:39
+INSTALLER C:\Windows\Installer\a2e95.msi 10/21/2026 17:21:57
+INSTALLER C:\Windows\Installer\SourceHash{923A99B5-32DE-4270-ABCE-026019B0C12F} 10/21/2026 17:26:38
+

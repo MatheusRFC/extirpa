@@ -1,0 +1,7 @@
+snapshot exit: 0
+msiexec install exit: 0
+atalho: C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GridCraft.lnk
+rodando: C:\Program Files\GridCraft\gridcraft.exe 
+exe: C:\Program Files\GridCraft\gridcraft.exe
+scan exit: 0
+realtest exit: 0
