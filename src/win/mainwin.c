@@ -295,7 +295,7 @@ static void do_open_folder(void) {
         xfree(v);
         return;
     }
-    Identity *id = program_identity(v[0]);
+    Identity *id = program_identity_target(v[0]);
     const WCHAR *dir = NULL;
     for (size_t i = 0; i < id->dirs.n && !dir; i++)
         if (dir_exists(id->dirs.items[i])) dir = id->dirs.items[i];

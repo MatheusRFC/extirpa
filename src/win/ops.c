@@ -136,7 +136,7 @@ bool op_uninstall(HWND owner, Program *const *progs, size_t n, bool quick) {
         job.t[i].name = wdup(progs[i]->name);
         job.t[i].key = wdup(progs[i]->key_path);
         job.t[i].cmd = uninstall_command(progs[i], job.opts.quiet, NULL);
-        job.t[i].id = program_identity(progs[i]);
+        job.t[i].id = program_identity_target(progs[i]);
     }
     WCHAR *label = n == 1 ? wdup(progs[0]->name) : wfmt(T(S_LABEL_MANY), (unsigned)n);
     log_fmt(u"Desinstalar: %s", label);
@@ -154,7 +154,7 @@ bool op_uninstall(HWND owner, Program *const *progs, size_t n, bool quick) {
 
 // ---------------------------------------------------------------- desinstalação forçada
 
-bool op_forced(HWND owner, const Program *prog, const WCHAR *name, const WCHAR *folder) {
+bool op_forced(HWND owner, Program *prog, const WCHAR *name, const WCHAR *folder) {
     WCHAR *n = name ? wdup(name) : NULL, *f = folder ? wdup(folder) : NULL;
     ScanMode mode = SCAN_MODERATE;
     if (!dlg_forced(owner, &n, &f, &mode)) {
@@ -170,7 +170,7 @@ bool op_forced(HWND owner, const Program *prog, const WCHAR *name, const WCHAR *
     job.t[0].name = wdup(label);
     if (prog && wieq(n, prog->name)) {
         // um programa da lista: usa tudo o que o Windows sabe dele, e a entrada dele também sai
-        job.t[0].id = program_identity(prog);
+        job.t[0].id = program_identity_target(prog);
         job.t[0].key = wdup(prog->key_path);
     } else {
         job.t[0].id = identity_new(label, NULL);
@@ -399,7 +399,7 @@ bool op_trace_uninstall(HWND owner, const WCHAR *trace_path, const PtrVec *progr
         }
         job.base.t[0].name = wdup(prog->name);
         job.base.t[0].key = wdup(prog->key_path);
-        job.base.t[0].id = program_identity(prog);
+        job.base.t[0].id = program_identity_target(prog);
     } else {
         job.base.t[0].name = wdup(t->name);
         job.base.t[0].id = identity_new(t->name, NULL);

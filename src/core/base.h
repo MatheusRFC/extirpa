@@ -36,6 +36,7 @@ typedef struct {
 } PtrVec;
 
 void pv_push(PtrVec *v, void *item);
+void pv_insert(PtrVec *v, size_t pos, void *item);  // pos <= n; os seguintes andam uma casa
 void pv_free(PtrVec *v);  // libera só o vetor, não os itens
 void pv_sort(PtrVec *v, int (*cmp)(const void *a, const void *b, void *ctx), void *ctx);
 

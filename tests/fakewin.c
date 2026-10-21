@@ -201,9 +201,11 @@ struct FKey {
 };
 
 static FKey *g_roots[4];  // HKLM, HKCU, HKCR, HKU
+static DWORD g_reg_gen;   // muda a cada gravação: a "data de gravação" das chaves simuladas
 
 static FKey *new_key(const WCHAR *name, FKey *parent) {
     FKey *k = xalloc(sizeof(FKey));
+    g_reg_gen++;
     k->name = wdup(name);
     k->parent = parent;
     if (parent) pv_push(&parent->kids, k);
@@ -274,6 +276,7 @@ void fake_key(const WCHAR *path) { key_from_path(path, true); }
 void fake_val(const WCHAR *path, const WCHAR *name, DWORD type, const void *data, DWORD size) {
     FKey *k = key_from_path(path, true);
     FVal *v = find_val(k, name);
+    g_reg_gen++;
     if (!v) {
         v = xalloc(sizeof(FVal));
         v->name = wdup(name ? name : u"");
@@ -386,11 +389,12 @@ LSTATUS WINAPI RegQueryInfoKeyW(HKEY h, LPWSTR c, LPDWORD cn, LPDWORD r, LPDWORD
     if (values) *values = (DWORD)k->vals.n;
     if (max_vname) *max_vname = mvn;
     if (max_vdata) *max_vdata = mvd;
-    if (ft) ft->dwLowDateTime = 0x12345678, ft->dwHighDateTime = 0x01DD0000;  // uma data em 2026
+    if (ft) ft->dwLowDateTime = 0x12345678 + g_reg_gen, ft->dwHighDateTime = 0x01DD0000;  // uma data em 2026
     return ERROR_SUCCESS;
 }
 
 LSTATUS WINAPI RegSetValueExW(HKEY h, LPCWSTR name, DWORD r, DWORD type, const BYTE *data, DWORD size) {
+    g_reg_gen++;
     (void)r;
     FKey *k = root_of(h);
     FVal *v = find_val(k, name);
@@ -407,6 +411,7 @@ LSTATUS WINAPI RegSetValueExW(HKEY h, LPCWSTR name, DWORD r, DWORD type, const B
 }
 
 LSTATUS WINAPI RegDeleteValueW(HKEY h, LPCWSTR name) {
+    g_reg_gen++;
     FKey *k = root_of(h);
     for (size_t i = 0; i < k->vals.n; i++) {
         FVal *v = k->vals.items[i];
@@ -429,6 +434,7 @@ static void detach(FKey *k) {
 }
 
 LSTATUS WINAPI RegDeleteTreeW(HKEY h, LPCWSTR sub) {
+    g_reg_gen++;
     FKey *k = walk(root_of(h), sub, false);
     if (!k) return ERROR_FILE_NOT_FOUND;
     if (!sub || !*sub) {  // só o conteúdo
@@ -441,6 +447,7 @@ LSTATUS WINAPI RegDeleteTreeW(HKEY h, LPCWSTR sub) {
 }
 
 LSTATUS WINAPI RegDeleteKeyExW(HKEY h, LPCWSTR sub, REGSAM sam, DWORD r) {
+    g_reg_gen++;
     (void)sam, (void)r;
     FKey *k = walk(root_of(h), sub, false);
     if (!k) return ERROR_FILE_NOT_FOUND;

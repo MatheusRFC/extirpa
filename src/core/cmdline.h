@@ -17,6 +17,9 @@ void cmd_free(Cmd *c);
 WCHAR *cmd_join(const WCHAR *exe, const WCHAR *args);  // coloca o executável entre aspas
 
 bool guid_valid(const WCHAR *s);  // "{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}"
+// Forma "compactada" que o Windows Installer usa no Registro ({923A99B5-32DE-...} ->
+// "5B99A329ED23..."): 32 caracteres em maiúsculas + zero. false se o GUID for inválido.
+bool guid_pack(const WCHAR *guid, WCHAR out[33]);
 // Se o comando for do Windows Installer (msiexec /I ou /X {produto}), copia o código do
 // produto (38 caracteres + zero) e devolve true.
 bool cmd_msi_product(const Cmd *c, WCHAR product[39]);

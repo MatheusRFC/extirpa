@@ -75,6 +75,27 @@ bool guid_valid(const WCHAR *s) {
     return true;
 }
 
+bool guid_pack(const WCHAR *guid, WCHAR out[33]) {
+    if (!guid_valid(guid)) return false;
+    // os três primeiros grupos ficam de trás para frente; nos dois últimos, cada par de dígitos
+    // troca de lugar
+    static const struct {
+        int start, len;
+    } GROUPS[] = {{1, 8}, {10, 4}, {15, 4}};
+    size_t o = 0;
+    for (size_t g = 0; g < COUNT(GROUPS); g++)
+        for (int i = GROUPS[g].len - 1; i >= 0; i--) out[o++] = guid[GROUPS[g].start + i];
+    for (int i = 20; i < 37; i += 2) {
+        if (guid[i] == '-') i++;
+        out[o++] = guid[i + 1];
+        out[o++] = guid[i];
+    }
+    for (size_t i = 0; i < 32; i++)
+        if (out[i] >= 'a' && out[i] <= 'f') out[i] = (WCHAR)(out[i] - 'a' + 'A');
+    out[32] = 0;
+    return o == 32;
+}
+
 bool cmd_msi_product(const Cmd *c, WCHAR product[39]) {
     WCHAR *base = path_strip_ext(path_leaf(c->exe));
     bool msi = wieq(base, u"msiexec");

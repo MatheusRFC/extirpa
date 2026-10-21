@@ -140,6 +140,17 @@ static void test_sort(void) {
     }
     CHECK(ok && v.n == 200);
     pv_free(&v);
+    // inserção no meio, no começo e no fim (mais de uma realocação)
+    static int nums[40];
+    for (int i = 0; i < 40; i++) nums[i] = i;
+    for (int i = 0; i < 40; i += 2) pv_push(&v, &nums[i]);
+    for (int i = 1; i < 40; i += 2) pv_insert(&v, (size_t)i, &nums[i]);
+    ok = v.n == 40;
+    for (size_t i = 0; i < v.n && ok; i++) ok = *(int *)v.items[i] == (int)i;
+    pv_insert(&v, 0, &nums[5]);
+    pv_insert(&v, v.n, &nums[7]);
+    CHECK(ok && v.n == 42 && *(int *)v.items[0] == 5 && *(int *)v.items[1] == 0 && *(int *)v.items[41] == 7);
+    pv_free(&v);
 }
 
 // ---------------------------------------------------------------- caminhos
@@ -407,6 +418,13 @@ static void test_cmdline(void) {
     CHECK(guid_valid(u"{23170F69-40C1-2702-2301-000001000000}"));
     CHECK(!guid_valid(u"{23170F69-40C1-2702-2301-00000100000}"));
     CHECK(!guid_valid(u"{23170F69x40C1-2702-2301-000001000000}"));
+    {
+        // código compactado do Windows Installer (conferido no Registro de um Windows com o GridCraft 0.9.0)
+        WCHAR packed[33];
+        CHECK(guid_pack(u"{923A99B5-32DE-4270-ABCE-026019B0C12F}", packed) && weq(packed, u"5B99A329ED230724BAEC2006910B1CF2"));
+        CHECK(guid_pack(u"{923a99b5-32de-4270-abce-026019b0c12f}", packed) && weq(packed, u"5B99A329ED230724BAEC2006910B1CF2"));
+        CHECK(!guid_pack(u"Mozilla Firefox", packed) && !guid_pack(u"{923A99B5-32DE-4270-ABCE-026019B0C12}", packed));
+    }
 
     WCHAR g[39];
     CHECK(cmd_split(u"MsiExec.exe /I{23170F69-40C1-2702-2301-000001000000}", &c));

@@ -4,6 +4,22 @@ All notable changes to EXTIRPA. Dates are in the author's time zone.
 
 ## [Unreleased]
 
+## [1.0.1] — 2026-10-21
+
+Leftover search for Windows Installer (MSI) programs that don't record their install folder, found testing GridCraft 0.9.0: its uninstall entry has no `InstallLocation`, no icon and `MsiExec.exe` as the uninstaller, so EXTIRPA didn't know where the program lived and only found its AppData folder.
+
+### Fixed
+- **Install folder of MSI programs** is now read from the installer's own component records (`Installer\UserData\<user>\Components`): the deepest folder shared by the program's files under Program Files (or `%LOCALAPPDATA%\Programs`). Components shared with another product are ignored. When there are no component records, the folder comes from App Paths and from Start menu shortcuts with the program's exact name. This also applies to forced uninstall, tracing and "Open folder".
+- With the folder known, App Paths, file types (ProgIDs), "Open with" lists, Start menu shortcuts (including Windows Installer "advertised" shortcuts, which have only a working folder), compatibility settings, MuiCache and UserAssist entries of such programs are found and come checked.
+- Other installed MSI programs are now known by their folders too, so their files are never taken for the program being removed.
+
+### Added
+- The Start menu's list of used shortcuts (`UFH\SHC`) is searched; only the program's values are removed, the key itself is protected.
+- When nothing says where the program was (forced uninstall of an orphan entry), usage traces, App Paths keys and file types that point to an executable or shortcut with the program's exact name that no longer exists are found by name. A file type with the program's name whose executable still exists comes unchecked, and so do the "Open with" entries that point to it.
+- RegisteredApplications values with the program's exact name that point to a key that no longer exists.
+- UserAssist and Jump List entries written with the Start menu or desktop folders in front (`{0139D44E-...}\GridCraft.lnk`).
+
+
 ## [1.0.0] — 2026-10-20
 
 First release.
