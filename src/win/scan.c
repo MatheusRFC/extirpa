@@ -45,6 +45,7 @@ typedef struct {
 } Scan;
 
 static bool name_is_ours(const Scan *sc, const WCHAR *name);
+static bool progid_named(const Scan *sc, const WCHAR *progid);
 
 static int threshold(ScanMode m) { return m == SCAN_SAFE ? CONF_HIGH : m == SCAN_MODERATE ? CONF_MEDIUM : CONF_LOW; }
 
@@ -467,7 +468,7 @@ static void scan_usage_named(Scan *sc) {
         PtrVec names = reg_value_names(k);
         for (size_t i = 0; i < names.n; i++) {
             WCHAR *x = expand_known_folder(names.items[i]);
-            if (owns(sc, x)) left_add(sc->out, LK_VALUE, JUMP, names.items[i], CONF_HIGH, LR_USAGE, x);
+            if (owns(sc, x) || (!wfindc(x, '\\') && progid_named(sc, x))) left_add(sc->out, LK_VALUE, JUMP, names.items[i], CONF_HIGH, LR_USAGE, x);
             xfree(x);
         }
         strings_free(&names);
@@ -484,7 +485,8 @@ static void scan_usage_named(Scan *sc) {
             PtrVec names = reg_value_names(c);
             for (size_t i = 0; i < names.n; i++) {
                 WCHAR *plain = rot13(names.items[i]), *x = expand_known_folder(plain);
-                if (owns(sc, x)) left_add(sc->out, LK_VALUE, key, names.items[i], CONF_HIGH, LR_USAGE, x);
+                // caminho de executável, ou ID de aplicativo ("FileZilla.Client.AppID")
+                if (owns(sc, x) || (!wfindc(plain, '\\') && progid_named(sc, plain))) left_add(sc->out, LK_VALUE, key, names.items[i], CONF_HIGH, LR_USAGE, x);
                 xfree(plain), xfree(x);
             }
             strings_free(&names);
@@ -577,6 +579,23 @@ static void scan_autoplay(Scan *sc) {
     strings_free(&mine);
 }
 
+// Pacote esparso: o manifesto (AppxManifest.xml na pasta do pacote) permite conteúdo externo,
+// ou seja, os arquivos são os do programa comum, fora de WindowsApps.
+static bool appx_sparse(const WCHAR *dir) {
+    WCHAR *m = path_join(dir, u"AppxManifest.xml");
+    uint8_t *d = NULL;
+    size_t n = 0;
+    bool r = false;
+    if (file_size(m) < 4u * 1024 * 1024 && file_read_all(m, &d, &n)) {
+        static const char NEEDLE[] = "AllowExternalContent>true<";
+        size_t ln = sizeof(NEEDLE) - 1;
+        for (size_t i = 0; !r && i + ln <= n; i++) r = mem_cmp(d + i, NEEDLE, ln) == 0;
+        xfree(d);
+    }
+    xfree(m);
+    return r;
+}
+
 // Pacotes do Windows registrados pelo programa. O caso típico é o pacote "esparso" que um
 // programa comum registra para aparecer no menu de contexto do Windows 11 (o Notepad++ faz
 // isso): o desinstalador às vezes não o remove, e as chaves dele ficam espalhadas por áreas do
@@ -599,7 +618,7 @@ static void scan_appx(Scan *sc) {
             // só pelo nome: desmarcado se for um aplicativo da Loja de verdade (arquivos em
             // WindowsApps); marcado se a pasta já não existe (registro órfão) ou está fora dali
             // (pacote esparso, cujos arquivos são os do próprio programa)
-            bool store = path && wifind(path, u"\\WindowsApps\\") && dir_exists(path);
+            bool store = path && wifind(path, u"\\WindowsApps\\") && dir_exists(path) && !appx_sparse(path);
             conf = store ? CONF_MEDIUM : CONF_HIGH;
         }
         if (conf) left_add(sc->out, LK_APPX, full, NULL, conf, LR_PACKAGE, path);

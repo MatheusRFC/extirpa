@@ -1070,6 +1070,9 @@ static void test_real_cases(void) {
     WCHAR *ua_np = rot13w(u"{F38BF404-1D43-42F2-9305-67DE0B28FC23}\\notepad.exe");
     fake_dword(USERASSIST, ua_vlc, 1);
     fake_dword(USERASSIST, ua_np, 1);
+    WCHAR *ua_appid = rot13w(u"VLC.Player.AppID"), *ua_other = rot13w(u"Microsoft.Windows.Explorer");
+    fake_dword(USERASSIST, ua_appid, 1);
+    fake_dword(USERASSIST, ua_other, 1);
     fake_str(JUMPLIST, u"{6D809377-6AF0-444B-8957-A3773F02200E}\\VideoLAN\\VLC\\vlc.exe", u"x");
     fake_str(JUMPLIST, u"Microsoft.Windows.Explorer", u"x");
     v = programs_load();
@@ -1102,6 +1105,9 @@ static void test_real_cases(void) {
         CHECK(it && it->checked);
         it = find_item(&l, LK_VALUE, USERASSIST, ua_vlc);
         CHECK(it && it->checked);
+        it = find_item(&l, LK_VALUE, USERASSIST, ua_appid);
+        CHECK(it && it->checked);
+        CHECK(!find_item(&l, LK_VALUE, USERASSIST, ua_other));
         it = find_item(&l, LK_VALUE, JUMPLIST, u"{6D809377-6AF0-444B-8957-A3773F02200E}\\VideoLAN\\VLC\\vlc.exe");
         CHECK(it && it->checked);
         CHECK(!any_path_contains(&l, u"MSPlayDVD") && !find_item(&l, LK_VALUE, FILEEXTS u"\\.mp3\\OpenWithProgids", u"WMP11.AssocFile.MP3"));
@@ -1124,7 +1130,7 @@ static void test_real_cases(void) {
         xfree(key);
     }
     programs_free(&v);
-    xfree(ua_vlc), xfree(ua_np);
+    xfree(ua_vlc), xfree(ua_np), xfree(ua_appid), xfree(ua_other);
 
     // Notepad++: o atalho do Bloco de Notas do Windows ("Notepad.lnk", sem destino) não é dele
     base_system();
@@ -1145,11 +1151,15 @@ static void test_real_cases(void) {
     }
     fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\Notepad++\\config.xml", "x", 1);
     // pacote esparso do menu de contexto do Windows 11, que o desinstalador do Notepad++ deixou
-    fake_str(APPX_PACKAGES_KEY u"\\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww", u"Path", u"C:\\ProgramData\\Packages\\NotepadPlusPlus_2247w0b46hfww");
-    fake_dir(u"C:\\ProgramData\\Packages\\NotepadPlusPlus_2247w0b46hfww");
+    fake_str(APPX_PACKAGES_KEY u"\\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww", u"Path",
+             u"C:\\Program Files\\WindowsApps\\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww");
+    {
+        static const char MANIFEST[] = "<Package><Properties><uap10:AllowExternalContent>true</uap10:AllowExternalContent></Properties></Package>";
+        fake_file(u"C:\\Program Files\\WindowsApps\\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww\\AppxManifest.xml", MANIFEST, sizeof(MANIFEST) - 1);
+    }
     // aplicativo da Loja com o mesmo nome: desmarcado
     fake_str(APPX_PACKAGES_KEY u"\\NotepadPlusPlus_9.0.0.0_x64__abcdefghjkmnp", u"Path", u"C:\\Program Files\\WindowsApps\\NotepadPlusPlus_9.0.0.0_x64__abcdefghjkmnp");
-    fake_dir(u"C:\\Program Files\\WindowsApps\\NotepadPlusPlus_9.0.0.0_x64__abcdefghjkmnp");
+    fake_file(u"C:\\Program Files\\WindowsApps\\NotepadPlusPlus_9.0.0.0_x64__abcdefghjkmnp\\AppxManifest.xml", "<Package></Package>", 19);
     fake_str(APPX_PACKAGES_KEY u"\\Microsoft.WindowsNotepad_11.2507.26.0_x64__8wekyb3d8bbwe", u"Path",
              u"C:\\Program Files\\WindowsApps\\Microsoft.WindowsNotepad_11.2507.26.0_x64__8wekyb3d8bbwe");
     v = programs_load();
