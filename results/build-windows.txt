@@ -1,0 +1,3 @@
+274 verificações, 0 falhas
+build\extirpa.exe: 239104 bytes
+build\extirpa-selftest.exe: 262656 bytes
