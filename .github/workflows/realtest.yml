@@ -14,24 +14,35 @@ jobs:
       - name: Environment
         shell: pwsh
         run: |
-          Get-Command clang, lld-link, llvm-rc, llvm-dlltool, llvm-lib -ErrorAction SilentlyContinue | Format-Table Name, Source
-          [Environment]::OSVersion
-          whoami /groups | Select-String "High Mandatory"
+          New-Item -ItemType Directory -Force results | Out-Null
+          & { Get-Command clang, lld-link, llvm-rc, llvm-dlltool, llvm-lib, python -ErrorAction SilentlyContinue | Format-Table Name, Source -AutoSize | Out-String -Width 300
+              [Environment]::OSVersion | Out-String
+              whoami /groups | Select-String "Mandatory" | Out-String
+              "elevated: " + ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+              Get-Process -Id $PID | Select-Object SessionId | Out-String
+          } *>&1 | Tee-Object -FilePath results\steps.txt -Append
+      - name: Build from source on Windows
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          python tools/build.py all *>&1 | Tee-Object -FilePath results\build-windows.txt
       - name: General self-test
         shell: pwsh
+        continue-on-error: true
         run: |
-          $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--selftest' -Wait -PassThru
-          "exit: $($p.ExitCode)"
+          try { $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--selftest' -Wait -PassThru; "selftest exit: $($p.ExitCode)" }
+          catch { "selftest start error: $_" } *>&1 | Tee-Object -FilePath results\steps.txt -Append
       - name: Snapshot before installing
         shell: pwsh
+        continue-on-error: true
         run: |
-          $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--snapshot-save','C:\snap.bin' -Wait -PassThru
-          "exit: $($p.ExitCode)"
-          Get-Content "$env:LOCALAPPDATA\EXTIRPA\selftest\snapshot.txt"
+          try { $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--snapshot-save','C:\snap.bin' -Wait -PassThru; "snapshot exit: $($p.ExitCode)" }
+          catch { "snapshot error: $_" } *>&1 | Tee-Object -FilePath results\steps.txt -Append
       - name: Install real programs
         shell: pwsh
+        continue-on-error: true
         run: |
-          choco install notepadplusplus vlc putty keepass filezilla winscp -y --no-progress | Select-Object -Last 30
+          choco install notepadplusplus vlc putty keepass filezilla winscp -y --no-progress *>&1 | Select-Object -Last 40 | Tee-Object -FilePath results\steps.txt -Append
       - name: Use each program once (creates user data)
         shell: pwsh
         continue-on-error: true
@@ -51,14 +62,14 @@ jobs:
           Start-Sleep 3
       - name: Uninstall with EXTIRPA and measure what is left
         shell: pwsh
+        continue-on-error: true
         run: |
-          $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--realtest','C:\snap.bin','Notepad++','VLC media player','PuTTY','KeePass','FileZilla','WinSCP' -Wait -PassThru
-          "exit: $($p.ExitCode)"
+          try { $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--realtest','C:\snap.bin','Notepad++','VLC media player','PuTTY','KeePass','FileZilla','WinSCP' -Wait -PassThru; "realtest exit: $($p.ExitCode)" }
+          catch { "realtest error: $_" } *>&1 | Tee-Object -FilePath results\steps.txt -Append
       - name: Collect results
         if: always()
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force results | Out-Null
           Copy-Item -Recurse -Force "$env:LOCALAPPDATA\EXTIRPA\selftest\*" results\ -ErrorAction SilentlyContinue
           Copy-Item -Force "$env:LOCALAPPDATA\EXTIRPA\extirpa.log" results\ -ErrorAction SilentlyContinue
           Get-ChildItem "$env:LOCALAPPDATA\EXTIRPA\Backups" -ErrorAction SilentlyContinue | Select-Object Name, Length | Out-File results\backups.txt
