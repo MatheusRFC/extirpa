@@ -1,0 +1,53 @@
+programa: GridCraft (Learning Machines LLC), entrada HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{923A99B5-32DE-4270-ABCE-026019B0C12F}, identidade em 3140 ms
+  pasta: C:\Program Files\GridCraft
+  nome exato: gridcraft
+
+==== moderado ====
+  22 itens em 625 ms
+    [valor conf=3 x] HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache -> C:\Program Files\GridCraft\gridcraft.exe.ApplicationCompany
+    [valor conf=3 x] HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache -> C:\Program Files\GridCraft\gridcraft.exe.FriendlyAppName
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\TevqPensg\tevqpensg.rkr  (C:\Program Files\GridCraft\gridcraft.exe)
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{F4E57C4B-2036-45F0-A9AB-443BCFE33D9F}\Count -> {0139Q44R-6NSR-49S2-8690-3QNSPNR6SSO8}\TevqPensg.yax  (C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GridCraft.lnk)
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 64  (C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GridCraft.lnk|C:\Program Files\GridCraft\gridcraft.exe)
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.csv\OpenWithProgids -> GridCraft.TextData
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.ods\OpenWithProgids -> GridCraft.Workbook
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.tsv\OpenWithProgids -> GridCraft.TextData
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.xlsb\OpenWithProgids -> GridCraft.Workbook
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.xlsm\OpenWithProgids -> GridCraft.Workbook
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.xlsx\OpenWithProgids -> GridCraft.Workbook
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\GridCraft.TextData  ("C:\Program Files\GridCraft\gridcraft.exe",0)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\GridCraft.Workbook  ("C:\Program Files\GridCraft\gridcraft.exe",0)
+    [chave conf=3 x] HKLM\SOFTWARE\GridCraft
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\gridcraft.exe  (C:\Program Files\GridCraft\gridcraft.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{923A99B5-32DE-4270-ABCE-026019B0C12F}
+    [valor conf=3 x] HKLM\SOFTWARE\RegisteredApplications -> GridCraft  (Software\GridCraft\Capabilities)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\gridcraft.exe  (C:\Program Files\GridCraft\gridcraft.exe)
+    [valor conf=3 x] HKLM\SOFTWARE\WOW6432Node\RegisteredApplications -> GridCraft  (Software\GridCraft\Capabilities)
+    [pasta conf=3 x] C:\Program Files\GridCraft
+    [arquivo conf=3 x] C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GridCraft.lnk  (C:\Program Files\GridCraft\)
+    [pasta conf=3 x] C:\Users\runneradmin\AppData\Roaming\GridCraft
+
+==== avançado ====
+  22 itens em 500 ms
+    [valor conf=3 x] HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache -> C:\Program Files\GridCraft\gridcraft.exe.ApplicationCompany
+    [valor conf=3 x] HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache -> C:\Program Files\GridCraft\gridcraft.exe.FriendlyAppName
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\TevqPensg\tevqpensg.rkr  (C:\Program Files\GridCraft\gridcraft.exe)
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{F4E57C4B-2036-45F0-A9AB-443BCFE33D9F}\Count -> {0139Q44R-6NSR-49S2-8690-3QNSPNR6SSO8}\TevqPensg.yax  (C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GridCraft.lnk)
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 64  (C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GridCraft.lnk|C:\Program Files\GridCraft\gridcraft.exe)
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.csv\OpenWithProgids -> GridCraft.TextData
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.ods\OpenWithProgids -> GridCraft.Workbook
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.tsv\OpenWithProgids -> GridCraft.TextData
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.xlsb\OpenWithProgids -> GridCraft.Workbook
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.xlsm\OpenWithProgids -> GridCraft.Workbook
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.xlsx\OpenWithProgids -> GridCraft.Workbook
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\GridCraft.TextData  ("C:\Program Files\GridCraft\gridcraft.exe",0)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\GridCraft.Workbook  ("C:\Program Files\GridCraft\gridcraft.exe",0)
+    [chave conf=3 x] HKLM\SOFTWARE\GridCraft
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\gridcraft.exe  (C:\Program Files\GridCraft\gridcraft.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{923A99B5-32DE-4270-ABCE-026019B0C12F}
+    [valor conf=3 x] HKLM\SOFTWARE\RegisteredApplications -> GridCraft  (Software\GridCraft\Capabilities)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\gridcraft.exe  (C:\Program Files\GridCraft\gridcraft.exe)
+    [valor conf=3 x] HKLM\SOFTWARE\WOW6432Node\RegisteredApplications -> GridCraft  (Software\GridCraft\Capabilities)
+    [pasta conf=3 x] C:\Program Files\GridCraft
+    [arquivo conf=3 x] C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GridCraft.lnk  (C:\Program Files\GridCraft\)
+    [pasta conf=3 x] C:\Users\runneradmin\AppData\Roaming\GridCraft
