@@ -630,7 +630,7 @@ static int realtest(int argc, WCHAR **argv) {
             programs_free(&progs);
             continue;
         }
-        Identity *id = program_identity(p);
+        Identity *id = program_identity_target(p);
         Tested *t = xalloc(sizeof(Tested));
         t->name = wdup(p->name);
         t->id = id;
@@ -786,7 +786,7 @@ static int scan_only(const WCHAR *wanted) {
         return 1;
     }
     ULONGLONG t0 = GetTickCount64();
-    Identity *id = program_identity(p);
+    Identity *id = program_identity_target(p);
     linef(wfmt(u"programa: %s (%s), entrada %s, identidade em %U ms", p->name, p->publisher ? p->publisher : u"-", p->key_path,
                (uint64_t)(GetTickCount64() - t0)));
     for (size_t i = 0; i < id->dirs.n; i++) linef(wfmt(u"  pasta: %s", id->dirs.items[i]));

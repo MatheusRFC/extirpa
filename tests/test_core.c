@@ -407,6 +407,13 @@ static void test_cmdline(void) {
     CHECK(guid_valid(u"{23170F69-40C1-2702-2301-000001000000}"));
     CHECK(!guid_valid(u"{23170F69-40C1-2702-2301-00000100000}"));
     CHECK(!guid_valid(u"{23170F69x40C1-2702-2301-000001000000}"));
+    {
+        // código compactado do Windows Installer (conferido no Registro de um Windows com o GridCraft 0.9.0)
+        WCHAR packed[33];
+        CHECK(guid_pack(u"{923A99B5-32DE-4270-ABCE-026019B0C12F}", packed) && weq(packed, u"5B99A329ED230724BAEC2006910B1CF2"));
+        CHECK(guid_pack(u"{923a99b5-32de-4270-abce-026019b0c12f}", packed) && weq(packed, u"5B99A329ED230724BAEC2006910B1CF2"));
+        CHECK(!guid_pack(u"Mozilla Firefox", packed) && !guid_pack(u"{923A99B5-32DE-4270-ABCE-026019B0C12}", packed));
+    }
 
     WCHAR g[39];
     CHECK(cmd_split(u"MsiExec.exe /I{23170F69-40C1-2702-2301-000001000000}", &c));

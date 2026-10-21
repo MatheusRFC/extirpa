@@ -36,6 +36,8 @@ static const char *const KEYS[] = {
     "%S\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers\\Handlers",
     "%S\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers\\EventHandlers",
     "%S\\Microsoft\\Windows\\CurrentVersion\\RunNotification",
+    "%S\\Microsoft\\Windows\\CurrentVersion\\UFH",
+    "%S\\Microsoft\\Windows\\CurrentVersion\\UFH\\SHC",
     "%S\\Microsoft\\Windows\\CurrentVersion\\Search",
     "%S\\Microsoft\\Windows\\CurrentVersion\\Search\\JumplistData",
     "%S\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions",

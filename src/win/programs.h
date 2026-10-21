@@ -19,14 +19,24 @@ typedef struct {
     bool msi;          // registrado pelo Windows Installer
     bool no_remove;    // NoRemove=1: o próprio programa pede para não ser desinstalado
     int icon;          // índice na lista de ícones; -1 = ainda não carregado
+    PtrVec msi_files;  // WCHAR*: arquivos-chave dos componentes do Windows Installer só deste produto
+    bool msi_loaded;   // programs_load_msi já passou por ele
 } Program;
 
 PtrVec programs_load(void);  // Program*, ordenados por nome
 void program_free(Program *p);
 void programs_free(PtrVec *v);
 
+// Arquivos de cada programa MSI da lista, lidos dos componentes do Windows Installer
+// (UserData\<SID>\Components). É o que diz onde um MSI instalou os arquivos quando ele não
+// grava InstallLocation. Uma passada só pelo Registro para todos os programas da lista.
+void programs_load_msi(PtrVec *programs);
 // Identidade para a busca de sobras: nome, editor e as pastas do programa.
 Identity *program_identity(const Program *p);
+// A identidade do programa que vai ser desinstalado: a de cima e, se ela não souber nenhuma
+// pasta, as pistas do App Paths e dos atalhos do menu Iniciar com o nome exato do programa.
+// Precisa ser montada antes de desinstalar.
+Identity *program_identity_target(Program *p);
 // Acrescenta o nome curto 8.3 de cada pasta da identidade (precisa que a pasta exista).
 void identity_add_short_names(Identity *id);
 // O programa a que pertence um executável (pela pasta de instalação), ou NULL.

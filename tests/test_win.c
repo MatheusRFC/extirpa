@@ -1208,6 +1208,267 @@ static void test_real_cases(void) {
     programs_free(&v);
 }
 
+
+// ---------------------------------------------------------------- GridCraft (MSI sem InstallLocation)
+// Caso real (GridCraft 0.9.0, instalador MSI): a entrada de desinstalação não tem
+// InstallLocation, nem ícone, e o desinstalador é o msiexec. A pasta do programa só aparece
+// nos componentes do Windows Installer, no App Paths e nos atalhos.
+
+#define GC_CODE u"{923A99B5-32DE-4270-ABCE-026019B0C12F}"
+#define GC_PACKED u"5B99A329ED230724BAEC2006910B1CF2"
+#define OTHER_CODE u"{11111111-2222-3333-4444-555555555555}"
+#define OTHER_PACKED u"11111111222233334444555555555555"
+#define MSI_COMP u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UserData\\S-1-5-18\\Components\\"
+#define GC_EXE u"C:\\Program Files\\GridCraft\\gridcraft.exe"
+#define GC_LNK u"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\GridCraft.lnk"
+#define APP_PATHS u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\"
+#define COMPAT_STORE u"HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Compatibility Assistant\\Store"
+#define UFH_SHC u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\UFH\\SHC"
+
+static void gridcraft_installed(bool msi_components) {
+    const WCHAR *k = UNINST GC_CODE;
+    fake_str(k, u"DisplayName", u"GridCraft");
+    fake_str(k, u"DisplayVersion", u"0.9.0");
+    fake_str(k, u"Publisher", u"Learning Machines LLC");
+    fake_str(k, u"InstallLocation", u"");
+    fake_str(k, u"UninstallString", u"MsiExec.exe /I" GC_CODE);
+    fake_dword(k, u"WindowsInstaller", 1);
+    const WCHAR *o = UNINST OTHER_CODE;  // outro produto MSI, de outro editor
+    fake_str(o, u"DisplayName", u"Planilha Antiga");
+    fake_str(o, u"Publisher", u"Outra Empresa");
+    fake_str(o, u"UninstallString", u"MsiExec.exe /X" OTHER_CODE);
+    fake_dword(o, u"WindowsInstaller", 1);
+    if (msi_components) {
+        fake_str(MSI_COMP u"6B4D705011111111111111111111111A", GC_PACKED, GC_EXE);
+        fake_str(MSI_COMP u"55136EFD11111111111111111111111B", GC_PACKED, u"C:\\Program Files\\GridCraft\\gridcraft-cli.exe");
+        fake_str(MSI_COMP u"55136EFD11111111111111111111111C", GC_PACKED, u"22:\\Software\\GridCraft\\Installer\\DesktopShortcut");
+        fake_str(MSI_COMP u"55136EFD11111111111111111111111D", GC_PACKED, u"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\");
+        // componente compartilhado com o outro produto: não diz onde fica o GridCraft
+        fake_str(MSI_COMP u"AAAAAAAA11111111111111111111111E", GC_PACKED, u"C:\\Program Files\\Common Files\\Shared Grid\\grid.dll");
+        fake_str(MSI_COMP u"AAAAAAAA11111111111111111111111E", OTHER_PACKED, u"C:\\Program Files\\Common Files\\Shared Grid\\grid.dll");
+        fake_str(MSI_COMP u"BBBBBBBB11111111111111111111111F", OTHER_PACKED, u"C:\\Program Files\\Planilha Antiga\\planilha.exe");
+    }
+    fake_file(GC_EXE, "MZ", 2);
+    fake_file(u"C:\\Program Files\\GridCraft\\gridcraft-cli.exe", "MZ", 2);
+    fake_file(u"C:\\Program Files\\Common Files\\Shared Grid\\grid.dll", "MZ", 2);
+    fake_file(u"C:\\Program Files\\Planilha Antiga\\planilha.exe", "MZ", 2);
+    fake_str(APP_PATHS u"gridcraft.exe", u"", u"\"" GC_EXE u"\"");
+    fake_str(u"HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\App Paths\\gridcraft.exe", u"", GC_EXE);
+    fake_str(u"HKLM\\SOFTWARE\\GridCraft\\Capabilities\\FileAssociations", u".xlsx", u"GridCraft.Workbook");
+    fake_dword(u"HKLM\\SOFTWARE\\GridCraft\\Installer", u"DesktopShortcut", 1);
+    fake_str(u"HKLM\\SOFTWARE\\RegisteredApplications", u"GridCraft", u"Software\\GridCraft\\Capabilities");
+    fake_str(u"HKLM\\SOFTWARE\\WOW6432Node\\RegisteredApplications", u"GridCraft", u"Software\\GridCraft\\Capabilities");
+    fake_str(u"HKLM\\SOFTWARE\\RegisteredApplications", u"Planilha Antiga", u"Software\\Outra Empresa\\Capabilities");
+    fake_key(u"HKLM\\SOFTWARE\\Outra Empresa\\Capabilities");
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\GridCraft.Workbook\\DefaultIcon", u"", GC_EXE u",1");
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\GridCraft.Workbook\\shell\\open\\command", u"", u"\"" GC_EXE u"\" \"%1\"");
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\GridCraft.TextData\\shell\\open\\command", u"", u"\"" GC_EXE u"\" \"%1\"");
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\Excel.Sheet.12\\shell\\open\\command", u"", u"\"C:\\Program Files\\Microsoft Office\\EXCEL.EXE\" \"%1\"");
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\.xlsx\\OpenWithProgids", u"GridCraft.Workbook", u"");
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\.xlsx\\OpenWithProgids", u"Excel.Sheet.12", u"");
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\.csv\\OpenWithProgids", u"GridCraft.TextData", u"");
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\.csv", u"", u"Excel.CSV");
+    make_lnk(GC_LNK, GC_EXE);
+    make_lnk(u"C:\\Users\\Public\\Desktop\\GridCraft.lnk", GC_EXE);
+    static const WCHAR shc[] = u"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\GridCraft.lnk\0" GC_EXE u"\0";
+    fake_val(UFH_SHC, u"12", REG_MULTI_SZ, shc, sizeof(shc));
+    static const WCHAR shc2[] = u"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Planilha Antiga.lnk\0C:\\Program Files\\Planilha Antiga\\planilha.exe\0";
+    fake_val(UFH_SHC, u"13", REG_MULTI_SZ, shc2, sizeof(shc2));
+    uint8_t blob[8] = {1};
+    fake_val(COMPAT_STORE, GC_EXE, REG_BINARY, blob, 8);
+    fake_val(COMPAT_STORE, u"C:\\Windows\\notepad.exe", REG_BINARY, blob, 8);
+    fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\GridCraft\\settings.json", "{}", 2);
+    // UserAssist (ROT13): o executável pela pasta conhecida e o atalho do menu Iniciar
+    WCHAR *ua = rot13w(u"{6D809377-6AF0-444B-8957-A3773F02200E}\\GridCraft\\gridcraft.exe");
+    WCHAR *ua_lnk = rot13w(u"{0139D44E-6AFE-49F2-8690-3DAFCAE6FFB8}\\GridCraft.lnk");
+    WCHAR *ua_np = rot13w(u"{0139D44E-6AFE-49F2-8690-3DAFCAE6FFB8}\\Planilha Antiga.lnk");
+    fake_dword(USERASSIST, ua, 1);
+    fake_dword(USERASSIST, ua_lnk, 1);
+    fake_dword(USERASSIST, ua_np, 1);
+    xfree(ua), xfree(ua_lnk), xfree(ua_np);
+    // o que é do Windows e fica: Prefetch e o cache do Windows Installer
+    fake_file(u"C:\\Windows\\Prefetch\\GRIDCRAFT.EXE-91B6E9E7.pf", "x", 1);
+    fake_file(u"C:\\Windows\\Installer\\10d3e05.msi", "x", 1);
+}
+
+// Nada do outro produto, dos componentes compartilhados, do Excel nem do Windows.
+static void gridcraft_not_others(LeftList *l) {
+    CHECK(!any_path_contains(l, u"Planilha Antiga") && !any_path_contains(l, u"Outra Empresa"));
+    CHECK(!any_path_contains(l, u"Shared Grid") && !any_path_contains(l, u"Common Files"));
+    CHECK(!any_path_contains(l, u"Excel") && !any_path_contains(l, u"notepad"));
+    CHECK(!any_path_contains(l, u"\\Installer\\UserData") && !any_path_contains(l, u"C:\\Windows"));
+    CHECK(!find_item(l, LK_KEY, u"HKLM\\SOFTWARE\\Classes\\.xlsx", NULL) && !find_item(l, LK_KEY, u"HKLM\\SOFTWARE\\Classes\\.csv", NULL));
+    CHECK(!find_item(l, LK_VALUE, u"HKLM\\SOFTWARE\\Classes\\.csv", u""));
+    CHECK(!find_item(l, LK_KEY, UFH_SHC, NULL) && !find_item(l, LK_VALUE, UFH_SHC, u"13"));
+}
+
+static void checked_item(LeftList *l, LeftKind kind, const WCHAR *path, const WCHAR *value, int line);
+
+// UserAssist do GridCraft: o executável e o atalho dele; nunca o da planilha antiga
+static void gridcraft_user_assist(LeftList *l, bool lnk_too) {
+    WCHAR *ua = rot13w(u"{6D809377-6AF0-444B-8957-A3773F02200E}\\GridCraft\\gridcraft.exe");
+    WCHAR *ua_lnk = rot13w(u"{0139D44E-6AFE-49F2-8690-3DAFCAE6FFB8}\\GridCraft.lnk");
+    WCHAR *ua_np = rot13w(u"{0139D44E-6AFE-49F2-8690-3DAFCAE6FFB8}\\Planilha Antiga.lnk");
+    checked_item(l, LK_VALUE, USERASSIST, ua, __LINE__);
+    if (lnk_too) checked_item(l, LK_VALUE, USERASSIST, ua_lnk, __LINE__);
+    CHECK(!find_item(l, LK_VALUE, USERASSIST, ua_np));
+    xfree(ua), xfree(ua_lnk), xfree(ua_np);
+}
+
+static void checked_item(LeftList *l, LeftKind kind, const WCHAR *path, const WCHAR *value, int line) {
+    Leftover *it = find_item(l, kind, path, value);
+    g_checks++;
+    if (!it || !it->checked) {
+        char *a = u8(path), *b = u8(value ? value : u"");
+        g_fail++;
+        fprintf(stderr, "%s:%d: faltou (marcado): %s %s\n", __FILE__, line, a, b);
+        xfree(a), xfree(b);
+    }
+}
+#define CHECKED(kind, path, value) checked_item(&l, kind, path, value, __LINE__)
+
+static void test_gridcraft_msi(void) {
+    // 1) desinstalação forçada com o programa ainda lá: a identidade vem dos componentes MSI
+    base_system();
+    gridcraft_installed(true);
+    PtrVec v = programs_load();
+    Program *p = find_program(&v, u"GridCraft");
+    CHECK(p != NULL);
+    if (p) {
+        Identity *plain = program_identity(p);
+        CHECK(plain->dirs.n == 0);  // sem os componentes não há pasta: era o defeito
+        identity_free(plain);
+        Identity *id = program_identity_target(p);
+        CHECK(p->msi_files.n == 2);  // só os dois arquivos que são só dele
+        CHECK(id->dirs.n >= 1 && weq(id->dirs.items[0], u"C:\\Program Files\\GridCraft"));
+        for (size_t i = 0; i < id->dirs.n; i++) CHECK(!wifind(id->dirs.items[i], u"Common Files") && !wifind(id->dirs.items[i], u"Planilha"));
+        LeftList l = {0};
+        scan_leftovers(&l, id, p->key_path, SCAN_MODERATE, NULL);
+        left_finalize(&l);
+        CHECKED(LK_DIR, u"C:\\Program Files\\GridCraft", NULL);
+        CHECKED(LK_DIR, u"C:\\Users\\ana\\AppData\\Roaming\\GridCraft", NULL);
+        CHECKED(LK_KEY, u"HKLM\\SOFTWARE\\GridCraft", NULL);
+        CHECKED(LK_KEY, APP_PATHS u"gridcraft.exe", NULL);
+        CHECKED(LK_KEY, u"HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\App Paths\\gridcraft.exe", NULL);
+        CHECKED(LK_KEY, u"HKLM\\SOFTWARE\\Classes\\GridCraft.Workbook", NULL);
+        CHECKED(LK_KEY, u"HKLM\\SOFTWARE\\Classes\\GridCraft.TextData", NULL);
+        CHECKED(LK_VALUE, u"HKLM\\SOFTWARE\\Classes\\.xlsx\\OpenWithProgids", u"GridCraft.Workbook");
+        CHECKED(LK_VALUE, u"HKLM\\SOFTWARE\\Classes\\.csv\\OpenWithProgids", u"GridCraft.TextData");
+        CHECKED(LK_VALUE, u"HKLM\\SOFTWARE\\RegisteredApplications", u"GridCraft");
+        CHECKED(LK_VALUE, u"HKLM\\SOFTWARE\\WOW6432Node\\RegisteredApplications", u"GridCraft");
+        CHECKED(LK_FILE, GC_LNK, NULL);
+        CHECKED(LK_FILE, u"C:\\Users\\Public\\Desktop\\GridCraft.lnk", NULL);
+        CHECKED(LK_VALUE, UFH_SHC, u"12");
+        CHECKED(LK_VALUE, COMPAT_STORE, GC_EXE);
+        gridcraft_user_assist(&l, true);
+        gridcraft_not_others(&l);
+        CHECK(!find_item(&l, LK_VALUE, u"HKLM\\SOFTWARE\\Classes\\.xlsx\\OpenWithProgids", u"Excel.Sheet.12"));
+        CHECK(!find_item(&l, LK_VALUE, u"HKLM\\SOFTWARE\\RegisteredApplications", u"Planilha Antiga"));
+        if (g_fail) dump(&l);
+        DelResult r;
+        delete_leftovers(&l, u"GridCraft", NULL, &r);
+        CHECK(r.failed == 0);
+        CHECK(!fake_exists(u"C:\\Program Files\\GridCraft") && !fake_key_exists(u"HKLM\\SOFTWARE\\Classes\\GridCraft.Workbook"));
+        CHECK(!fake_val_exists(UFH_SHC, u"12") && fake_val_exists(UFH_SHC, u"13") && fake_key_exists(UFH_SHC));
+        CHECK(fake_val_exists(u"HKLM\\SOFTWARE\\Classes\\.xlsx\\OpenWithProgids", u"Excel.Sheet.12"));
+        CHECK(fake_val_exists(COMPAT_STORE, u"C:\\Windows\\notepad.exe") && fake_val_exists(UFH_SHC, u"13"));
+        CHECK(fake_exists(u"C:\\Program Files\\Common Files\\Shared Grid\\grid.dll") && fake_exists(u"C:\\Program Files\\Planilha Antiga\\planilha.exe"));
+        CHECK(fake_exists(u"C:\\Windows\\Prefetch\\GRIDCRAFT.EXE-91B6E9E7.pf") && fake_exists(u"C:\\Windows\\Installer\\10d3e05.msi"));
+        CHECK(fake_key_exists(MSI_COMP u"AAAAAAAA11111111111111111111111E") && fake_key_exists(MSI_COMP u"6B4D705011111111111111111111111A"));
+        del_result_free(&r);
+        left_free(&l);
+        identity_free(id);
+    }
+    programs_free(&v);
+
+    // 2) sem os componentes (registro do Windows Installer de outro usuário ou já perdido):
+    // a pasta sai do App Paths, mesmo com o valor entre aspas
+    base_system();
+    gridcraft_installed(false);
+    v = programs_load();
+    p = find_program(&v, u"GridCraft");
+    if (p) {
+        Identity *id = program_identity_target(p);
+        CHECK(id->dirs.n >= 1 && weq(id->dirs.items[0], u"C:\\Program Files\\GridCraft"));
+        identity_free(id);
+        // e, sem App Paths, pelo atalho do menu Iniciar
+        reg_delete_key(APP_PATHS u"gridcraft.exe");
+        reg_delete_key(u"HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\App Paths\\gridcraft.exe");
+        id = program_identity_target(p);
+        CHECK(id->dirs.n >= 1 && weq(id->dirs.items[0], u"C:\\Program Files\\GridCraft"));
+        identity_free(id);
+    }
+    CHECK(p != NULL);
+    programs_free(&v);
+
+    // 3) o programa já não existe e nada diz onde ele ficava (desinstalação forçada de uma
+    // entrada órfã): os rastros que citam um gridcraft.exe que sumiu ainda são achados pelo nome
+    base_system();
+    gridcraft_installed(false);
+    reg_delete_key(APP_PATHS u"gridcraft.exe");
+    reg_delete_key(u"HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\App Paths\\gridcraft.exe");
+    DeleteFileW(GC_LNK);
+    DeleteFileW(u"C:\\Users\\Public\\Desktop\\GridCraft.lnk");
+    DeleteFileW(GC_EXE);
+    DeleteFileW(u"C:\\Program Files\\GridCraft\\gridcraft-cli.exe");
+    RemoveDirectoryW(u"C:\\Program Files\\GridCraft");
+    reg_delete_key(u"HKLM\\SOFTWARE\\GridCraft");
+    // a planilha antiga também se chama assim por dentro, mas o executável dela existe
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\Planilha.Antiga\\shell\\open\\command", u"", u"\"C:\\Program Files\\Planilha Antiga\\planilha.exe\" \"%1\"");
+    v = programs_load();
+    p = find_program(&v, u"GridCraft");
+    if (p) {
+        Identity *id = program_identity_target(p);
+        CHECK(id->dirs.n == 0);
+        LeftList l = {0};
+        scan_leftovers(&l, id, p->key_path, SCAN_MODERATE, NULL);
+        left_finalize(&l);
+        CHECKED(LK_DIR, u"C:\\Users\\ana\\AppData\\Roaming\\GridCraft", NULL);
+        CHECKED(LK_KEY, u"HKLM\\SOFTWARE\\Classes\\GridCraft.Workbook", NULL);
+        CHECKED(LK_KEY, u"HKLM\\SOFTWARE\\Classes\\GridCraft.TextData", NULL);
+        CHECKED(LK_VALUE, u"HKLM\\SOFTWARE\\Classes\\.xlsx\\OpenWithProgids", u"GridCraft.Workbook");
+        CHECKED(LK_VALUE, u"HKLM\\SOFTWARE\\Classes\\.csv\\OpenWithProgids", u"GridCraft.TextData");
+        CHECKED(LK_VALUE, u"HKLM\\SOFTWARE\\RegisteredApplications", u"GridCraft");
+        CHECKED(LK_VALUE, UFH_SHC, u"12");
+        CHECKED(LK_VALUE, COMPAT_STORE, GC_EXE);
+        gridcraft_user_assist(&l, true);
+        gridcraft_not_others(&l);
+        CHECK(!any_path_contains(&l, u"Planilha.Antiga"));
+        if (g_fail) dump(&l);
+        left_free(&l);
+        identity_free(id);
+    }
+    CHECK(p != NULL);
+    programs_free(&v);
+
+    // 4) o ProgID com o nome do programa, mas o executável dele existe e não é da pasta
+    // conhecida: só sugerido (desmarcado)
+    base_system();
+    gridcraft_installed(false);
+    reg_delete_key(APP_PATHS u"gridcraft.exe");
+    reg_delete_key(u"HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\App Paths\\gridcraft.exe");
+    DeleteFileW(GC_LNK);
+    DeleteFileW(u"C:\\Users\\Public\\Desktop\\GridCraft.lnk");
+    v = programs_load();
+    p = find_program(&v, u"GridCraft");
+    if (p) {
+        Identity *id = program_identity_target(p);
+        LeftList l = {0};
+        scan_leftovers(&l, id, p->key_path, SCAN_MODERATE, NULL);
+        left_finalize(&l);
+        Leftover *it = find_item(&l, LK_KEY, u"HKLM\\SOFTWARE\\Classes\\GridCraft.Workbook", NULL);
+        CHECK(it && it->conf == CONF_MEDIUM && !it->checked);
+        it = find_item(&l, LK_VALUE, u"HKLM\\SOFTWARE\\Classes\\.xlsx\\OpenWithProgids", u"GridCraft.Workbook");
+        CHECK(it && it->conf == CONF_MEDIUM && !it->checked);  // o ProgID fica: a referência também fica desmarcada
+        CHECK(!find_item(&l, LK_VALUE, UFH_SHC, u"12") && !find_item(&l, LK_VALUE, COMPAT_STORE, GC_EXE));  // exe existe: não
+        gridcraft_not_others(&l);
+        if (g_fail) dump(&l);
+        left_free(&l);
+        identity_free(id);
+    }
+    programs_free(&v);
+}
+
 int main(void) {
     test_programs_load();
     test_scan_safe();
@@ -1222,6 +1483,7 @@ int main(void) {
     test_full_cleanup();
     test_two_versions();
     test_real_cases();
+    test_gridcraft_msi();
     printf("%d verificações (Windows simulado), %d falhas\n", g_checks, g_fail);
     return g_fail ? 1 : 0;
 }

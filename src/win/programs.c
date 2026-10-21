@@ -2,6 +2,7 @@
 #include "programs.h"
 
 #include "../core/cmdline.h"
+#include "../core/lnk.h"
 #include "../core/pathx.h"
 #include "../core/protect.h"
 #include "platform.h"
@@ -19,7 +20,9 @@ static const struct {
 void program_free(Program *p) {
     if (!p) return;
     xfree(p->key_path), xfree(p->name), xfree(p->publisher), xfree(p->version), xfree(p->install_location);
-    xfree(p->uninstall), xfree(p->quiet_uninstall), xfree(p->display_icon), xfree(p);
+    xfree(p->uninstall), xfree(p->quiet_uninstall), xfree(p->display_icon);
+    strings_free(&p->msi_files);
+    xfree(p);
 }
 
 void programs_free(PtrVec *v) {
@@ -178,6 +181,171 @@ void identity_add_short_names(Identity *id) {
     }
 }
 
+// ---------------------------------------------------------------- Windows Installer
+
+#define MSI_USERDATA u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UserData"
+#define MSI_MAX_FILES 512
+
+typedef struct {
+    WCHAR code[33];
+    Program *p;
+} MsiWant;
+
+static int cmp_want(const void *a, const void *b, void *ctx) {
+    (void)ctx;
+    return wicmp(((const MsiWant *)a)->code, ((const MsiWant *)b)->code);
+}
+
+static MsiWant *find_want(const PtrVec *wants, const WCHAR *code) {
+    size_t lo = 0, hi = wants->n;
+    while (lo < hi) {
+        size_t mid = (lo + hi) / 2;
+        MsiWant *w = wants->items[mid];
+        int c = wicmp(code, w->code);
+        if (!c) return w;
+        if (c < 0) hi = mid;
+        else lo = mid + 1;
+    }
+    return NULL;
+}
+
+// Caminho de arquivo do valor de um componente ("C:\x\a.exe"; "C?\..." quando roda da origem).
+// Chaves do Registro ("02:\Software\...") e pastas não contam.
+static WCHAR *component_file(const WCHAR *v) {
+    if (!v || wlen(v) < 4) return NULL;
+    WCHAR c = v[0] | 32;
+    if (c < 'a' || c > 'z' || (v[1] != ':' && v[1] != '?') || v[2] != '\\') return NULL;
+    if (v[wlen(v) - 1] == '\\') return NULL;
+    WCHAR *w = wdup(v);
+    w[1] = ':';
+    WCHAR *n = path_norm(w);
+    xfree(w);
+    return n;
+}
+
+void programs_load_msi(PtrVec *programs) {
+    PtrVec wants = {0};
+    for (size_t i = 0; i < programs->n; i++) {
+        Program *p = programs->items[i];
+        if (p->msi_loaded) continue;
+        p->msi_loaded = true;
+        MsiWant *w = xalloc(sizeof(MsiWant));
+        if (p->key_path && guid_pack(path_leaf(p->key_path), w->code)) {
+            w->p = p;
+            pv_push(&wants, w);
+        } else {
+            xfree(w);
+        }
+    }
+    if (!wants.n) return;
+    pv_sort(&wants, cmp_want, NULL);
+    ULONGLONG t0 = GetTickCount64();
+    size_t comps = 0;
+    HKEY ud = reg_open(MSI_USERDATA, KEY_READ);
+    PtrVec sids = ud ? reg_subkeys(ud) : (PtrVec){0};
+    for (size_t s = 0; s < sids.n; s++) {
+        WCHAR *sub = path_join(sids.items[s], u"Components");
+        HKEY ck = reg_open_sub(ud, sub);
+        xfree(sub);
+        if (!ck) continue;
+        PtrVec list = reg_subkeys(ck);
+        for (size_t c = 0; c < list.n; c++) {
+            HKEY k = reg_open_sub(ck, list.items[c]);
+            if (!k) continue;
+            comps++;
+            PtrVec names = reg_value_names(k);
+            // só componentes deste produto e de mais nenhum: um componente compartilhado
+            // (runtime, pasta comum do editor) não diz onde fica o programa
+            size_t clients = 0;
+            MsiWant *hit = NULL;
+            for (size_t v = 0; v < names.n; v++) {
+                const WCHAR *nm = names.items[v];
+                if (wlen(nm) != 32 || wieq(nm, u"00000000000000000000000000000000")) continue;
+                clients++;
+                if (!hit) hit = find_want(&wants, nm);
+            }
+            if (hit && clients == 1 && hit->p->msi_files.n < MSI_MAX_FILES) {
+                WCHAR *val = reg_get_str(k, hit->code), *f = component_file(val);
+                if (f) pv_push(&hit->p->msi_files, f);
+                xfree(val);
+            }
+            strings_free(&names);
+            RegCloseKey(k);
+        }
+        strings_free(&list);
+        RegCloseKey(ck);
+    }
+    strings_free(&sids);
+    if (ud) RegCloseKey(ud);
+    log_fmt(u"Windows Installer: %u componentes lidos em %U ms para %u programa(s)", (unsigned)comps, (uint64_t)(GetTickCount64() - t0), (unsigned)wants.n);
+    for (size_t i = 0; i < wants.n; i++) xfree(wants.items[i]);
+    pv_free(&wants);
+}
+
+// Pasta comum mais funda de dois caminhos (NULL se não houver).
+static WCHAR *common_dir(const WCHAR *a, const WCHAR *b) {
+    size_t i = 0, last = 0;
+    while (a[i] && b[i] && wfold(a[i]) == wfold(b[i])) {
+        if (a[i] == '\\') last = i;
+        i++;
+    }
+    if ((!a[i] || a[i] == '\\') && (!b[i] || b[i] == '\\')) last = i;
+    return last >= 3 ? wdupn(a, last) : NULL;
+}
+
+// Pastas do programa pelos arquivos dos componentes MSI. Em Arquivos de Programas (e em
+// %LOCALAPPDATA%\Programs) vale a pasta comum mais funda dos arquivos dele; fora dali, só a
+// pasta de um arquivo com o nome do programa.
+static void add_msi_dirs(Identity *id, const PtrVec *files) {
+    WCHAR *user_programs = g_paths.local_appdata ? path_join(g_paths.local_appdata, u"Programs") : NULL;
+    const WCHAR *roots[] = {g_paths.program_files, g_paths.program_files_x86, user_programs};
+    for (size_t r = 0; r < COUNT(roots); r++) {
+        if (!roots[r]) continue;
+        WCHAR *lca = NULL;
+        for (size_t i = 0; i < files->n; i++) {
+            const WCHAR *f = files->items[i];
+            if (!path_is_under(f, roots[r])) continue;
+            WCHAR *parent = path_parent(f);
+            if (!lca) {
+                lca = parent;
+            } else {
+                WCHAR *c = common_dir(lca, parent);
+                xfree(lca), xfree(parent);
+                lca = c;
+                if (!lca) break;
+            }
+        }
+        // subpastas genéricas ("bin") sobem até a pasta do programa, nunca até a raiz
+        for (int up = 0; lca && up < 2 && path_is_under(lca, roots[r]); up++) {
+            WCHAR *parent = path_parent(lca), *ln = norm_alnum(path_leaf(lca));
+            bool generic = is_generic_word(ln) && parent && path_is_under(parent, roots[r]);
+            xfree(ln);
+            if (!generic) {
+                xfree(parent);
+                break;
+            }
+            xfree(lca);
+            lca = parent;
+        }
+        if (lca && path_is_under(lca, roots[r]) && !protect_dir_blocked(lca)) {
+            WCHAR *parent = path_parent(lca);
+            identity_add_dir(id, lca, parent && path_eq(parent, roots[r]));
+            xfree(parent);
+        }
+        xfree(lca);
+    }
+    for (size_t i = 0; i < files->n; i++) {
+        const WCHAR *f = files->items[i];
+        bool in_root = false;
+        for (size_t r = 0; r < COUNT(roots); r++) in_root = in_root || (roots[r] && path_is_under(f, roots[r]));
+        if (in_root) continue;
+        WCHAR *dir = path_parent(f);
+        if (dir && !protect_dir_blocked(dir) && match_name(id, path_leaf(dir)) >= CONF_MEDIUM) identity_add_dir(id, dir, false);
+        xfree(dir);
+    }
+    xfree(user_programs);
+}
+
 Identity *program_identity(const Program *p) {
     Identity *id = identity_new(p->name, p->publisher);
     identity_set_version(id, p->version);
@@ -203,7 +371,114 @@ Identity *program_identity(const Program *p) {
     if (icon && wiends(icon, u".exe")) add_exe_dir(id, icon);
     if (unins) add_exe_dir(id, unins);
     xfree(icon), xfree(unins);
+    if (p->msi_files.n) add_msi_dirs(id, &p->msi_files);
     identity_add_short_names(id);
+    return id;
+}
+
+// Executável apontado pelo atalho, se o atalho tiver o nome exato do programa.
+static WCHAR *lnk_target_named(const Identity *id, const WCHAR *path, const WCHAR *file_name) {
+    WCHAR *base = path_strip_ext(file_name);
+    bool named = match_name(id, base) == CONF_HIGH;
+    xfree(base);
+    if (!named || file_size(path) > (1u << 20)) return NULL;
+    uint8_t *data;
+    size_t len;
+    WCHAR *r = NULL;
+    if (file_read_all(path, &data, &len)) {
+        LnkInfo l;
+        if (lnk_parse(data, len, &l)) {
+            if (l.target && wiends(l.target, u".exe")) {
+                WCHAR *x = expand_env(l.target);
+                r = path_norm(x);
+                xfree(x);
+            }
+            lnk_free(&l);
+        }
+        xfree(data);
+    }
+    return r;
+}
+
+static void hint_shortcuts(Identity *id, const WCHAR *dir, int depth) {
+    if (!dir || depth > 2) return;
+    WCHAR *pat = path_join(dir, u"*");
+    WIN32_FIND_DATAW fd;
+    HANDLE h = FindFirstFileExW(pat, FindExInfoBasic, &fd, FindExSearchNameMatch, NULL, 0);
+    xfree(pat);
+    if (h == INVALID_HANDLE_VALUE) return;
+    PtrVec subdirs = {0};
+    do {
+        if (fd.cFileName[0] == '.') continue;
+        WCHAR *path = path_join(dir, fd.cFileName);
+        if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)) pv_push(&subdirs, wdup(path));
+        } else if (wiends(fd.cFileName, u".lnk")) {
+            WCHAR *t = lnk_target_named(id, path, fd.cFileName);
+            if (t) add_exe_dir(id, t);
+            xfree(t);
+        }
+        xfree(path);
+    } while (FindNextFileW(h, &fd));
+    FindClose(h);
+    for (size_t i = 0; i < subdirs.n; i++) hint_shortcuts(id, subdirs.items[i], depth + 1);
+    strings_free(&subdirs);
+}
+
+static void hint_app_paths(Identity *id) {
+    static const WCHAR *const ROOTS[] = {
+        u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths",
+        u"HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\App Paths",
+        u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\App Paths",
+    };
+    for (size_t r = 0; r < COUNT(ROOTS); r++) {
+        HKEY root = reg_open(ROOTS[r], KEY_READ);
+        if (!root) continue;
+        PtrVec subs = reg_subkeys(root);
+        for (size_t i = 0; i < subs.n; i++) {
+            const WCHAR *leaf = subs.items[i];
+            if (!wiends(leaf, u".exe")) continue;
+            WCHAR *base = path_strip_ext(leaf);
+            bool named = match_name(id, base) == CONF_HIGH;
+            xfree(base);
+            if (!named) continue;
+            HKEY k = reg_open_sub(root, leaf);
+            WCHAR *v = k ? reg_get_str(k, u"") : NULL;
+            if (k) RegCloseKey(k);
+            if (v) {
+                // o valor às vezes vem entre aspas
+                WCHAR *x = expand_env(v);
+                Cmd c;
+                if (cmd_split(x, &c)) {
+                    WCHAR *n = path_norm(c.exe);
+                    if (wiends(n, u".exe") && n[1] == ':') add_exe_dir(id, n);
+                    xfree(n);
+                    cmd_free(&c);
+                }
+                xfree(x);
+            }
+            xfree(v);
+        }
+        strings_free(&subs);
+        RegCloseKey(root);
+    }
+}
+
+Identity *program_identity_target(Program *p) {
+    PtrVec one = {0};
+    pv_push(&one, p);
+    programs_load_msi(&one);
+    pv_free(&one);
+    Identity *id = program_identity(p);
+    if (!id->dirs.n) {
+        // sem InstallLocation, sem ícone e com desinstalador fora da pasta (msiexec, cache do
+        // instalador): o App Paths e os atalhos com o nome do programa dizem onde ele está
+        hint_app_paths(id);
+        hint_shortcuts(id, g_paths.common_programs, 0);
+        hint_shortcuts(id, g_paths.programs, 0);
+        identity_add_short_names(id);
+        for (size_t i = 0; i < id->dirs.n; i++) log_fmt(u"  pasta deduzida pelo App Paths ou pelos atalhos: %s", id->dirs.items[i]);
+    }
     return id;
 }
 

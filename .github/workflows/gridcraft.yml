@@ -17,7 +17,7 @@ jobs:
         shell: powershell
         continue-on-error: true
         run: |
-          New-Item -ItemType Directory -Force results | Out-Null
+          New-Item -ItemType Directory -Force results-gc | Out-Null
           & {
             $i = New-Object -ComObject WindowsInstaller.Installer
             $db = $i.GetType().InvokeMember('OpenDatabase', 'InvokeMethod', $null, $i, @("$PWD\testdata\gridcraft.msi", 0))
@@ -32,20 +32,20 @@ jobs:
                 }
               } catch { "== $t (sem tabela)" }
             }
-          } *>&1 | Out-File -Encoding utf8 results\msi-tables.txt
+          } *>&1 | Out-File -Encoding utf8 results-gc\msi-tables.txt
       - name: Snapshot before installing
         shell: pwsh
         continue-on-error: true
         run: |
           & { $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--snapshot-save','C:\snap.bin' -PassThru
-              if (-not $p.WaitForExit(1200000)) { "SNAPSHOT TRAVADO"; $p | Stop-Process -Force } else { "snapshot exit: $($p.ExitCode)" } } *>&1 | Tee-Object -FilePath results\steps.txt -Append
+              if (-not $p.WaitForExit(1200000)) { "SNAPSHOT TRAVADO"; $p | Stop-Process -Force } else { "snapshot exit: $($p.ExitCode)" } } *>&1 | Tee-Object -FilePath results-gc\steps.txt -Append
       - name: Install GridCraft (MSI, sem interface)
         shell: pwsh
         continue-on-error: true
         run: |
           & { $p = Start-Process msiexec.exe -ArgumentList '/i', "`"$PWD\testdata\gridcraft.msi`"", '/qn', '/norestart', '/l*v', 'C:\gc-install.log' -Wait -PassThru
-              "msiexec install exit: $($p.ExitCode)" } *>&1 | Tee-Object -FilePath results\steps.txt -Append
-          Copy-Item C:\gc-install.log results\ -ErrorAction SilentlyContinue
+              "msiexec install exit: $($p.ExitCode)" } *>&1 | Tee-Object -FilePath results-gc\steps.txt -Append
+          Copy-Item C:\gc-install.log results-gc\ -ErrorAction SilentlyContinue
       - name: Use GridCraft (pelo atalho e pelo exe)
         shell: pwsh
         continue-on-error: true
@@ -58,43 +58,43 @@ jobs:
             $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
             $bmp = New-Object System.Drawing.Bitmap $b.Width, $b.Height
             [System.Drawing.Graphics]::FromImage($bmp).CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
-            $bmp.Save("$PWD\results\gridcraft-running.png")
+            $bmp.Save("$PWD\results-gc\gridcraft-running.png")
             Get-Process gridcraft -ErrorAction SilentlyContinue | ForEach-Object { $_.CloseMainWindow() | Out-Null }
             Start-Sleep 5
             Get-Process gridcraft -ErrorAction SilentlyContinue | Stop-Process -Force
             $exe = @("$env:ProgramFiles\GridCraft\gridcraft.exe", "$env:LOCALAPPDATA\Programs\GridCraft\gridcraft.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1
             if ($exe) { "exe: $exe"; Start-Process $exe; Start-Sleep 12; Get-Process gridcraft -ErrorAction SilentlyContinue | Stop-Process -Force }
             Start-Sleep 3
-          } *>&1 | Tee-Object -FilePath results\steps.txt -Append
+          } *>&1 | Tee-Object -FilePath results-gc\steps.txt -Append
       - name: Probe (installed)
         shell: pwsh
         continue-on-error: true
-        run: pwsh -File testdata\probe.ps1 -Label instalado *>&1 | Out-File -Encoding utf8 results\probe-installed.txt
+        run: pwsh -File testdata\probe.ps1 -Label instalado *>&1 | Out-File -Encoding utf8 results-gc\probe-installed.txt
       - name: EXTIRPA scan while installed (o que a desinstalação forçada veria)
         shell: pwsh
         continue-on-error: true
         run: |
           & { $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--scan','GridCraft' -PassThru
-              if (-not $p.WaitForExit(900000)) { "SCAN TRAVADO"; $p | Stop-Process -Force } else { "scan exit: $($p.ExitCode)" } } *>&1 | Tee-Object -FilePath results\steps.txt -Append
+              if (-not $p.WaitForExit(900000)) { "SCAN TRAVADO"; $p | Stop-Process -Force } else { "scan exit: $($p.ExitCode)" } } *>&1 | Tee-Object -FilePath results-gc\steps.txt -Append
       - name: Uninstall with EXTIRPA and measure what is left
         shell: pwsh
         continue-on-error: true
         run: |
           & { $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--realtest','C:\snap.bin','GridCraft' -PassThru
-              if (-not $p.WaitForExit(1800000)) { "REALTEST TRAVADO"; $p | Stop-Process -Force } else { "realtest exit: $($p.ExitCode)" } } *>&1 | Tee-Object -FilePath results\steps.txt -Append
+              if (-not $p.WaitForExit(1800000)) { "REALTEST TRAVADO"; $p | Stop-Process -Force } else { "realtest exit: $($p.ExitCode)" } } *>&1 | Tee-Object -FilePath results-gc\steps.txt -Append
       - name: Probe (after EXTIRPA)
         shell: pwsh
         continue-on-error: true
-        run: pwsh -File testdata\probe.ps1 -Label depois *>&1 | Out-File -Encoding utf8 results\probe-after.txt
+        run: pwsh -File testdata\probe.ps1 -Label depois *>&1 | Out-File -Encoding utf8 results-gc\probe-after.txt
       - name: Collect results
         if: always()
         shell: pwsh
         run: |
-          Copy-Item -Recurse -Force "$env:LOCALAPPDATA\EXTIRPA\selftest\*" results\ -ErrorAction SilentlyContinue
-          Copy-Item -Force "$env:LOCALAPPDATA\EXTIRPA\extirpa.log" results\ -ErrorAction SilentlyContinue
+          Copy-Item -Recurse -Force "$env:LOCALAPPDATA\EXTIRPA\selftest\*" results-gc\ -ErrorAction SilentlyContinue
+          Copy-Item -Force "$env:LOCALAPPDATA\EXTIRPA\extirpa.log" results-gc\ -ErrorAction SilentlyContinue
           git config user.name "extirpa-ci"
           git config user.email "extirpa-ci@users.noreply.github.com"
-          git add results
+          git add results-gc
           git commit -m "gridcraft results [skip ci]"
           git pull --rebase origin ci-teste-real
           git push origin HEAD:ci-teste-real

@@ -128,6 +128,48 @@ static bool value_exists(const WCHAR *key, const WCHAR *name) {
     return ok;
 }
 
+// O atalho é do programa (destino ou pasta de trabalho dentro da pasta dele)? Atalhos
+// "anunciados" do Windows Installer não têm destino, só a pasta de trabalho.
+static bool lnk_owned(const Scan *sc, const WCHAR *path) {
+    uint8_t *data;
+    size_t len;
+    bool r = false;
+    if (file_size(path) > (1u << 20) || !file_read_all(path, &data, &len)) return false;
+    LnkInfo l;
+    if (lnk_parse(data, len, &l)) {
+        WCHAR *target = l.target ? expand_env(l.target) : NULL, *wd = l.workdir ? expand_env(l.workdir) : NULL;
+        r = owns(sc, target) || (!target && owns(sc, wd));
+        xfree(target), xfree(wd);
+        lnk_free(&l);
+    }
+    xfree(data);
+    return r;
+}
+
+// O primeiro executável (ou, sem executável, o atalho) citado no texto tem o nome exato deste programa (e de
+// nenhum outro instalado) e não existe mais? É como os rastros de uso de um programa já
+// desinstalado aparecem quando o EXTIRPA não sabe a pasta dele. Um atalho que ainda existe
+// vale se for do programa.
+static bool exe_gone_named(const Scan *sc, const WCHAR *text) {
+    if (!text) return false;
+    // com executável no texto vale o executável; sem ele, o atalho
+    const WCHAR *e = wifind(text, u".exe");
+    if (!e) e = wifind(text, u".lnk");
+    if (!e) return false;
+    const WCHAR *start = text;
+    for (const WCHAR *p = text; p < e; p++)
+        if (*p == '|' || *p == '"') start = p + 1;
+    WCHAR *raw = wdupn(start, (size_t)(e + 4 - start)), *t = wtrim_dup(raw);
+    bool r = false;
+    if (wlen(t) > 7 && t[1] == ':' && t[2] == '\\') {
+        WCHAR *base = path_strip_ext(path_leaf(t));
+        if (name_is_ours(sc, base)) r = !file_exists(t) || (wiends(t, u".lnk") && lnk_owned(sc, t));
+        xfree(base);
+    }
+    xfree(raw), xfree(t);
+    return r;
+}
+
 // ---------------------------------------------------------------- outros programas instalados
 
 static const WCHAR *const UNINSTALL_ROOTS[] = {
@@ -148,6 +190,7 @@ static bool own_entry(const LeftList *l, const WCHAR *key) {
 static void load_others(Scan *sc, const WCHAR *own_key) {
     // programas visíveis: nome e pastas, como na lista principal
     PtrVec progs = programs_load();
+    programs_load_msi(&progs);
     for (size_t i = 0; i < progs.n; i++) {
         Program *p = progs.items[i];
         if ((own_key && path_eq(p->key_path, own_key)) || own_entry(sc->out, p->key_path)) continue;
@@ -372,7 +415,7 @@ static void scan_app_paths(Scan *sc) {
             HKEY k = reg_open_sub(root, subs.items[i]);
             if (!k) continue;
             WCHAR *def = value_text(k, u""), *path = value_text(k, u"Path");
-            if (owns(sc, def) || (!def && owns(sc, path))) {
+            if (owns(sc, def) || (!def && owns(sc, path)) || exe_gone_named(sc, def)) {
                 WCHAR *full = path_join(ROOTS[r], subs.items[i]);
                 left_add(sc->out, LK_KEY, full, NULL, CONF_HIGH, LR_APP_PATHS, def);
                 xfree(full);
@@ -425,6 +468,8 @@ static void scan_services(Scan *sc) {
     RegCloseKey(root);
 }
 
+#define UFH_SHC_KEY u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\UFH\\SHC"
+
 // Valores com o caminho de um executável no nome, onde o Windows guarda rastros de uso.
 static void scan_usage(Scan *sc) {
     static const WCHAR *const KEYS[] = {
@@ -438,10 +483,23 @@ static void scan_usage(Scan *sc) {
         if (!k) continue;
         PtrVec names = reg_value_names(k);
         for (size_t i = 0; i < names.n; i++)
-            if (owns(sc, names.items[i])) left_add(sc->out, LK_VALUE, KEYS[r], names.items[i], CONF_HIGH, LR_USAGE, NULL);
+            if (owns(sc, names.items[i]) || exe_gone_named(sc, names.items[i])) left_add(sc->out, LK_VALUE, KEYS[r], names.items[i], CONF_HIGH, LR_USAGE, NULL);
         strings_free(&names);
         RegCloseKey(k);
     }
+    // Atalhos usados pelo menu Iniciar (UFH\SHC): um valor por atalho, com o .lnk e o
+    // executável no conteúdo
+    HKEY k = reg_open(UFH_SHC_KEY, KEY_READ);
+    if (!k) return;
+    PtrVec vals = reg_values(k);
+    for (size_t i = 0; i < vals.n; i++) {
+        RegValue *v = vals.items[i];
+        WCHAR *t = regvalue_text(v);
+        if (t && (owns(sc, t) || exe_gone_named(sc, t))) left_add(sc->out, LK_VALUE, UFH_SHC_KEY, v->name, CONF_HIGH, LR_USAGE, t);
+        xfree(t);
+    }
+    reg_values_free(&vals);
+    RegCloseKey(k);
 }
 
 // Caminho gravado com uma pasta conhecida na frente ("{7C5A40EF-...}\WinSCP\WinSCP.exe", como
@@ -460,6 +518,10 @@ static WCHAR *expand_known_folder(const WCHAR *s) {
         {u"{3EB685DB-65F9-4CF6-A03A-E3EF65729F3D}", 5},  // FOLDERID_RoamingAppData
         {u"{62AB5D82-FDC1-4DC3-A9DD-070D1D495D97}", 6},  // FOLDERID_ProgramData
         {u"{5CD7AEE2-2219-4A67-B85D-6C9CE15660CB}", 7},  // FOLDERID_UserProgramFiles
+        {u"{0139D44E-6AFE-49F2-8690-3DAFCAE6FFB8}", 8},  // FOLDERID_CommonPrograms (atalhos do menu Iniciar)
+        {u"{A77F5D77-2E2B-44C3-A6A2-ABA601054A51}", 9},  // FOLDERID_Programs
+        {u"{B4BFCC3A-DB2C-424C-B029-7FE99A87C641}", 10}, // FOLDERID_Desktop
+        {u"{C4AA340D-F20F-4863-AFEF-F87EF2E6BA25}", 11}, // FOLDERID_PublicDesktop
     };
     const Paths *p = &g_paths;
     for (size_t i = 0; i < COUNT(KF); i++) {
@@ -475,6 +537,10 @@ static WCHAR *expand_known_folder(const WCHAR *s) {
         case 5: base = wdup(p->appdata); break;
         case 6: base = wdup(p->program_data); break;
         case 7: base = p->local_appdata ? path_join(p->local_appdata, u"Programs") : NULL; break;
+        case 8: base = wdup(p->common_programs); break;
+        case 9: base = wdup(p->programs); break;
+        case 10: base = wdup(p->desktop); break;
+        case 11: base = wdup(p->public_desktop); break;
         }
         if (!base) return wdup(s);
         WCHAR *r = s[lg] ? path_join(base, s + lg + 1) : wdup(base);
@@ -502,7 +568,7 @@ static void scan_usage_named(Scan *sc) {
         PtrVec names = reg_value_names(k);
         for (size_t i = 0; i < names.n; i++) {
             WCHAR *x = expand_known_folder(names.items[i]);
-            if (owns(sc, x) || (!wfindc(x, '\\') && progid_named(sc, x))) left_add(sc->out, LK_VALUE, JUMP, names.items[i], CONF_HIGH, LR_USAGE, x);
+            if (owns(sc, x) || exe_gone_named(sc, x) || (!wfindc(x, '\\') && progid_named(sc, x))) left_add(sc->out, LK_VALUE, JUMP, names.items[i], CONF_HIGH, LR_USAGE, x);
             xfree(x);
         }
         strings_free(&names);
@@ -520,7 +586,8 @@ static void scan_usage_named(Scan *sc) {
             for (size_t i = 0; i < names.n; i++) {
                 WCHAR *plain = rot13(names.items[i]), *x = expand_known_folder(plain);
                 // caminho de executável, ou ID de aplicativo ("FileZilla.Client.AppID")
-                if (owns(sc, x) || (!wfindc(plain, '\\') && progid_named(sc, plain))) left_add(sc->out, LK_VALUE, key, names.items[i], CONF_HIGH, LR_USAGE, x);
+                if (owns(sc, x) || exe_gone_named(sc, x) || (!wfindc(plain, '\\') && progid_named(sc, plain)))
+                    left_add(sc->out, LK_VALUE, key, names.items[i], CONF_HIGH, LR_USAGE, x);
                 xfree(plain), xfree(x);
             }
             strings_free(&names);
@@ -737,6 +804,33 @@ static WCHAR *owned_command(Scan *sc, HKEY k) {
     return hit;
 }
 
+// Primeiro comando (shell\<verbo>\command) ou ícone da chave, ou NULL.
+static WCHAR *any_command(HKEY k) {
+    HKEY shell = reg_open_sub(k, u"shell");
+    WCHAR *r = NULL;
+    if (shell) {
+        PtrVec verbs = reg_subkeys(shell);
+        for (size_t i = 0; i < verbs.n && !r && i < 64; i++) {
+            WCHAR *sub = path_join(verbs.items[i], u"command");
+            HKEY c = reg_open_sub(shell, sub);
+            xfree(sub);
+            if (!c) continue;
+            r = value_text(c, u"");
+            RegCloseKey(c);
+        }
+        strings_free(&verbs);
+        RegCloseKey(shell);
+    }
+    if (!r) {
+        HKEY ic = reg_open_sub(k, u"DefaultIcon");
+        if (ic) {
+            r = value_text(ic, u"");
+            RegCloseKey(ic);
+        }
+    }
+    return r;
+}
+
 static bool skip_class(const WCHAR *name) {
     static const WCHAR *const SKIP[] = {u"CLSID", u"Interface", u"TypeLib", u"AppID", u"Installer", u"Local Settings", u"WOW6432Node", u"*", u"Directory",
                                         u"Folder", u"Drive", u"AllFilesystemObjects", u"SystemFileAssociations", u"Applications", u"MIME", u"Protocols"};
@@ -758,10 +852,17 @@ static void scan_classes(Scan *sc) {
             HKEY k = reg_open_sub(root, name);
             if (!k) continue;
             WCHAR *hit = owned_command(sc, k);
+            int conf = hit ? CONF_HIGH : CONF_NONE;
+            if (!hit && progid_named(sc, name)) {
+                // tipo de arquivo com o nome do programa ("GridCraft.Workbook"): marcado se o
+                // executável dele não existe mais (ou se não tem comando), senão só sugerido
+                hit = any_command(k);
+                conf = (!hit || exe_missing(hit)) ? CONF_HIGH : CONF_MEDIUM;
+            }
             RegCloseKey(k);
-            if (hit) {
+            if (conf && conf >= sc->thr) {
                 WCHAR *full = path_join(CLASSES_ROOTS[r], name);
-                if (left_add(sc->out, LK_KEY, full, NULL, CONF_HIGH, LR_FILE_ASSOC, hit)) remember(&sc->progids, name);
+                if (left_add(sc->out, LK_KEY, full, NULL, conf, LR_FILE_ASSOC, hit) && conf == CONF_HIGH) remember(&sc->progids, name);
                 xfree(full);
             }
             xfree(hit);
@@ -1001,8 +1102,19 @@ static void scan_clsid_refs(Scan *sc) {
 }
 
 // Extensões de arquivo que apontam para um tipo de arquivo (ProgID) do programa.
+// Confiança de uma referência a um ProgID com o nome do programa que não sai com ele: alta se
+// o ProgID não existe em nenhuma raiz de classes, média se ainda existe.
+static int progid_conf(const WCHAR *progid) {
+    for (size_t r = 0; r < COUNT(CLASSES_ROOTS); r++) {
+        WCHAR *k = path_join(CLASSES_ROOTS[r], progid);
+        bool e = reg_exists(k);
+        xfree(k);
+        if (e) return CONF_MEDIUM;
+    }
+    return CONF_HIGH;
+}
+
 static void scan_progid_refs(Scan *sc) {
-    if (!sc->progids.n) return;
     for (size_t r = 0; r < COUNT(CLASSES_ROOTS); r++) {
         HKEY root = reg_open(CLASSES_ROOTS[r], KEY_READ);
         if (!root) continue;
@@ -1015,14 +1127,17 @@ static void scan_progid_refs(Scan *sc) {
             WCHAR *key = path_join(CLASSES_ROOTS[r], ext);
             // ".ext" (padrão) = ProgID: a associação aponta para algo que vai sumir
             WCHAR *def = reg_get_str(k, u"");
-            if (def && vec_has_i(&sc->progids, def)) left_add(sc->out, LK_VALUE, key, u"", CONF_MEDIUM, LR_REFERENCE, def);
+            if (def && (vec_has_i(&sc->progids, def) || progid_named(sc, def))) left_add(sc->out, LK_VALUE, key, u"", CONF_MEDIUM, LR_REFERENCE, def);
             xfree(def);
             HKEY ow = reg_open_sub(k, u"OpenWithProgids");
             if (ow) {
                 PtrVec names = reg_value_names(ow);
                 WCHAR *owkey = path_join(key, u"OpenWithProgids");
-                for (size_t j = 0; j < names.n; j++)
-                    if (vec_has_i(&sc->progids, names.items[j])) left_add(sc->out, LK_VALUE, owkey, names.items[j], CONF_HIGH, LR_REFERENCE, NULL);
+                for (size_t j = 0; j < names.n; j++) {
+                    // ProgID com o nome do programa: marcado só se ele sai junto ou já não existe
+                    int c = vec_has_i(&sc->progids, names.items[j]) ? CONF_HIGH : progid_named(sc, names.items[j]) ? progid_conf(names.items[j]) : CONF_NONE;
+                    if (c && c >= sc->thr) left_add(sc->out, LK_VALUE, owkey, names.items[j], c, LR_REFERENCE, NULL);
+                }
                 xfree(owkey);
                 strings_free(&names);
                 RegCloseKey(ow);
@@ -1138,7 +1253,14 @@ static void scan_registered_apps(Scan *sc) {
             if (v->type != REG_SZ) continue;
             WCHAR *data = wdupn((const WCHAR *)v->data, v->size / 2), *full = wcat3(ROOTS[r].hive, u"\\", data);
             WCHAR *n = path_norm(full);
-            if (key_in_list(sc->out, n, CONF_HIGH)) left_add(sc->out, LK_VALUE, ROOTS[r].key, v->name, CONF_HIGH, LR_REFERENCE, data);
+            bool dangling = false;
+            if (!key_in_list(sc->out, n, CONF_HIGH) && name_is_ours(sc, v->name)) {
+                // aponta para a chave de um programa com o nome dele que já não existe (nas duas vistas)
+                WCHAR *wow = wcat3(ROOTS[r].hive, u"\\SOFTWARE\\WOW6432Node\\", wistarts(data, u"Software\\") ? data + 9 : data);
+                dangling = !reg_exists(n) && !reg_exists(wow);
+                xfree(wow);
+            }
+            if (key_in_list(sc->out, n, CONF_HIGH) || dangling) left_add(sc->out, LK_VALUE, ROOTS[r].key, v->name, CONF_HIGH, LR_REFERENCE, data);
             xfree(data), xfree(full), xfree(n);
         }
         reg_values_free(&vals);

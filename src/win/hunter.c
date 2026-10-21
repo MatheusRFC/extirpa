@@ -47,6 +47,7 @@ static void paint(HWND h) {
 static void reload(Hunter *hu) {
     programs_free(&hu->programs);
     hu->programs = programs_load();
+    programs_load_msi(&hu->programs);
 }
 
 static StartupEntry *startup_for(PtrVec *entries, const WCHAR *exe) {
@@ -215,6 +216,7 @@ bool hunter_run(HWND main) {
     mem_set(&hu, 0, sizeof(hu));
     hu.main = main;
     hu.programs = programs_load();
+    programs_load_msi(&hu.programs);
     HWND w = CreateWindowExW(WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_LAYERED, u"ExtirpaHunter", u"EXTIRPA", WS_POPUP, 0, 0, S(64), S(64), NULL, NULL, g_inst, &hu);
     if (!w) {
         programs_free(&hu.programs);
