@@ -7,7 +7,7 @@ Desinstalador completo para Windows (equivalente ao Revo Uninstaller, escrito do
 - Executável: `python3 tools/build.py` → `build/extirpa.exe`. Só precisa do LLVM (clang, lld-link, llvm-rc, llvm-dlltool); funciona no Windows e no Linux.
 - Tudo de uma vez: `python3 tools/build.py all` (testes, `extirpa.exe` e `extirpa-selftest.exe`).
 - Autoteste num Windows de verdade: `extirpa-selftest.exe --selftest` (relatório e capturas em `%LOCALAPPDATA%\EXTIRPA\selftest`). Teste com programas reais: `--snapshot-save <arquivo>` antes de instalar e `--realtest <arquivo> <nomes...>` depois (relatório em `selftest\real\report.txt`, com o que FICOU). O `selftest.c` só entra no executável de autoteste (`-DEXTIRPA_SELFTEST`).
-- Declarações do Windows: `src/win/win32.h` é escrito à mão. Depois de mexer nele, `python3 tools/check_win32.py <pasta mingw-w64-headers/include>` confere assinaturas, constantes, campos e GUIDs contra os cabeçalhos do mingw-w64. As `.lib` de importação são geradas pelo `build.py` a partir das funções declaradas no `win32.h`.
+- Declarações do Windows: `src/win/win32.h` é escrito à mão. Depois de mexer nele, `python3 tools/check_win32.py --mingw <pasta mingw-w64-headers>` (a do código-fonte do mingw-w64, com `include/` e `crt/`) confere assinaturas, constantes, campos e GUIDs contra os cabeçalhos do mingw-w64. As `.lib` de importação são geradas pelo `build.py` a partir das funções declaradas no `win32.h`.
 - Ícones: `python3 tools/gerar_icones.py` (Pillow). Desenho-mestre: `assets/extirpa.svg`.
 - Release: `python3 scripts/package.py` → `dist/` (`extirpa.exe`, zip e `SHA256SUMS`).
 

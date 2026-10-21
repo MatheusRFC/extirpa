@@ -15,7 +15,8 @@ static int run(void) {
     i18n_init();
     ui_init();
 #ifdef EXTIRPA_SELFTEST
-    if (wifind(GetCommandLineW(), u"--selftest") || wifind(GetCommandLineW(), u"--snapshot-save") || wifind(GetCommandLineW(), u"--realtest"))
+    if (wifind(GetCommandLineW(), u"--selftest") || wifind(GetCommandLineW(), u"--snapshot-save") || wifind(GetCommandLineW(), u"--realtest") ||
+        wifind(GetCommandLineW(), u"--scan "))
         return selftest_run();
 #endif
 

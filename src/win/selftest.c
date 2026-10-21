@@ -770,12 +770,57 @@ static int realtest(int argc, WCHAR **argv) {
     return (int)mine + problems;
 }
 
+// --scan <nome>: só a busca de sobras (moderado e avançado), sem desinstalar nem apagar nada.
+// Mostra o que o EXTIRPA acha com o programa ainda instalado (o que a desinstalação forçada vê).
+static int scan_only(const WCHAR *wanted) {
+    PtrVec progs = programs_load();
+    Program *p = NULL;
+    for (size_t i = 0; i < progs.n && !p; i++)
+        if (wieq(((Program *)progs.items[i])->name, wanted)) p = progs.items[i];
+    for (size_t i = 0; i < progs.n && !p; i++)
+        if (wifind(((Program *)progs.items[i])->name, wanted)) p = progs.items[i];
+    if (!p) {
+        linef(wfmt(u"NÃO ENCONTRADO: %s", wanted));
+        flush();
+        programs_free(&progs);
+        return 1;
+    }
+    ULONGLONG t0 = GetTickCount64();
+    Identity *id = program_identity(p);
+    linef(wfmt(u"programa: %s (%s), entrada %s, identidade em %U ms", p->name, p->publisher ? p->publisher : u"-", p->key_path,
+               (uint64_t)(GetTickCount64() - t0)));
+    for (size_t i = 0; i < id->dirs.n; i++) linef(wfmt(u"  pasta: %s", id->dirs.items[i]));
+    for (size_t i = 0; i < id->exact.n; i++) linef(wfmt(u"  nome exato: %s", id->exact.items[i]));
+    static const ScanMode modes[] = {SCAN_MODERATE, SCAN_ADVANCED};
+    for (size_t m = 0; m < COUNT(modes); m++) {
+        section(modes[m] == SCAN_MODERATE ? u"moderado" : u"avançado");
+        LeftList l = {0};
+        t0 = GetTickCount64();
+        scan_leftovers(&l, id, p->key_path, modes[m], NULL);
+        left_finalize(&l);
+        linef(wfmt(u"  %u itens em %U ms", (unsigned)l.items.n, (uint64_t)(GetTickCount64() - t0)));
+        dump_left(&l, 400);
+        left_free(&l);
+        flush();
+    }
+    identity_free(id);
+    programs_free(&progs);
+    return 0;
+}
+
 int selftest_run(void) {
     g_dir = path_join(g_paths.data_dir, u"selftest");
     dir_create_all(g_dir);
     int argc = 0;
     WCHAR **argv = CommandLineToArgvW(GetCommandLineW(), &argc);
     if (argv && argc >= 3 && wieq(argv[1], u"--snapshot-save")) return snapshot_save(argv[2]);
+    if (argv && argc >= 3 && wieq(argv[1], u"--scan")) {
+        WCHAR *old = g_dir;
+        g_dir = path_join(old, u"scan");
+        xfree(old);
+        dir_create_all(g_dir);
+        return scan_only(argv[2]);
+    }
     if (argv && argc >= 4 && wieq(argv[1], u"--realtest")) {
         // relatório separado do autoteste geral
         WCHAR *old = g_dir;
