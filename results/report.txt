@@ -1,0 +1,356 @@
+
+==== Ambiente ====
+EXTIRPA 1.0.0, administrador: sim, idioma: en-US
+  windows = C:\Windows
+  program_files = C:\Program Files
+  program_files_x86 = C:\Program Files (x86)
+  program_data = C:\ProgramData
+  appdata = C:\Users\runneradmin\AppData\Roaming
+  local_appdata = C:\Users\runneradmin\AppData\Local
+  desktop = C:\Users\runneradmin\Desktop
+  programs = C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Start Menu\Programs
+  data_dir = C:\Users\runneradmin\AppData\Local\EXTIRPA
+[OK] pastas do sistema encontradas e existentes
+
+==== Programas instalados ====
+[OK] lista de programas instalados lida
+  7-Zip 26.04 (x64) | 26.04 | Igor Pavlov | escopo 0 | 5.65 MB | 2026-10-19 | "C:\Program Files\7-Zip\Uninstall.exe" /S  [silencioso]
+  AWS Command Line Interface v2 | 2.38.0.0 | Amazon Web Services | escopo 0 | 193 MB | 2026-10-19 | "C:\Windows\system32\msiexec.exe" /X{077C8D9D-CA5D-4C2F-BA99-7E16E1C5655D} /passive /norestart  [silencioso]
+  AWS SAM Command Line Interface | 1.169.0 | AWS Serverless Applications | escopo 0 | 344 MB | 2026-10-19 | "C:\Windows\system32\msiexec.exe" /X{03E3EBF2-353C-47E3-AE98-5DD1A0156171} /passive /norestart  [silencioso]
+  Azure Cosmos DB Emulator | 2.14.28 | Microsoft® Corporation | escopo 0 | 2.45 GB | 2026-10-19 | "C:\Windows\system32\msiexec.exe" /X{CB0238CA-3B36-47AB-86FD-D60F4C47607A} /passive /norestart  [silencioso]
+  CMake | 4.4.4 | Kitware | escopo 0 | 157 MB | 2026-10-18 | "C:\Windows\system32\msiexec.exe" /X{0DEA00BE-9AC0-4348-839D-8EFDCCBD3205} /passive /norestart  [silencioso]
+  Git | 2.56.0.2 | The Git Development Community | escopo 0 | 342 MB | 2026-10-19 | "C:\Program Files\Git\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART  [silencioso]
+  GitHub CLI | 2.102.0 | GitHub, Inc. | escopo 0 | 40.9 MB | 2026-10-19 | "C:\Windows\system32\msiexec.exe" /X{4EF7967E-A6AE-4EA6-80F8-448F03B4C0B4} /passive /norestart  [silencioso]
+  Google Chrome | 155.0.8059.85 | Google LLC | escopo 0 | 504 MB | 2026-10-19 | "C:\Windows\system32\msiexec.exe" /X{0228B730-26AA-39E9-B2E1-0FC0E3EA58C8} /passive /norestart  [silencioso]
+  IIS 10.0 Express | 10.0.11304 | Microsoft Corporation | escopo 0 | 54.2 MB | 2026-10-18 | "C:\Windows\system32\msiexec.exe" /X{C21221FC-C5DD-488F-AA88-9C936DB25907} /passive /norestart  [silencioso]
+  ImageMagick 7.1.2-25 Q16-HDRI (64-bit) (2026-06-04) | 7.1.2.25 | ImageMagick Studio LLC | escopo 0 | 60.7 MB | 2026-10-18 | "C:\Program Files\ImageMagick-7.1.2-Q16-HDRI\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART  [silencioso]
+  Inno Setup version 6.7.1 | 6.7.1 | jrsoftware.org | escopo 1 | 32.5 MB | 2026-10-18 | "C:\Program Files (x86)\Inno Setup 6\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART  [silencioso]
+  LLVM | 20.1.8 | LLVM | escopo 1 | - | 2026-10-19 | "C:\Program Files\LLVM\Uninstall.exe" /S  [silencioso]
+  Microsoft .NET SDK 10.0.402 (x64) from Visual Studio | 40.11.62483 | Microsoft Corporation | escopo 0 | 400 KB | 2026-10-18 | "C:\Windows\system32\msiexec.exe" /X{F35ABD6B-6374-4345-AD58-4E6E64BD3F8A} /passive /norestart  [silencioso]
+  Microsoft Azure CLI (64-bit) | 2.91.0 | Microsoft Corporation | escopo 0 | 288 MB | 2026-10-18 | "C:\Windows\system32\msiexec.exe" /X{7D82F772-C4C9-400C-85E5-8311E5CCDF04} /passive /norestart  [silencioso]
+  Microsoft Azure Service Fabric | 11.7.157.1 | Microsoft Corporation | escopo 0 | 623 MB | 2026-10-19 | "powershell.exe" -File "C:\Program Files\Microsoft Service Fabric\bin\Fabric\Fabric.Code\CleanFabric.ps1"
+  Microsoft Azure Service Fabric SDK | 8.7.157.1 | Microsoft Corporation | escopo 0 | 32.2 MB | 2026-10-18 | "C:\Windows\system32\msiexec.exe" /X{4D0D5C48-CCFF-4E37-B925-7D33C3A2F938} /passive /norestart  [silencioso]
+  Microsoft Edge | 155.0.4283.62 | Microsoft Corporation | escopo 1 | 2.45 GB | 2026-10-18 | "C:\Program Files (x86)\Microsoft\Edge\Application\155.0.4283.62\Installer\setup.exe" --uninstall --msedge --channel=stable --system-level --verbose-logging
+  Microsoft Edge WebView2 Runtime | 155.0.4283.62 | Microsoft Corporation | escopo 1 | 2.26 GB | 2026-10-18 | "C:\Program Files (x86)\Microsoft\EdgeWebView\Application\155.0.4283.62\Installer\setup.exe" --uninstall --msedgewebview --system-level --verbose-logging
+  Microsoft ODBC Driver 17 for SQL Server | 17.10.6.1 | Microsoft Corporation | escopo 0 | 7.27 MB | 2026-10-18 | "C:\Windows\system32\msiexec.exe" /X{0E0F96AC-80DE-4400-A40C-429D63293651} /passive /norestart  [silencioso]
+  Microsoft OLE DB Driver 19 for SQL Server | 19.4.1.0 | Microsoft Corporation | escopo 0 | 16.6 MB | 2026-10-19 | "C:\Windows\system32\msiexec.exe" /X{AFFC3E2E-B4E9-40CE-8F85-9D104554535C} /passive /norestart  [silencioso]
+  Microsoft SQL Server 2016 Management Objects  (x64) | 13.2.5026.0 | Microsoft Corporation | escopo 0 | 20.7 MB | 2026-10-19 | "C:\Windows\system32\msiexec.exe" /X{E3806E56-5AF2-4467-A6B8-F78331A9F194} /passive /norestart  [silencioso]
+  Microsoft SQL Server 2025 LocalDB | 17.0.4025.3 | Microsoft Corporation | escopo 0 | 308 MB | 2026-10-18 | "C:\Windows\system32\msiexec.exe" /X{E9279A3D-A613-4CA7-8B09-A6C4C5C5AB5A} /passive /norestart  [silencioso]
+  Microsoft SQL Server Data-Tier Application Framework | 170.4.83.3 | Microsoft Corporation | escopo 0 | 36.6 MB | 2026-10-19 | "C:\Windows\system32\msiexec.exe" /X{CF482EC2-1283-4368-B407-CCCA0AF4D57B} /passive /norestart  [silencioso]
+  Microsoft SQL Server Integration Services Projects | 17.0.1016.0 | Microsoft Corporation | escopo 1 | 365 MB | 2026-10-19 | "C:\ProgramData\Package Cache\{74995560-eb15-4f17-aaf1-15437f5be64b}\Microsoft.DataTools.IntegrationServices.exe" /uninstall /quiet  [silencioso]
+  Microsoft System CLR Types for SQL Server 2016 | 13.2.5026.0 | Microsoft Corporation | escopo 0 | 8.01 MB | 2026-10-19 | "C:\Windows\system32\msiexec.exe" /X{A5B947FD-875D-448C-AB7C-A737CA9FEA4C} /passive /norestart  [silencioso]
+  Microsoft System CLR Types for SQL Server 2019 | 15.0.2000.5 | Microsoft Corporation | escopo 0 | 6.57 MB | 2026-10-18 | "C:\Windows\system32\msiexec.exe" /X{5BC7E9EB-13E8-45DB-8A60-F2481FEB4595} /passive /norestart  [silencioso]
+  Microsoft Visual C++ 2013 Redistributable (x64) - 12.0.40660 | 12.0.40660.0 | Microsoft Corporation | escopo 1 | 20.6 MB | 2026-10-19 | "C:\ProgramData\Package Cache\{ef6b00ec-13e1-4c25-9064-b2f383cb8412}\vcredist_x64.exe" /uninstall /quiet  [silencioso]
+  Microsoft Visual C++ v14 Redistributable (x64) - 14.51.36247 | 14.51.36247.0 | Microsoft Corporation | escopo 1 | 20.8 MB | 2026-10-19 | "C:\ProgramData\Package Cache\{0e3bb569-69d6-4c34-bff9-c2f81db5e5f0}\VC_redist.x64.exe" /uninstall /quiet  [silencioso]
+  Microsoft Visual C++ v14 Redistributable (x86) - 14.51.36247 | 14.51.36247.0 | Microsoft Corporation | escopo 1 | 18.5 MB | 2026-10-19 | "C:\ProgramData\Package Cache\{9a6ce18d-11c0-4452-aa35-9f2b8437c686}\VC_redist.x86.exe" /uninstall /quiet  [silencioso]
+  Microsoft Visual Studio Installer | 4.11.24.2075 | Microsoft Corporation | escopo 0 | - | 2026-10-18 | "C:\Program Files (x86)\Microsoft Visual Studio\Installer\setup.exe" /uninstall
+  Microsoft Visual Studio Tools for Applications 2022 | 17.1.37110 | Microsoft Corporation | escopo 1 | 11.1 MB | 2026-10-18 | "C:\ProgramData\Package Cache\{C0A2B576-1630-4449-93B8-06C8FBBAF369}\vsta_setup.exe" /uninstall /quiet  [silencioso]
+  Microsoft Web Deploy 4.0 | 10.0.9419 | Microsoft Corporation | escopo 0 | 15.4 MB | 2026-10-18 | "C:\Windows\system32\msiexec.exe" /X{DE4FFB86-1944-4273-B040-92E920BD6861} /passive /norestart  [silencioso]
+  Microsoft Web Platform Installer 5.1 | 5.1.51515.0 | Microsoft Corporation | escopo 0 | 5.05 MB | 2026-10-18 | "C:\Windows\system32\msiexec.exe" /X{4D38C3A3-B685-4AB5-BD6D-FD88BCED5805} /passive /norestart  [silencioso]
+  Microsoft Windows Application Compatibility Fix Database | - | - | escopo 0 | - | 2026-10-18 | "C:\Windows\system32\sdbinst.exe" -u "C:\Windows\AppPatch\CustomSDB\{22221111-1111-1111-1111-111111111111}.sdb"
+  Miniconda3 py314_26.9.3-0 (Python 3.14.8 64-bit) | py314_26.9.3-0 | Anaconda, Inc. | escopo 0 | - | 2026-10-19 | "C:\Miniconda\Uninstall-Miniconda3.exe" /S  [silencioso]
+  MongoDB 7.0.45 2008R2Plus SSL (64 bit) | 7.0.45 | MongoDB Inc. | escopo 0 | 1.70 GB | 2026-10-19 | "C:\Windows\system32\msiexec.exe" /X{3B1BBB97-C952-4564-BE69-723F5DF090C3} /passive /norestart  [silencioso]
+  MongoDB Shell | 2.13.0 | MongoDB Inc. | escopo 0 | 197 MB | 2026-10-19 | "C:\Windows\system32\msiexec.exe" /X{38CDD35C-C8E8-436E-A72C-674709162421} /passive /norestart  [silencioso]
+  Mozilla Firefox (x64 en-US) | 158.0 | Mozilla | escopo 0 | 355 MB | 2026-10-19 | "C:\Program Files\Mozilla Firefox\uninstall\helper.exe" /S  [silencioso]
+  Mozilla Maintenance Service | 158.0 | Mozilla | escopo 0 | 378 KB | 2026-10-19 | "C:\Program Files (x86)\Mozilla Maintenance Service\uninstall.exe" /S  [silencioso]
+  MySQL Server 8.0 | 8.0.46 | Oracle Corporation | escopo 0 | 552 MB | 2026-10-19 | "C:\Windows\system32\msiexec.exe" /X{98F56C49-2C6F-45B6-B086-F0B55794FDD8} /passive /norestart  [silencioso]
+  Node.js | 22.23.3 | Node.js Foundation | escopo 0 | 98.4 MB | 2026-10-18 | "C:\Windows\system32\msiexec.exe" /X{8077DB9D-18D9-4DAF-8CA6-B8CAE42EB734} /passive /norestart  [silencioso]
+  OpenSSL 3.6.5 (64-bit) | 3.6.5 | OpenSSL Win64 Installer Team | escopo 0 | 837 MB | 2026-10-18 | "C:\Program Files\OpenSSL\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART  [silencioso]
+  PostgreSQL 17 | 17.11-5 | PostgreSQL Global Development Group | escopo 0 | 1.11 GB | 2026-10-19 | "C:\Program Files\PostgreSQL\17\uninstall-postgresql.exe"
+  PowerShell 7-x64 | 7.6.7.0 | Microsoft Corporation | escopo 0 | 285 MB | 2026-10-18 | "C:\Windows\system32\msiexec.exe" /X{B6950B97-25F0-4EB3-9FC8-DB5D085645DE} /passive /norestart  [silencioso]
+  PowerShell Extensions for SQL Server 2016 | 13.2.5026.0 | Microsoft Corporation | escopo 0 | 5.36 MB | 2026-10-19 | "C:\Windows\system32\msiexec.exe" /X{D113B5D0-D291-4FCD-8609-17265878F921} /passive /norestart  [silencioso]
+  Python Launcher | 3.15.150.0 | Python Software Foundation | escopo 1 | 1.52 MB | 2026-10-18 | "C:\Windows\system32\msiexec.exe" /X{F2F64D6B-2DFC-4CE5-8316-A8C51291C896} /passive /norestart  [silencioso]
+  R for Windows 4.6.1 | 4.6.1 | R Core Team | escopo 0 | 189 MB | 2026-10-19 | "C:\Program Files\R\R-4.6.1\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART  [silencioso]
+  Rtools 4.5 (6768-6492) | 4.5.6768 | The R Foundation | escopo 0 | 3.07 GB | 2026-10-19 | "C:\rtools45\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART  [silencioso]
+  sbt 1.12.12 | 1.12.12 | Scala Center | escopo 1 | 35.2 MB | 2026-10-19 | "C:\Windows\system32\msiexec.exe" /X{CE07BE71-510D-414A-92D4-DFF47631848A} /passive /norestart  [silencioso]
+  Session Manager Plugin | 1.2.896.0 | Amazon Web Services | escopo 1 | 14.4 MB | 2026-10-19 | "C:\ProgramData\Package Cache\{cef0d74c-33bc-432b-941f-6e17bea1f9d3}\SessionManagerPluginSetup.exe" /uninstall /quiet  [silencioso]
+  Strawberry Perl (64-bit) | 5.42.1 | strawberryperl.com project | escopo 0 | 1020 MB | 2026-10-18 | "C:\Windows\system32\msiexec.exe" /X{0E359BC1-76FA-1014-8E4D-A688F4A101C4} /passive /norestart  [silencioso]
+  Unity Hub 3.22.3 | 3.22.3 | Unity Technologies Inc. | escopo 0 | 594 MB | 2026-10-19 | "C:\Program Files\Unity Hub\Uninstall Unity Hub.exe" /allusers /S  [silencioso]
+  Visual Studio Enterprise 2026 | 18.11.0 | Microsoft Corporation | escopo 1 | - | 2026-10-18 | "C:\Program Files (x86)\Microsoft Visual Studio\Installer\setup.exe" uninstall --installPath "C:\Program Files\Microsoft Visual Studio\18\Enterprise"
+  vs_CoreEditorFonts | 17.7.40001 | Microsoft Corporation | escopo 1 | 728 KB | 2026-10-18 | "C:\Windows\system32\msiexec.exe" /X{1851460E-0E63-4117-B5BA-25A2F045801B} /passive /norestart  [silencioso]
+  Windows Application Driver | 1.2.1.0 | Microsoft Corporation | escopo 1 | 6.86 MB | 2026-10-19 | "C:\Windows\system32\msiexec.exe" /X{087BBF93-D9E3-4D27-BDBE-9C702E0066FC} /passive /norestart  [silencioso]
+  Windows SDK AddOn | 10.1.0.0 | Microsoft Corporation | escopo 1 | 152 KB | 2026-10-18 | "C:\Windows\system32\msiexec.exe" /X{F6E49AB1-AA83-433D-8D7E-9F0F23CB497D} /passive /norestart  [silencioso]
+  Windows Software Development Kit - Windows 10.0.26100.7705 | 10.1.26100.7705 | Microsoft Corporation | escopo 1 | 96.5 MB | 2026-10-19 | "C:\ProgramData\Package Cache\{c0b93b80-d0a4-47fc-a4d1-21a4008a63ca}\winsdksetup.exe" /uninstall /quiet  [silencioso]
+  Windows Software Development Kit - Windows 10.0.26100.8249 | 10.1.26100.8249 | Microsoft Corporation | escopo 1 | 2.28 GB | 2026-10-19 | "C:\ProgramData\Package Cache\{204d0387-6d9a-48cf-bb7d-93d49ec0141c}\winsdksetup.exe" /uninstall /quiet  [silencioso]
+  WiX Toolset v3.14.1.8722 | 3.14.1.8722 | .NET Foundation | escopo 1 | 276 MB | 2026-10-19 | "C:\ProgramData\Package Cache\{87475ca3-0418-47e5-a51f-de5bd3d0d9fb}\WiX314.exe" /uninstall /quiet  [silencioso]
+
+==== Busca de sobras (só leitura) em programas reais instalados ====
+  7-Zip 26.04 (x64) (pastas: 1, palavra principal: -)
+    14 itens em 953 ms
+    [chave conf=3 x] HKLM\SOFTWARE\7-Zip
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\*\shellex\ContextMenuHandlers\7-Zip  ({23170F69-40C1-278A-1000-000100020000})
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\CLSID\{23170F69-40C1-278A-1000-000100020000}  (C:\Program Files\7-Zip\7-zip.dll)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\Directory\shellex\ContextMenuHandlers\7-Zip  ({23170F69-40C1-278A-1000-000100020000})
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\Directory\shellex\DragDropHandlers\7-Zip  ({23170F69-40C1-278A-1000-000100020000})
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\Folder\shellex\ContextMenuHandlers\7-Zip  ({23170F69-40C1-278A-1000-000100020000})
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\7zFM.exe  (C:\Program Files\7-Zip\7zFM.exe)
+    [valor conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved -> {23170F69-40C1-278A-1000-000100020000}
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\7-Zip
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Classes\CLSID\{23170F69-40C1-278A-1000-000100020000}  (C:\Program Files\7-Zip\7-zip32.dll)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\7zFM.exe  (C:\Program Files\7-Zip\7zFM.exe)
+    [valor conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved -> {23170F69-40C1-278A-1000-000100020000}
+    [pasta conf=3 x] C:\Program Files\7-Zip
+    [pasta conf=3 x] C:\ProgramData\Microsoft\Windows\Start Menu\Programs\7-Zip
+  Azure Cosmos DB Emulator (pastas: 1, palavra principal: emulator)
+    3 itens em 625 ms
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{CB0238CA-3B36-47AB-86FD-D60F4C47607A}
+    [pasta conf=3 x] C:\Program Files\Azure Cosmos DB Emulator
+    [pasta conf=3 x] C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Azure Cosmos DB Emulator
+  CMake (pastas: 1, palavra principal: cmake)
+    6 itens em 609 ms
+    [PATH conf=3 x] HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment -> C:\Program Files\CMake\bin
+    [chave conf=3 x] HKLM\SOFTWARE\Kitware\CMake
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{0DEA00BE-9AC0-4348-839D-8EFDCCBD3205}
+    [chave-se-vazia conf=2 x] HKLM\SOFTWARE\Kitware
+    [pasta conf=3 x] C:\Program Files\CMake
+    [pasta conf=3 x] C:\ProgramData\Microsoft\Windows\Start Menu\Programs\CMake
+  Git (pastas: 1, palavra principal: -)
+    7 itens em 609 ms
+    [PATH conf=3 x] HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment -> C:\Program Files\Git\bin
+    [PATH conf=3 x] HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment -> C:\Program Files\Git\cmd
+    [PATH conf=3 x] HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment -> C:\Program Files\Git\ucrt64\bin
+    [PATH conf=3 x] HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment -> C:\Program Files\Git\usr\bin
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1
+    [pasta conf=3 x] C:\Program Files\Git
+    [pasta conf=3 x] C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Git
+  ImageMagick 7.1.2-25 Q16-HDRI (64-bit) (2026-06-04) (pastas: 1, palavra principal: -)
+    4 itens em 641 ms
+    [PATH conf=3 x] HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment -> C:\Program Files\ImageMagick-7.1.2-Q16-HDRI
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ImageMagick 7.1.2 Q16-HDRI (64-bit)_is1
+    [pasta conf=3 x] C:\Program Files\ImageMagick-7.1.2-Q16-HDRI
+    [arquivo conf=3 x] C:\ProgramData\Microsoft\Windows\Start Menu\Programs\ImageMagick 7.1.2 Q16-HDRI (64-bit)\ImageMagick Web Pages.lnk  (C:\Program Files\ImageMagick-7.1.2-Q16-HDRI\index.html)
+  Inno Setup version 6.7.1 (pastas: 1, palavra principal: -)
+    10 itens em 641 ms
+    [valor conf=2  ] HKLM\SOFTWARE\Classes\.iss ->   (InnoSetupScriptFile)
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.iss\OpenWithProgids -> InnoSetupScriptFile
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\InnoSetupScriptFile  (C:\Program Files (x86)\Inno Setup 6\Compil32.exe,1)
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\innosetup.exe  (C:\Program Files (x86)\Inno Setup 6\Compil32.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ISCC.exe  (C:\Program Files (x86)\Inno Setup 6\ISCC.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\innosetup.exe  (C:\Program Files (x86)\Inno Setup 6\Compil32.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\ISCC.exe  (C:\Program Files (x86)\Inno Setup 6\ISCC.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 6_is1
+    [pasta conf=3 x] C:\Program Files (x86)\Inno Setup 6
+    [pasta conf=3 x] C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Inno Setup 6
+  Microsoft Azure Service Fabric (pastas: 1, palavra principal: fabric)
+    10 itens em 625 ms
+    [serviço conf=3 x] FabricHostSvc  ("C:\Program Files\Microsoft Service Fabric\bin\FabricHost.exe")
+    [PATH conf=3 x] HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment -> C:\Program Files\Microsoft Service Fabric\bin\Fabric\Fabric.Code
+    [serviço conf=3 x] KtlLogger  (C:\Program Files\Microsoft Service Fabric\bin\Fabric\Fabric.Code\KtlLogger.sys)
+    [serviço conf=3 x] LeasLayr  (C:\Program Files\Microsoft Service Fabric\bin\Fabric\Fabric.Code\LeasLayr.sys)
+    [valor conf=2  ] HKCU\Software\Microsoft\Windows\CurrentVersion\RunNotification -> StartupTNotiService Fabric Local Cluster Manager.lnk
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Service Fabric
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ServiceFabric
+    [pasta conf=3 x] C:\Program Files\Microsoft Service Fabric
+    [pasta conf=3 x] C:\ProgramData\Microsoft Service Fabric
+    [pasta conf=1  ] C:\ProgramData\Microsoft\Windows\Start Menu\Programs\ServiceFabricLocalClusterManager  (the name also belongs to another installed program (Microsoft Azure Service Fabric SDK))
+  Microsoft Edge (pastas: 1, palavra principal: -)
+    41 itens em 640 ms
+    [serviço conf=3 x] MicrosoftEdgeElevationService  ("C:\Program Files (x86)\Microsoft\Edge\Application\155.0.4283.62\elevation_service.exe")
+    [firewall conf=3 x] {C721BD97-08AE-4A40-AFDE-63A7381F0163}  (C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe)
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.htm\OpenWithProgids -> MSEdgeHTM
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.html\OpenWithProgids -> MSEdgeHTM
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.mht\OpenWithProgids -> MSEdgeMHT
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.mhtml\OpenWithProgids -> MSEdgeHTM
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.mhtml\OpenWithProgids -> MSEdgeMHT
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.pdf\OpenWithProgids -> MSEdgePDF
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.shtml\OpenWithProgids -> MSEdgeHTM
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.svg\OpenWithProgids -> MSEdgeHTM
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.webp\OpenWithProgids -> MSEdgeHTM
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.xht\OpenWithProgids -> MSEdgeHTM
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.xhtml\OpenWithProgids -> MSEdgeHTM
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\CLSID\{1FD49718-1D00-4B19-AF5F-070AF6D5D54C}  (C:\Program Files (x86)\Microsoft\Edge\Application\155.0.4283.62\BHO\ie_to_edge_bho_64.dll)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\CLSID\{3A84F9C2-6164-485C-A7D9-4B27F8AC009E}  (C:\Program Files (x86)\Microsoft\Edge\Application\155.0.4283.62\PdfPreview\PdfPreviewHandler.dll)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\CLSID\{4A749F25-A9E2-4CBE-9859-CF7B15255E14}  ("C:\Program Files (x86)\Microsoft\Edge\Application\155.0.4283.62\notification_click_helper.exe")
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\CLSID\{628ACE20-B77A-456F-A88D-547DB6CEEDD5}  ("C:\Program Files (x86)\Microsoft\Edge\Application\155.0.4283.62\notification_helper.exe")
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\CLSID\{7D6FA3E8-2A3B-4C7D-9F4A-8B2E5C9A7F12}  ("C:\Program Files (x86)\Microsoft\Edge\Application\155.0.4283.62\passkey_authenticator_plugin.exe" --run-mpm-plugin-operation)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\CLSID\{B54934CD-71A6-4698-BDC2-AFEA5B86504C}  (C:\Program Files (x86)\Microsoft\Edge\Application\155.0.4283.62\EBWebView\x64\EmbeddedBrowserWebView.dll)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\microsoft-edge  ("C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --single-argument %1)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\MSEdgeHTM  (C:\Program Files (x86)\Microsoft\Edge\Application\155.0.4283.62\msedge.exe,0)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\MSEdgeMHT  (C:\Program Files (x86)\Microsoft\Edge\Application\155.0.4283.62\msedge.exe,0)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\MSEdgePDF  (C:\Program Files (x86)\Microsoft\Edge\Application\155.0.4283.62\msedge.exe,11)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\TypeLib\{C9C2B807-7731-4F34-81B7-44FF7779522B}  (C:\Program Files (x86)\Microsoft\Edge\Application\155.0.4283.62\elevation_service.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\Clients\StartMenuInternet\Microsoft Edge  (C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe,0)
+    ... mais 16
+  Microsoft Edge WebView2 Runtime (pastas: 2, palavra principal: webview2)
+    4 itens em 625 ms
+    [firewall conf=3 x] {AF0F4B21-46E1-485D-A290-D006B391178C}  (C:\Program Files (x86)\Microsoft\EdgeWebView\Application\155.0.4283.62\msedgewebview2.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Microsoft EdgeWebView
+    [pasta conf=3 x] C:\Program Files (x86)\Microsoft\EdgeWebView
+    [pasta-se-vazia conf=3 x] C:\Program Files (x86)\Microsoft
+  Microsoft Visual Studio Installer (pastas: 2, palavra principal: -)
+    12 itens em 625 ms
+    [serviço conf=3 x] VSInstallerElevationService  ("C:\Program Files (x86)\Microsoft Visual Studio\Installer\VSInstallerElevationService.exe")
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\CLSID\{6377A4B2-F371-4E8D-B723-3BCD433C6EE5}  (C:\Program Files (x86)\Microsoft Visual Studio\Installer\ProxyStub\x64\Microsoft.VisualStudio.Setup.ProxyStub.dll)
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{6F320B93-EE3C-4826-85E0-ADF79F8D4C61}
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Classes\CLSID\{6377A4B2-F371-4E8D-B723-3BCD433C6EE5}  (C:\Program Files (x86)\Microsoft Visual Studio\Installer\ProxyStub\x86\Microsoft.VisualStudio.Setup.ProxyStub.dll)
+    [pasta conf=3 x] C:\Program Files (x86)\Microsoft Visual Studio\Installer
+    [pasta conf=3 x] C:\Program Files (x86)\Microsoft Visual Studio\Shared
+    [pasta conf=1  ] C:\Program Files (x86)\Visual Studio  (the name also belongs to another installed program (Microsoft .NET SDK 10.0.402 (x64) from Visual Studio))
+    [pasta conf=1  ] C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio  (the name also belongs to another installed program (Microsoft .NET SDK 10.0.402 (x64) from Visual Studio))
+    [arquivo conf=3 x] C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio Installer.lnk  (C:\Program Files (x86)\Microsoft Visual Studio\Installer\setup.exe)
+    [pasta-se-vazia conf=3 x] C:\Program Files (x86)\Microsoft Visual Studio  (contains another installed program's folder (C:\Program Files (x86)\Microsoft Visual Studio): removed item by item, keeping it)
+    [pasta-se-vazia conf=3 x] C:\Program Files\Microsoft Visual Studio  (contains another installed program's folder (C:\Program Files\Microsoft Visual Studio\18\Enterprise): removed item by item, keeping it)
+    [pasta-se-vazia conf=3 x] C:\Program Files\Microsoft Visual Studio\18  (contains another installed program's folder (C:\Program Files\Microsoft Visual Studio\18\Enterprise): removed item by item, keeping it)
+  MongoDB Shell (pastas: 1, palavra principal: shell)
+    3 itens em 610 ms
+    [PATH conf=3 x] HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment -> C:\Program Files\mongosh\
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{38CDD35C-C8E8-436E-A72C-674709162421}
+    [pasta conf=3 x] C:\Program Files\mongosh
+  Mozilla Firefox (x64 en-US) (pastas: 1, palavra principal: firefox)
+    30 itens em 640 ms
+    [tarefa conf=3 x] \Mozilla\Firefox Default Browser Agent 308046B0AF4A39CB  (C:\Program Files\Mozilla Firefox\default-browser-agent.exe)
+    [firewall conf=3 x] {689096FB-389B-47EC-9685-3B9159E5AB9D}  (C:\Program Files\Mozilla Firefox\firefox.exe)
+    [firewall conf=3 x] {A04E421C-40A2-4C9C-BC21-07FB119488C8}  (C:\Program Files\Mozilla Firefox\firefox.exe)
+    [chave conf=3 x] HKCU\Software\Mozilla\Firefox
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\Applications\firefox.exe  (C:\Program Files\Mozilla Firefox\firefox.exe,1)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\CLSID\{1814CEEB-49E2-407F-AF99-FA755A7D2607}  (C:\Program Files\Mozilla Firefox\AccessibleMarshal.dll)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\CLSID\{BF4D7AC5-4D06-4C0F-9CCB-869A24710D8D}  (C:\Program Files\Mozilla Firefox\notificationserver.dll)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\FirefoxHTML-308046B0AF4A39CB  (C:\Program Files\Mozilla Firefox\firefox.exe,1)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\FirefoxPDF-308046B0AF4A39CB  (C:\Program Files\Mozilla Firefox\firefox.exe,5)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\FirefoxURL-308046B0AF4A39CB  (C:\Program Files\Mozilla Firefox\firefox.exe,1)
+    [chave conf=3 x] HKLM\SOFTWARE\Clients\StartMenuInternet\Firefox-308046B0AF4A39CB  (C:\Program Files\Mozilla Firefox\firefox.exe,0)
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe  (C:\Program Files\Mozilla Firefox\firefox.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Mozilla Firefox
+    [chave conf=3 x] HKLM\SOFTWARE\Mozilla\Firefox
+    [chave conf=3 x] HKLM\SOFTWARE\Mozilla\Mozilla Firefox
+    [chave conf=3 x] HKLM\SOFTWARE\Mozilla\Mozilla Firefox 158.0
+    [valor conf=3 x] HKLM\SOFTWARE\RegisteredApplications -> Firefox-308046B0AF4A39CB  (Software\Clients\StartMenuInternet\Firefox-308046B0AF4A39CB\Capabilities)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Clients\StartMenuInternet\Firefox-308046B0AF4A39CB  (C:\Program Files\Mozilla Firefox\firefox.exe,0)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe  (C:\Program Files\Mozilla Firefox\firefox.exe)
+    [valor conf=3 x] HKLM\SOFTWARE\WOW6432Node\RegisteredApplications -> Firefox-308046B0AF4A39CB  (Software\Clients\StartMenuInternet\Firefox-308046B0AF4A39CB\Capabilities)
+    [chave-se-vazia conf=2 x] HKCU\Software\Mozilla
+    [chave-se-vazia conf=2 x] HKLM\SOFTWARE\Mozilla
+    [pasta conf=3 x] C:\Program Files\Mozilla Firefox
+    [arquivo conf=3 x] C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Firefox Private Browsing.lnk  (C:\Program Files\Mozilla Firefox\private_browsing.exe)
+    [arquivo conf=3 x] C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Firefox.lnk  (C:\Program Files\Mozilla Firefox\firefox.exe)
+    ... mais 5
+[OK] buscas de sobras em programas reais executadas
+
+==== Programa de mentira: instalar, desinstalar, buscar, apagar, restaurar ====
+[OK] programa de mentira aparece na lista
+[OK] pasta de instalação identificada
+  desinstalador: "C:\Windows\system32\cmd.exe" /c rd /s /q "C:\Users\runneradmin\AppData\Local\Programs\Extirpa Selftest Widget\bin"
+  rodou: sim, código 0, 234 ms
+[OK] desinstalador executado e esperado (job object)
+    [chave conf=3 x] HKCU\Software\Extirpa Selftest Corp\Extirpa Selftest Widget
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run -> Extirpa Selftest Widget
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Run -> Extirpa Selftest Widget  ("C:\Users\runneradmin\AppData\Local\Programs\Extirpa Selftest Widget\widget.exe" --tray)
+    [chave-se-vazia conf=2 x] HKCU\Software\Extirpa Selftest Corp
+    [pasta conf=3 x] C:\Users\runneradmin\AppData\Local\Programs\Extirpa Selftest Widget
+    [pasta conf=3 x] C:\Users\runneradmin\AppData\Roaming\Extirpa Selftest Corp\Extirpa Selftest Widget
+    [arquivo conf=3 x] C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Extirpa Selftest Widget.lnk  (C:\Users\runneradmin\AppData\Local\Programs\Extirpa Selftest Widget\widget.exe)
+    [pasta-se-vazia conf=2 x] C:\Users\runneradmin\AppData\Roaming\Extirpa Selftest Corp
+[OK] a busca não achou nada de outros programas (sem falso positivo)
+[OK] 8 itens esperados: pasta, chave, chave do editor, pasta de dados, pasta do editor, Run, StartupApproved, atalho
+  apagados 6, falharam 0, mantidos 2, backup C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261021-022518 - Extirpa Selftest Widget.reg
+[OK] exclusão sem falhas e com backup .reg
+[OK] pastas e atalho foram para a Lixeira
+[OK] chaves e valores do programa saíram do Registro
+[OK] o outro produto do mesmo editor ficou intacto
+[OK] pasta e chave do editor mantidas (não ficaram vazias)
+  reg import: ok
+[OK] backup .reg restaurado pelo reg.exe
+[OK] limpeza do teste
+
+==== Espera do desinstalador e dos processos que ele abre ====
+  2203 ms
+[OK] espera também os processos filhos
+[OK] desinstalador inexistente: erro sem travar
+
+==== Rastreamento de instalação (fotos do sistema) ====
+  primeira foto: 134828 ms, 1171303 entradas
+  segunda foto: 11063 ms, 90 itens novos
+    V HKLM\SOFTWARE\Classes\CLSID\{5FFAB5C8-9A36-4B65-9FC6-FB69F451F99C} -> LocalizedString
+    K HKLM\SOFTWARE\Classes\CLSID\{5FFAB5C8-9A36-4B65-9FC6-FB69F451F99C}\Elevation
+    K HKLM\SOFTWARE\Classes\Interface\{310D6E68-14B2-4997-AE2C-59CD42AAA5BA}
+    K HKLM\SOFTWARE\Classes\Interface\{520CC469-8FD0-40C5-B922-9BA5E33E7CD7}
+    K HKLM\SOFTWARE\Classes\Interface\{5D310596-4358-44E4-9FD3-11F0AE54ACD9}
+    V HKLM\SOFTWARE\Microsoft\Provisioning\Sessions\cWgW+2dnPUa2Et+A.0 -> NextSession
+    K HKLM\SOFTWARE\Microsoft\Provisioning\Sessions\qT4QC/ufjEadvc10.0
+    K HKLM\SOFTWARE\Microsoft\Provisioning\FirstBootRun
+    K HKLM\SOFTWARE\Microsoft\Provisioning\LogonTaskCompleted
+    K HKLM\SOFTWARE\Microsoft\SecurityManager\CapAuthz\ApplicationsEx\Microsoft.SecHealthUI_1000.29628.1000.0_x64__8wekyb3d8bbwe
+    K HKLM\SOFTWARE\Microsoft\Wbem\Tracing\Providers\NetAdapterCim @ ROOT/StandardCimv2
+    K HKLM\SOFTWARE\Microsoft\Wbem\Tracing\Providers\Win32_DeviceGuard @ root/Microsoft/Windows/DeviceGuard
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StagingInfo\Microsoft.SecHealthUI_1000.29628.1000.0_x64__8wekyb3d8bbwe
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\Application\Data\76
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\Application\Index\Package\40
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\Application\Index\PackageAndPackageRelativeApplicationId\40^SecHealthUI
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Data\197
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Data\198
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Data\199
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Data\19a
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Index\Application\76
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Index\ApplicationAndCategory\76^windows.backgroundTasks
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Index\ApplicationAndCategory\76^windows.fileTypeAssociation
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Index\ApplicationAndCategory\76^windows.protocol
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Index\Category\windows.backgroundTasks\199
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Index\Category\windows.backgroundTasks\19a
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Index\Category\windows.fileTypeAssociation\197
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Index\Category\windows.protocol\198
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Data\245
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Index\Application\76
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Index\PackageUser\144
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Index\PackageUserAndApplication\144^76
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Index\User\4\245
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Index\UserAndApplication\4^76
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Index\UserAndApplicationUserModelId\4^Microsoft.SecHealthUI_8wekyb3d8bbwe!SecHealthUI\245
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\FileTypeAssociation\Data\a
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\FileTypeAssociation\Index\Extension\197
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\FileTypeAssociation\Index\FileType\.all\a
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\FileTypeAssociation\Index\FileTypeAndExtension\.all^197
+    K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\FileTypeAssociation\Index\ProgID\AppXb5yxv86nkhp530y0y50yxe69c1qwad1x\a
+[OK] chave e pasta novas apareceram no rastreamento
+
+==== Inicialização ====
+  AzureArcSetup | ativado | HKLM\…\Run | %windir%\AzureArcSetup\Systray\AzureArcSysTray.exe
+  SecurityHealth | ativado | HKLM\…\Run | %windir%\system32\SecurityHealthSystray.exe
+  Service Fabric Local Cluster Manager.lnk | ativado | Startup folder (all users) | C:\Program Files\Microsoft SDKs\Service Fabric\Tools\ServiceFabricLocalClusterManager\ServiceFabricLocalClusterManager.exe
+[OK] lista de inicialização lida
+
+==== Aplicativos do Windows (PowerShell) ====
+  45 pacotes em 3687 ms
+  1527c705-839a-4832-9118-54d4Bd6a0c89 | 10.0.19640.1000 | Microsoft Corporation | sistema
+  c5e2524a-ea46-4f67-841f-6a9465d9d515 | 10.0.26100.1 | Microsoft Corporation | sistema
+  E2A4F912-2574-4A75-9BB0-0D023378592B | 10.0.19640.1000 | Microsoft Corporation | sistema
+  F46D4000-FD22-4DB4-AC8E-4E1DDDE828FE | 10.0.26100.1 | Microsoft Corporation | sistema
+  Microsoft.AAD.BrokerPlugin | 1000.19580.1000.2 | Microsoft Corporation | sistema
+  Microsoft.AccountsControl | 10.0.26100.1 | Microsoft Corporation | sistema
+  Microsoft.AsyncTextService | 10.0.26100.1 | Microsoft Corporation | sistema
+  Microsoft.BioEnrollment | 10.0.19587.1000 | Microsoft Corporation | sistema
+  Microsoft.CredDialogHost | 10.0.19595.1001 | Microsoft Corporation | sistema
+  Microsoft.ECApp | 10.0.26100.33648 | Microsoft Corporation | sistema
+  Microsoft.LockApp | 10.0.26100.33648 | Microsoft Corporation | sistema
+  Microsoft.MicrosoftEdgeDevToolsClient | 1000.25128.1000.0 | Microsoft Corporation | sistema
+  Microsoft.Win32WebViewHost | 10.0.26100.1 | Microsoft Corporation | sistema
+  Microsoft.Windows.Apprep.ChxApp | 1000.25128.1000.0 | Microsoft Corporation | sistema
+  Microsoft.Windows.CapturePicker | 10.0.19580.1000 | Microsoft Corporation | sistema
+  Microsoft.Windows.CloudExperienceHost | 10.0.26100.1 | Microsoft Corporation | sistema
+  Microsoft.Windows.ContentDeliveryManager | 10.0.26100.1 | Microsoft Corporation | sistema
+  Microsoft.Windows.OOBENetworkCaptivePortal | 10.0.26495.1000 | Microsoft Corporation | sistema
+  Microsoft.Windows.OOBENetworkConnectionFlow | 10.0.26495.1000 | Microsoft Corporation | sistema
+  Microsoft.Windows.PeopleExperienceHost | 10.0.26100.1 | Microsoft Corporation | sistema
+[OK] aplicativos do Windows listados
+
+==== Ponto de restauração ====
+  The service cannot be started, either because it is disabled or because it has no enabled devices associated with it (1058)
+[OK] chamada ao ponto de restauração não travou
+
+==== Interface (capturas de tela) ====
+[OK] janela principal criada
+  captura 01-programas: ok (1044x700)
+  captura 02-apps: ok (1044x700)
+  captura 03-rastreados: ok (1044x700)
+  captura 04-inicializacao: ok (1044x700)
+  captura 05-backups: ok (1044x700)
+  captura 10-confirmar-um: ok (580x420)
+  captura 11-confirmar-varios: ok (580x494)
+  captura 12-forcada: ok (580x420)
+  captura 13-nome: ok (480x190)
+  captura 14-sobras: ok (1044x640)
+  captura 15-progresso: ok (560x230)
+  captura 16-cacador: ok (64x64)
+[OK] todas as janelas abriram e fecharam
+
+==== Resultado ====
+23 OK, 0 FALHAS
