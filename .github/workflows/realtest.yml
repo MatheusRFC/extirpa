@@ -1,8 +1,7 @@
 # Temporário: teste com programas reais num Windows limpo. Este branch é apagado depois.
 name: realtest
 on:
-  push:
-    branches: [ci-teste-real]
+  workflow_dispatch:
 permissions:
   contents: write
 jobs:
