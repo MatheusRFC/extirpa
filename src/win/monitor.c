@@ -14,6 +14,7 @@ typedef struct {
     Ctl *ctl;
     uint64_t count;
     PtrVec skip_dirs;  // WCHAR*: pastas que mudam sozinhas o tempo todo
+    ULONGLONG t0;
 } Walk;
 
 // Chaves fora da foto: o banco de dados do Windows Installer e outras áreas que o EXTIRPA
@@ -35,8 +36,22 @@ static bool skip_key(const WCHAR *path) {
     return false;
 }
 
-static void tick(Walk *w, StrId what) {
-    if (++w->count % 4096) return;
+// Sinal de vida no log a cada 2^18 entradas: numa foto lenta, mostra por onde ela anda.
+static void heartbeat(Walk *w, const WCHAR *path) {
+    if (w->count & ((1u << 18) - 1)) return;
+    log_fmt(u"  foto: %U entradas, %U ms, em %s", w->count, (uint64_t)(GetTickCount64() - w->t0), path);
+}
+
+// Partes da foto que demoram mais de 2 s vão para o log, com o tempo e o número de entradas.
+static void slow_part(Walk *w, const WCHAR *path, ULONGLONG t, uint64_t c) {
+    ULONGLONG ms = GetTickCount64() - t;
+    if (ms >= 2000) log_fmt(u"  foto: %s levou %U ms (%U entradas)", path, (uint64_t)ms, w->count - c);
+}
+
+static void tick(Walk *w, StrId what, const WCHAR *path) {
+    ++w->count;
+    heartbeat(w, path);
+    if (w->count % 4096) return;
     WCHAR *t = wfmt(T(what), w->count);
     ctl_progress(w->ctl, t);
     xfree(t);
@@ -54,7 +69,9 @@ static void walk_key(Walk *w, const WCHAR *path, HKEY k, int depth) {
     PtrVec subs = reg_subkeys(k);
     for (size_t i = 0; i < subs.n && !ctl_cancelled(w->ctl); i++) {
         WCHAR *child = path_join(path, subs.items[i]);
-        tick(w, S_TRACE_READING_REG);
+        tick(w, S_TRACE_READING_REG, child);
+        ULONGLONG t = GetTickCount64();
+        uint64_t c = w->count;
         if (!skip_key(child)) {
             bool descend = true;
             if (w->second) descend = snap_check(w->s, TR_KEY, child, NULL);  // nova: entra inteira, sem descer
@@ -67,6 +84,7 @@ static void walk_key(Walk *w, const WCHAR *path, HKEY k, int depth) {
                 }
             }
         }
+        if (depth <= 1) slow_part(w, child, t, c);
         xfree(child);
     }
     strings_free(&subs);
@@ -94,24 +112,40 @@ static bool skip_dir(Walk *w, const WCHAR *path) {
     return false;
 }
 
+// Pastas grandes que instaladores não tocam: descer nelas só deixaria a foto lenta.
+static bool heavy_dir(const WCHAR *name) {
+    static const WCHAR *const HEAVY[] = {u"steamapps", u"node_modules", u".git", u"$Recycle.Bin", u"WinSxS", u"Package Cache", u"__pycache__"};
+    for (size_t i = 0; i < COUNT(HEAVY); i++)
+        if (wieq(name, HEAVY[i])) return true;
+    return false;
+}
+
+// Profundidade máxima da foto de arquivos (a partir de Arquivos de Programas, AppData...).
+// Instaladores criam a pasta do programa nos primeiros níveis: o que fica mais fundo dentro
+// de uma pasta que já existia não muda o resultado, só o tempo.
+#define WALK_MAX_DEPTH 6
+
 static void walk_dir(Walk *w, const WCHAR *dir, int depth) {
-    if (ctl_cancelled(w->ctl) || depth > 32) return;
+    if (ctl_cancelled(w->ctl) || depth > WALK_MAX_DEPTH) return;
     PtrVec v = fs_list(dir);
     for (size_t i = 0; i < v.n && !ctl_cancelled(w->ctl); i++) {
         DirEntry *e = v.items[i];
         WCHAR *path = path_join(dir, e->name);
-        tick(w, S_TRACE_READING_FILES);
+        tick(w, S_TRACE_READING_FILES, path);
+        ULONGLONG t = GetTickCount64();
+        uint64_t c = w->count;
         if (e->is_dir) {
             if (!skip_dir(w, path)) {
                 bool descend = true;
                 if (w->second) descend = snap_check(w->s, TR_DIR, path, NULL);
                 else snap_record(w->s, TR_DIR, path, NULL);
-                if (descend && !e->is_link) walk_dir(w, path, depth + 1);
+                if (descend && !e->is_link && !heavy_dir(e->name)) walk_dir(w, path, depth + 1);
             }
         } else {
             if (w->second) snap_check(w->s, TR_FILE, path, NULL);
             else snap_record(w->s, TR_FILE, path, NULL);
         }
+        if (depth <= 1) slow_part(w, path, t, c);
         xfree(path);
     }
     fs_list_free(&v);
@@ -143,7 +177,7 @@ static void add_skip(Walk *w, const WCHAR *base, const WCHAR *sub) {
 }
 
 void monitor_snapshot(Snapshot *s, bool second, Ctl *ctl) {
-    Walk w = {s, second, ctl, 0, {0}};
+    Walk w = {s, second, ctl, 0, {0}, GetTickCount64()};
     const Paths *p = &g_paths;
     add_skip(&w, p->temp, NULL);
     add_skip(&w, p->data_dir, NULL);
@@ -169,6 +203,7 @@ void monitor_snapshot(Snapshot *s, bool second, Ctl *ctl) {
         if (!k) continue;
         walk_key(&w, KEYS[i], k, 0);
         RegCloseKey(k);
+        log_fmt(u"  foto: %s pronto, %U entradas, %U ms", KEYS[i], w.count, (uint64_t)(GetTickCount64() - w.t0));
     }
     walk_services(&w);
     // regras do firewall (um valor por regra) e tarefas agendadas (um arquivo por tarefa)
@@ -194,10 +229,12 @@ void monitor_snapshot(Snapshot *s, bool second, Ctl *ctl) {
         bool dup = false;  // a Área de Trabalho pode estar dentro de outra pasta da lista
         for (size_t j = 0; j < i; j++)
             if (dirs[j] && path_is_under_or_eq(dirs[i], dirs[j])) dup = true;
-        if (!dup) walk_dir(&w, dirs[i], 0);
+        if (dup) continue;
+        walk_dir(&w, dirs[i], 0);
+        log_fmt(u"  foto: %s pronto, %U entradas, %U ms", dirs[i], w.count, (uint64_t)(GetTickCount64() - w.t0));
     }
     strings_free(&w.skip_dirs);
-    log_fmt(u"Foto do sistema (%s): %U entradas lidas", second ? u"depois" : u"antes", w.count);
+    log_fmt(u"Foto do sistema (%s): %U entradas lidas em %U ms", second ? u"depois" : u"antes", w.count, (uint64_t)(GetTickCount64() - w.t0));
 }
 
 WCHAR *trace_guess_name(const Trace *t) {

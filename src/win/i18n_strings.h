@@ -191,6 +191,7 @@ X(S_KIND_SERVICE, u"Serviço", u"Service")
 X(S_KIND_TASK, u"Tarefa agendada", u"Scheduled task")
 X(S_KIND_FWRULE, u"Regra do firewall", u"Firewall rule")
 X(S_KIND_PATHENTRY, u"Entrada do PATH", u"PATH entry")
+X(S_KIND_APPX, u"Pacote do Windows", u"Windows package")
 X(S_CONF_HIGH, u"Alta", u"High")
 X(S_CONF_MEDIUM, u"Média", u"Medium")
 X(S_CONF_LOW, u"Baixa", u"Low")
@@ -214,6 +215,8 @@ X(S_REASON_PATH_VAR, u"Pasta do programa na variável PATH", u"Program folder in
 X(S_REASON_USAGE, u"Rastro de uso guardado pelo Windows", u"Usage trace kept by Windows")
 X(S_REASON_SHELL_EXT, u"Menu de contexto ou extensão do Explorer", u"Context menu or Explorer extension")
 X(S_REASON_REFERENCE, u"Aponta para outro item do programa", u"Points to another item of the program")
+X(S_REASON_PACKAGE, u"Pacote do Windows registrado pelo programa (ex.: menu de contexto do Windows 11)",
+  u"Windows package registered by the program (e.g. Windows 11 context menu)")
 
 // desinstalação forçada
 X(S_FORCED_TITLE, u"Desinstalação forçada", u"Forced uninstall")

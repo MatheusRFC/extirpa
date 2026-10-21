@@ -256,6 +256,18 @@ static void test_programs_load(void) {
     c = uninstall_command(code, true, &q);
     CHECK_WEQ(c, u"\"C:\\Users\\ana\\AppData\\Local\\Programs\\Microsoft VS Code\\unins000.exe\" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART");
     xfree(c);
+    // Inno Setup com QuietUninstallString /SILENT (que ainda faz perguntas): vale o tipo do executável
+    fake_str(u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Code", u"QuietUninstallString",
+             u"\"%LOCALAPPDATA%\\Programs\\Microsoft VS Code\\unins000.exe\" /SILENT");
+    fake_file(u"C:\\Users\\ana\\AppData\\Local\\Programs\\Microsoft VS Code\\unins000.exe", "MZ..Inno Setup Uninstall", 24);
+    {
+        PtrVec v2 = programs_load();
+        c = uninstall_command(find_program(&v2, u"Visual Studio Code (User)"), true, &q);
+        CHECK_WEQ(c, u"\"C:\\Users\\ana\\AppData\\Local\\Programs\\Microsoft VS Code\\unins000.exe\" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART");
+        CHECK(q);
+        xfree(c);
+        programs_free(&v2);
+    }
     c = uninstall_command(ff, true, &q);  // desinstalador desconhecido: o normal
     CHECK_WEQ(c, u"\"C:\\Program Files\\Mozilla Firefox\\uninstall\\helper.exe\"");
     CHECK(!q);
@@ -703,6 +715,8 @@ static void super_editor_installed(void) {
     task_file(u"\\Microsoft\\Windows\\Fake\\Task", SE_DIR u"\\se.exe");  // do Windows: nunca
     fake_str(FW_KEY, u"{AAAA-SE}", u"v2.30|Action=Allow|Active=TRUE|Dir=In|App=%ProgramFiles%\\Nimbus\\Super Editor\\se.exe|Name=Super Editor|");
     fake_str(FW_KEY, u"TCP Query User{B}C:\\program files\\nimbus\\super editor\\se.exe", u"v2.30|Action=Block|Dir=In|App=C:\\program files\\nimbus\\super editor\\se.exe|");
+    // nome com aspas simples e tipográficas: não pode quebrar o literal do script do PowerShell
+    fake_str(FW_KEY, u"Ana's \u2019rule\u2019", u"v2.30|Action=Allow|Dir=In|App=" SE_DIR u"\\se.exe|");
     fake_str(FW_KEY, u"{BBBB-UP}", u"v2.30|Action=Allow|Dir=Out|App=" UP_DIR u"\\nu.exe|Name=Updater|");
     const WCHAR path_val[] = u"C:\\Users\\ana\\bin;%ProgramFiles%\\Nimbus\\Super Editor\\bin;" UP_DIR u";";
     fake_val(u"HKCU\\Environment", u"Path", REG_EXPAND_SZ, path_val, sizeof(path_val));
@@ -758,6 +772,7 @@ static void test_full_cleanup(void) {
         {LK_TASK, u"\\Nimbus\\SuperEditorUpdate", NULL},
         {LK_FWRULE, u"{AAAA-SE}", NULL},
         {LK_FWRULE, u"TCP Query User{B}C:\\program files\\nimbus\\super editor\\se.exe", NULL},
+        {LK_FWRULE, u"Ana's \u2019rule\u2019", NULL},
         {LK_PATHENTRY, u"HKCU\\Environment", u"%ProgramFiles%\\Nimbus\\Super Editor\\bin"},
         {LK_VALUE, MUI, SE_DIR u"\\se.exe.FriendlyAppName"},
         {LK_SERVICE, u"SuperEditorSvc", NULL},
@@ -805,6 +820,7 @@ static void test_full_cleanup(void) {
     CHECK(!fake_exists(u"C:\\Windows\\System32\\Tasks\\Nimbus\\SuperEditorUpdate"));
     CHECK(!fake_val_exists(FW_KEY, u"{AAAA-SE}"));
     CHECK(!fake_val_exists(FW_KEY, u"TCP Query User{B}C:\\program files\\nimbus\\super editor\\se.exe"));
+    CHECK(!fake_val_exists(FW_KEY, u"Ana's \u2019rule\u2019"));
     CHECK(!fake_val_exists(MUI, SE_DIR u"\\se.exe.FriendlyAppName"));
     CHECK(!fake_key_exists(u"HKLM\\SYSTEM\\CurrentControlSet\\Services\\SuperEditorSvc"));
     // o PATH perdeu só a entrada do programa (e manteve o tipo REG_EXPAND_SZ)
@@ -945,6 +961,253 @@ static void test_two_versions(void) {
     xfree(key);
 }
 
+static WCHAR *rot13w(const WCHAR *s) {
+    WCHAR *r = wdup(s);
+    for (WCHAR *p = r; *p; p++) {
+        if (*p >= 'a' && *p <= 'z') *p = (WCHAR)('a' + (*p - 'a' + 13) % 26);
+        else if (*p >= 'A' && *p <= 'Z') *p = (WCHAR)('A' + (*p - 'A' + 13) % 26);
+    }
+    return r;
+}
+
+#define AUTOPLAY u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers"
+#define USERASSIST u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count"
+#define JUMPLIST u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Search\\JumplistData"
+#define FILEEXTS u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts"
+
+// Casos vistos com programas reais (teste no Windows do GitHub Actions)
+static void test_real_cases(void) {
+    // FileZilla: a chave do programa tem o nome da chave de desinstalação ("FileZilla Client")
+    base_system();
+    const WCHAR FZ[] = u"HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\FileZilla Client";
+    fake_str(FZ, u"DisplayName", u"FileZilla 3.71.1");
+    fake_str(FZ, u"DisplayVersion", u"3.71.1");
+    fake_str(FZ, u"Publisher", u"Tim Kosse");
+    fake_str(FZ, u"UninstallString", u"\"C:\\Program Files\\FileZilla FTP Client\\uninstall.exe\"");
+    fake_str(FZ, u"DisplayIcon", u"C:\\Program Files\\FileZilla FTP Client\\filezilla.exe");
+    fake_file(u"C:\\Program Files\\FileZilla FTP Client\\filezilla.exe", "MZ", 2);
+    fake_str(u"HKLM\\SOFTWARE\\WOW6432Node\\FileZilla Client", u"", u"C:\\Program Files\\FileZilla FTP Client");
+    fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\FileZilla\\filezilla.xml", "x", 1);
+    PtrVec v = programs_load();
+    Program *p = find_program(&v, u"FileZilla 3.71.1");
+    CHECK(p != NULL);
+    if (p) {
+        Identity *id = program_identity(p);
+        WCHAR *key = wdup(p->key_path);
+        reg_delete_key(key);
+        LeftList l = {0};
+        scan_leftovers(&l, id, key, SCAN_MODERATE, NULL);
+        left_finalize(&l);
+        Leftover *k = find_item(&l, LK_KEY, u"HKLM\\SOFTWARE\\WOW6432Node\\FileZilla Client", NULL);
+        CHECK(k && k->conf == CONF_HIGH && k->checked);
+        Leftover *d = find_item(&l, LK_DIR, u"C:\\Users\\ana\\AppData\\Roaming\\FileZilla", NULL);
+        CHECK(d && d->checked);
+        if (g_fail) dump(&l);
+        left_free(&l);
+        identity_free(id);
+        xfree(key);
+    }
+    programs_free(&v);
+
+    // WinSCP: configuração em "Martin Prikryl\WinSCP 2" (nome + número); "WinSCP 2023" seria outra coisa
+    base_system();
+    const WCHAR WS[] = u"HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\winscp3_is1";
+    fake_str(WS, u"DisplayName", u"WinSCP 6.7");
+    fake_str(WS, u"DisplayVersion", u"6.7");
+    fake_str(WS, u"Publisher", u"Martin Prikryl");
+    fake_str(WS, u"InstallLocation", u"C:\\Program Files (x86)\\WinSCP\\");
+    fake_str(WS, u"UninstallString", u"\"C:\\Program Files (x86)\\WinSCP\\unins000.exe\"");
+    fake_str(u"HKCU\\Software\\Martin Prikryl\\WinSCP 2\\Configuration", u"x", u"1");
+    fake_str(u"HKCU\\Software\\Martin Prikryl\\WinSCP 2023", u"x", u"1");
+    fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\winscp.rnd", "x", 1);
+    // a entrada de inicialização já saiu com o desinstalador; o aviso do Windows sobre ela ficou
+    fake_str(u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunNotification", u"StartupTNotiWinSCP", u"");
+    fake_str(u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunNotification", u"StartupTNotiOneDrive", u"");
+    fake_str(u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run", u"WinSCP", u"x");
+    fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\winscpx.log", "x", 1);  // outro nome: não
+    v = programs_load();
+    p = find_program(&v, u"WinSCP 6.7");
+    CHECK(p != NULL);
+    if (p) {
+        Identity *id = program_identity(p);
+        WCHAR *key = wdup(p->key_path);
+        reg_delete_key(key);
+        LeftList l = {0};
+        scan_leftovers(&l, id, key, SCAN_MODERATE, NULL);
+        left_finalize(&l);
+        Leftover *k = find_item(&l, LK_KEY, u"HKCU\\Software\\Martin Prikryl\\WinSCP 2", NULL);
+        CHECK(k && k->conf == CONF_HIGH && k->checked);
+        Leftover *other = find_item(&l, LK_KEY, u"HKCU\\Software\\Martin Prikryl\\WinSCP 2023", NULL);
+        CHECK(!other || !other->checked);
+        Leftover *rnd = find_item(&l, LK_FILE, u"C:\\Users\\ana\\AppData\\Roaming\\winscp.rnd", NULL);
+        CHECK(rnd && rnd->checked);
+        CHECK(!any_path_contains(&l, u"winscpx.log"));
+        Leftover *rn = find_item(&l, LK_VALUE, u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunNotification", u"StartupTNotiWinSCP");
+        CHECK(rn && rn->checked);
+        CHECK(!find_item(&l, LK_VALUE, u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunNotification", u"StartupTNotiOneDrive"));
+        Leftover *ap = find_item(&l, LK_VALUE, u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run", u"WinSCP");
+        CHECK(ap && ap->checked);
+        if (g_fail) dump(&l);
+        left_free(&l);
+        identity_free(id);
+        xfree(key);
+    }
+    programs_free(&v);
+
+    // VLC: a pasta de configuração tem o nome do executável, de 3 letras ("vlc")
+    base_system();
+    const WCHAR VL[] = u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\VLC media player";
+    fake_str(VL, u"DisplayName", u"VLC media player");
+    fake_str(VL, u"DisplayVersion", u"3.0.24");
+    fake_str(VL, u"Publisher", u"VideoLAN");
+    fake_str(VL, u"UninstallString", u"\"C:\\Program Files\\VideoLAN\\VLC\\uninstall.exe\"");
+    fake_str(VL, u"DisplayIcon", u"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe");
+    fake_file(u"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe", "MZ", 2);
+    fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\vlc\\vlc-qt-interface.ini", "x", 1);
+    fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\vlcsnap\\x.png", "x", 1);  // outro nome: não
+    // reprodução automática: um handler com ícone do VLC, outro que o desinstalador já apagou
+    // (sobrou só o nome no evento) e um da Microsoft no mesmo evento
+    fake_str(AUTOPLAY u"\\Handlers\\VLCPlayDVDMovieOnArrival", u"DefaultIcon", u"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe,0");
+    fake_str(AUTOPLAY u"\\Handlers\\MSPlayDVD", u"DefaultIcon", u"%SystemRoot%\\system32\\wmploc.dll,-25");
+    fake_str(AUTOPLAY u"\\EventHandlers\\PlayDVDMovieOnArrival", u"VLCPlayDVDMovieOnArrival", u"");
+    fake_str(AUTOPLAY u"\\EventHandlers\\PlayDVDMovieOnArrival", u"MSPlayDVD", u"");
+    fake_str(AUTOPLAY u"\\EventHandlers\\PlayBluRayOnArrival", u"VLCPlayBlurayOnArrival", u"");
+    // "Abrir com" do Explorer, rastros de uso (UserAssist em ROT13, Jump Lists)
+    fake_str(FILEEXTS u"\\.mp3\\OpenWithProgids", u"VLC.mp3", u"");
+    fake_str(FILEEXTS u"\\.mp3\\OpenWithProgids", u"WMP11.AssocFile.MP3", u"");
+    WCHAR *ua_vlc = rot13w(u"{6D809377-6AF0-444B-8957-A3773F02200E}\\VideoLAN\\VLC\\vlc.exe");
+    WCHAR *ua_np = rot13w(u"{F38BF404-1D43-42F2-9305-67DE0B28FC23}\\notepad.exe");
+    fake_dword(USERASSIST, ua_vlc, 1);
+    fake_dword(USERASSIST, ua_np, 1);
+    WCHAR *ua_appid = rot13w(u"VLC.Player.AppID"), *ua_other = rot13w(u"Microsoft.Windows.Explorer");
+    fake_dword(USERASSIST, ua_appid, 1);
+    fake_dword(USERASSIST, ua_other, 1);
+    fake_str(JUMPLIST, u"{6D809377-6AF0-444B-8957-A3773F02200E}\\VideoLAN\\VLC\\vlc.exe", u"x");
+    fake_str(JUMPLIST, u"Microsoft.Windows.Explorer", u"x");
+    v = programs_load();
+    p = find_program(&v, u"VLC media player");
+    CHECK(p != NULL);
+    if (p) {
+        Identity *id = program_identity(p);
+        WCHAR *key = wdup(p->key_path);
+        // o desinstalador tira a entrada e a pasta; a do editor (VideoLAN) fica vazia
+        reg_delete_key(key);
+        DeleteFileW(u"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe");
+        RemoveDirectoryW(u"C:\\Program Files\\VideoLAN\\VLC");
+        LeftList l = {0};
+        scan_leftovers(&l, id, key, SCAN_MODERATE, NULL);
+        left_finalize(&l);
+        Leftover *d = find_item(&l, LK_DIR, u"C:\\Users\\ana\\AppData\\Roaming\\vlc", NULL);
+        CHECK(d && d->conf == CONF_HIGH && d->checked);
+        Leftover *o = find_item(&l, LK_DIR, u"C:\\Users\\ana\\AppData\\Roaming\\vlcsnap", NULL);
+        CHECK(!o || !o->checked);
+        Leftover *it = find_item(&l, LK_DIR_IF_EMPTY, u"C:\\Program Files\\VideoLAN", NULL);
+        CHECK(it && it->checked);
+        it = find_item(&l, LK_KEY, AUTOPLAY u"\\Handlers\\VLCPlayDVDMovieOnArrival", NULL);
+        CHECK(it && it->checked);
+        it = find_item(&l, LK_VALUE, AUTOPLAY u"\\EventHandlers\\PlayDVDMovieOnArrival", u"VLCPlayDVDMovieOnArrival");
+        CHECK(it && it->checked);
+        it = find_item(&l, LK_VALUE, AUTOPLAY u"\\EventHandlers\\PlayBluRayOnArrival", u"VLCPlayBlurayOnArrival");
+        CHECK(it && !it->checked);  // só pelo nome: desmarcado
+        if (it) it->checked = true;  // o usuário marca
+        it = find_item(&l, LK_VALUE, FILEEXTS u"\\.mp3\\OpenWithProgids", u"VLC.mp3");
+        CHECK(it && it->checked);
+        it = find_item(&l, LK_VALUE, USERASSIST, ua_vlc);
+        CHECK(it && it->checked);
+        it = find_item(&l, LK_VALUE, USERASSIST, ua_appid);
+        CHECK(it && it->checked);
+        CHECK(!find_item(&l, LK_VALUE, USERASSIST, ua_other));
+        it = find_item(&l, LK_VALUE, JUMPLIST, u"{6D809377-6AF0-444B-8957-A3773F02200E}\\VideoLAN\\VLC\\vlc.exe");
+        CHECK(it && it->checked);
+        CHECK(!any_path_contains(&l, u"MSPlayDVD") && !find_item(&l, LK_VALUE, FILEEXTS u"\\.mp3\\OpenWithProgids", u"WMP11.AssocFile.MP3"));
+        CHECK(!find_item(&l, LK_VALUE, USERASSIST, ua_np) && !find_item(&l, LK_VALUE, JUMPLIST, u"Microsoft.Windows.Explorer"));
+        if (g_fail) dump(&l);
+        DelResult r;
+        delete_leftovers(&l, u"VLC", NULL, &r);
+        CHECK(r.failed == 0);
+        CHECK(!fake_exists(u"C:\\Program Files\\VideoLAN") && !fake_exists(u"C:\\Users\\ana\\AppData\\Roaming\\vlc"));
+        CHECK(!fake_key_exists(AUTOPLAY u"\\Handlers\\VLCPlayDVDMovieOnArrival") && fake_key_exists(AUTOPLAY u"\\Handlers\\MSPlayDVD"));
+        CHECK(!fake_val_exists(AUTOPLAY u"\\EventHandlers\\PlayDVDMovieOnArrival", u"VLCPlayDVDMovieOnArrival"));
+        CHECK(fake_val_exists(AUTOPLAY u"\\EventHandlers\\PlayDVDMovieOnArrival", u"MSPlayDVD"));
+        CHECK(fake_key_exists(AUTOPLAY u"\\EventHandlers\\PlayBluRayOnArrival"));  // a chave do evento fica, mesmo vazia
+        CHECK(!fake_val_exists(FILEEXTS u"\\.mp3\\OpenWithProgids", u"VLC.mp3") && fake_val_exists(FILEEXTS u"\\.mp3\\OpenWithProgids", u"WMP11.AssocFile.MP3"));
+        CHECK(!fake_val_exists(USERASSIST, ua_vlc) && fake_val_exists(USERASSIST, ua_np));
+        CHECK(fake_val_exists(JUMPLIST, u"Microsoft.Windows.Explorer"));
+        del_result_free(&r);
+        left_free(&l);
+        identity_free(id);
+        xfree(key);
+    }
+    programs_free(&v);
+    xfree(ua_vlc), xfree(ua_np), xfree(ua_appid), xfree(ua_other);
+
+    // Notepad++: o atalho do Bloco de Notas do Windows ("Notepad.lnk", sem destino) não é dele
+    base_system();
+    const WCHAR NP[] = u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Notepad++";
+    fake_str(NP, u"DisplayName", u"Notepad++ (64-bit x64)");
+    fake_str(NP, u"DisplayVersion", u"8.9.8.1");
+    fake_str(NP, u"Publisher", u"Notepad++ Team");
+    fake_str(NP, u"UninstallString", u"\"C:\\Program Files\\Notepad++\\uninstall.exe\"");
+    fake_str(NP, u"DisplayIcon", u"C:\\Program Files\\Notepad++\\notepad++.exe");
+    fake_file(u"C:\\Program Files\\Notepad++\\notepad++.exe", "MZ", 2);
+    fake_key(u"HKLM\\SOFTWARE\\WOW6432Node\\Notepad++");
+    {
+        uint8_t hdr[76] = {0};
+        static const uint8_t clsid[16] = {0x01, 0x14, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46};
+        put32(hdr, 0x4C);
+        memcpy(hdr + 4, clsid, 16);
+        fake_file(u"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Notepad.lnk", hdr, sizeof(hdr));
+    }
+    fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\Notepad++\\config.xml", "x", 1);
+    // pacote esparso do menu de contexto do Windows 11, que o desinstalador do Notepad++ deixou
+    fake_str(APPX_PACKAGES_KEY u"\\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww", u"Path",
+             u"C:\\Program Files\\WindowsApps\\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww");
+    {
+        static const char MANIFEST[] = "<Package><Properties><uap10:AllowExternalContent>true</uap10:AllowExternalContent></Properties></Package>";
+        fake_file(u"C:\\Program Files\\WindowsApps\\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww\\AppxManifest.xml", MANIFEST, sizeof(MANIFEST) - 1);
+    }
+    // aplicativo da Loja com o mesmo nome: desmarcado
+    fake_str(APPX_PACKAGES_KEY u"\\NotepadPlusPlus_9.0.0.0_x64__abcdefghjkmnp", u"Path", u"C:\\Program Files\\WindowsApps\\NotepadPlusPlus_9.0.0.0_x64__abcdefghjkmnp");
+    fake_file(u"C:\\Program Files\\WindowsApps\\NotepadPlusPlus_9.0.0.0_x64__abcdefghjkmnp\\AppxManifest.xml", "<Package></Package>", 19);
+    fake_str(APPX_PACKAGES_KEY u"\\Microsoft.WindowsNotepad_11.2507.26.0_x64__8wekyb3d8bbwe", u"Path",
+             u"C:\\Program Files\\WindowsApps\\Microsoft.WindowsNotepad_11.2507.26.0_x64__8wekyb3d8bbwe");
+    v = programs_load();
+    p = find_program(&v, u"Notepad++ (64-bit x64)");
+    CHECK(p != NULL);
+    if (p) {
+        Identity *id = program_identity(p);
+        WCHAR *key = wdup(p->key_path);
+        reg_delete_key(key);
+        LeftList l = {0};
+        scan_leftovers(&l, id, key, SCAN_MODERATE, NULL);
+        left_finalize(&l);
+        CHECK(!any_path_contains(&l, u"Notepad.lnk"));
+        CHECK(!any_path_contains(&l, u"WindowsNotepad"));
+        Leftover *pk = find_item(&l, LK_APPX, u"NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww", NULL);
+        CHECK(pk && pk->checked);
+        Leftover *store = find_item(&l, LK_APPX, u"NotepadPlusPlus_9.0.0.0_x64__abcdefghjkmnp", NULL);
+        CHECK(store && !store->checked);
+        DelResult r;
+        delete_leftovers(&l, u"Notepad++", NULL, &r);
+        CHECK(r.failed == 0);
+        CHECK(!fake_key_exists(APPX_PACKAGES_KEY u"\\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww"));
+        CHECK(fake_key_exists(APPX_PACKAGES_KEY u"\\Microsoft.WindowsNotepad_11.2507.26.0_x64__8wekyb3d8bbwe"));
+        bool ps_all = false;
+        for (size_t c = 0; c < fake_command_count(); c++) ps_all = ps_all || wifind(fake_command(c), u"powershell.exe");
+        CHECK(ps_all);
+        del_result_free(&r);
+        Leftover *k = find_item(&l, LK_KEY, u"HKLM\\SOFTWARE\\WOW6432Node\\Notepad++", NULL);
+        CHECK(k && k->checked);
+        Leftover *d = find_item(&l, LK_DIR, u"C:\\Users\\ana\\AppData\\Roaming\\Notepad++", NULL);
+        CHECK(d && d->checked);
+        if (g_fail) dump(&l);
+        left_free(&l);
+        identity_free(id);
+        xfree(key);
+    }
+    programs_free(&v);
+}
+
 int main(void) {
     test_programs_load();
     test_scan_safe();
@@ -958,6 +1221,7 @@ int main(void) {
     test_monitor();
     test_full_cleanup();
     test_two_versions();
+    test_real_cases();
     printf("%d verificações (Windows simulado), %d falhas\n", g_checks, g_fail);
     return g_fail ? 1 : 0;
 }

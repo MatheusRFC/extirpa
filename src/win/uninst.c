@@ -54,23 +54,27 @@ WCHAR *uninstall_command(const Program *p, bool quiet, bool *is_quiet) {
     WCHAR *qu = p->quiet_uninstall ? expand_env(p->quiet_uninstall) : NULL;
     WCHAR *r = NULL;
     if (quiet && un) {
-        WCHAR *q = cmd_quiet_variant(un, qu);
-        if (q) {
-            r = fix_exe(q);
-            xfree(q);
-            if (is_quiet) *is_quiet = true;
-        } else {
-            Cmd c;
-            if (cmd_split(un, &c)) {
-                const WCHAR *args = silent_args_for(c.exe);
-                if (args && !wifind(c.args, args)) {
-                    WCHAR *a = c.args[0] ? wcat3(c.args, u" ", args) : wdup(args);
-                    r = cmd_join(c.exe, a);
-                    xfree(a);
-                    if (is_quiet) *is_quiet = true;
-                }
+        // Primeiro o tipo do desinstalador, pelo próprio executável: o QuietUninstallString do
+        // Inno Setup costuma ser só /SILENT, que ainda mostra perguntas (ex.: "apagar as
+        // configurações?") e deixa a desinstalação parada esperando um clique.
+        Cmd c;
+        if (cmd_split(un, &c)) {
+            const WCHAR *args = silent_args_for(c.exe);
+            if (args) {
+                WCHAR *a = wifind(c.args, args) ? wdup(c.args) : c.args[0] ? wcat3(c.args, u" ", args) : wdup(args);
+                r = cmd_join(c.exe, a);
+                xfree(a);
+                if (is_quiet) *is_quiet = true;
             }
-            cmd_free(&c);
+        }
+        cmd_free(&c);
+        if (!r) {
+            WCHAR *q = cmd_quiet_variant(un, qu);
+            if (q) {
+                r = fix_exe(q);
+                xfree(q);
+                if (is_quiet) *is_quiet = true;
+            }
         }
     }
     if (!r && un) {

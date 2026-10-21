@@ -853,6 +853,8 @@ static int b64v(WCHAR c) {
     return -1;
 }
 
+static bool ps_quote(WCHAR c) { return c == '\'' || (c >= 0x2018 && c <= 0x201B); }
+
 int fake_run_capture(const WCHAR *cmdline, char **out, size_t *out_len) {
     if (out) *out = NULL;
     if (out_len) *out_len = 0;
@@ -884,14 +886,29 @@ int fake_run_capture(const WCHAR *cmdline, char **out, size_t *out_len) {
         }
         WCHAR *script = wdupn((const WCHAR *)bytes, nb / 2);
         xfree(bytes);
+        const WCHAR *ra = wifind(script, u"Remove-AppxPackage -Package '");
+        if (ra) {
+            // o pacote some do repositório de pacotes (e só ele: as chaves vizinhas ficam)
+            ra += wlen(u"Remove-AppxPackage -Package '");
+            const WCHAR *e = wfindc(ra, '\'');
+            WCHAR *name = e ? wdupn(ra, (size_t)(e - ra)) : NULL;
+            if (name) {
+                HKEY k;
+                if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, u"SOFTWARE\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\CurrentVersion\\AppModel\\PackageRepository\\Packages", 0, 0, &k) == 0)
+                    RegDeleteTreeW(k, name);
+                xfree(name);
+            }
+        }
         if (wifind(script, u"Remove-NetFirewallRule")) {
             const WCHAR *p = wifind(script, u"$ids=@(");
             for (p = p ? wfindc(p, '\'') : NULL; p;) {
                 StrBuf id = {0};
                 const WCHAR *q = p + 1;
                 for (; *q; q++) {
-                    if (*q == '\'' && q[1] == '\'') sb_addc(&id, '\''), q++;
-                    else if (*q == '\'') break;
+                    // como o PowerShell: ' e as aspas tipográficas U+2018 a U+201B fecham o literal;
+                    // duas seguidas valem a segunda, literal
+                    if (ps_quote(*q) && ps_quote(q[1])) sb_addc(&id, q[1]), q++;
+                    else if (ps_quote(*q)) break;
                     else sb_addc(&id, *q);
                 }
                 HKEY k;
@@ -912,4 +929,10 @@ static void fake_misc_reset(void) {
     mem_set(&g_commands, 0, sizeof(g_commands));
     mem_set(&g_short_long, 0, sizeof(g_short_long));
     mem_set(&g_short_short, 0, sizeof(g_short_short));
+}
+
+// relógio de mentira: avança 1 ms por consulta
+ULONGLONG GetTickCount64(void) {
+    static ULONGLONG t;
+    return ++t;
 }

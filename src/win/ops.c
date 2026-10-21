@@ -330,6 +330,12 @@ static bool item_exists(const Leftover *it) {
         return ok;
     }
     case LK_PATHENTRY: return true;  // entradas de PATH não vêm de rastreamentos
+    case LK_APPX: {
+        WCHAR *k = path_join(APPX_PACKAGES_KEY, it->path);
+        bool ok = reg_exists(k);
+        xfree(k);
+        return ok;
+    }
     }
     return false;
 }

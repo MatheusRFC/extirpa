@@ -245,6 +245,8 @@ static void test_clean_names(void) {
     CHECK_WEQ_FREE(clean_publisher(u"Igor Pavlov"), u"Igor Pavlov");
     CHECK_WEQ_FREE(clean_publisher(u"Foo, Inc."), u"Foo");
     CHECK_WEQ_FREE(norm_alnum(u"Mozilla-Firefox 2!"), u"mozillafirefox2");
+    CHECK_WEQ_FREE(norm_alnum(u"Notepad++"), u"notepadplusplus");  // não pode virar "notepad"
+    CHECK_WEQ_FREE(norm_alnum(u"C# Tools"), u"csharptools");
     CHECK(is_generic_word(u"update"));
     CHECK(is_generic_word(u"2024"));
     CHECK(is_generic_word(u"ab"));
@@ -616,20 +618,23 @@ static void test_leftovers(void) {
     trace_add(t, TR_FILE, u"C:\\Windows\\System32\\Tasks\\Foo\\FooUpdate", NULL);
     trace_add(t, TR_DIR, u"C:\\Windows\\System32\\Tasks\\Foo", NULL);
     trace_add(t, TR_VALUE, FIREWALL_RULES_KEY, u"{ABC-123}");
+    trace_add(t, TR_KEY, APPX_PACKAGES_KEY u"\\Foo_1.0.0.0_neutral__abc123", NULL);
+    trace_add(t, TR_KEY, APPX_PACKAGES_KEY u"\\Microsoft.Foo_1.0_x64__8wekyb3d8bbwe", NULL);  // da Microsoft: nunca
     LeftList m = {0};
     left_add_trace(&m, t);
     left_finalize(&m);
-    int high = 0, low = 0, svc = 0, task = 0, fw = 0;
+    int high = 0, low = 0, svc = 0, task = 0, fw = 0, appx = 0;
     for (size_t i = 0; i < m.items.n; i++) {
         Leftover *it = m.items.items[i];
         if (it->kind == LK_SERVICE) svc++;
         if (it->kind == LK_TASK && weq(it->path, u"\\Foo\\FooUpdate")) task++;
         if (it->kind == LK_FWRULE && weq(it->path, u"{ABC-123}")) fw++;
+        if (it->kind == LK_APPX && weq(it->path, u"Foo_1.0.0.0_neutral__abc123")) appx++;
         if (it->conf == CONF_HIGH) high++;
         if (it->conf == CONF_LOW) low++;
     }
-    CHECK(m.items.n == 9);  // a do Windows Installer é bloqueada
-    CHECK(svc == 1 && task == 1 && fw == 1 && high == 7 && low == 2);
+    CHECK(m.items.n == 9);  // as do Windows Installer, do UserAssist e o pacote da Microsoft são bloqueadas
+    CHECK(svc == 1 && task == 1 && fw == 1 && appx == 1 && high == 8 && low == 1);
     left_free(&m);
     trace_free(t);
 }
@@ -733,6 +738,7 @@ static void test_fmt(void) {
     CHECK(!parse_install_date(NULL, &y, &m, &d));
     CHECK_WEQ_FREE(wfmt(u"%s tem %d itens (%u, %U) 100%% %x", u"Lista", -42, 7u, (uint64_t)1 << 40), u"Lista tem -42 itens (7, 1099511627776) 100% %x");
     CHECK_WEQ_FREE(wfmt(u"%s|%s", NULL, u"b"), u"|b");
+    CHECK_WEQ_FREE(wfmt(u"[%c] %s", (WCHAR)'K', u"HKCU"), u"[K] HKCU");
     CHECK_WEQ_FREE(base64_utf16le(u"dir"), u"ZABpAHIA");
     CHECK_WEQ_FREE(base64_utf16le(u"a"), u"YQA=");
     CHECK_WEQ_FREE(base64_utf16le(u""), u"");

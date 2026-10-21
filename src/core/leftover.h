@@ -17,6 +17,8 @@ typedef enum {
     LK_TASK,          // tarefa agendada (path = nome completo, "\Pasta\Tarefa"; removida pelo schtasks)
     LK_FWRULE,        // regra do Firewall do Windows (path = ID da regra; removida pelo PowerShell)
     LK_PATHENTRY,     // entrada da variável PATH (path = chave do ambiente, value = a entrada)
+    LK_APPX,          // pacote do Windows (path = PackageFullName; removido pelo Remove-AppxPackage).
+                      // Ex.: o pacote "esparso" que põe o programa no menu de contexto do Windows 11
 } LeftKind;
 
 // Por que o item foi considerado sobra (o texto de cada motivo fica na interface).
@@ -41,6 +43,7 @@ typedef enum {
     LR_USAGE,          // rastro de uso guardado pelo Windows (MuiCache, compatibilidade)
     LR_SHELL_EXT,      // extensão do Explorer (menu de contexto, ícones) do programa
     LR_REFERENCE,      // referência a um item do programa que também está sendo removido
+    LR_PACKAGE,        // pacote do Windows registrado pelo programa
 } LeftReason;
 
 typedef struct {
@@ -65,11 +68,16 @@ typedef struct {
 // Chaves de ambiente onde fica a variável PATH (as únicas aceitas em LK_PATHENTRY)
 #define ENV_KEY_MACHINE u"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment"
 #define ENV_KEY_USER u"HKCU\\Environment"
+// Pacotes do Windows (AppX/MSIX) registrados na máquina: uma subchave por PackageFullName
+#define APPX_PACKAGES_KEY u"HKLM\\SOFTWARE\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\CurrentVersion\\AppModel\\PackageRepository\\Packages"
 #define FIREWALL_RULES_KEY u"HKLM\\SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\FirewallRules"
 
 bool left_is_registry(LeftKind k);
 bool left_has_value(LeftKind k);  // LK_VALUE e LK_PATHENTRY usam o campo value
 bool left_is_file(LeftKind k);
+// Nome de pacote aceito em LK_APPX: só letras, dígitos, '.', '_', '-' e '~', e nunca um pacote
+// da Microsoft ou do Windows
+bool left_appx_name_ok(const WCHAR *full_name);
 // Acrescenta respeitando a lista de proteção; repetido mantém a maior confiança.
 // Devolve o item (novo ou existente) ou NULL se bloqueado.
 Leftover *left_add(LeftList *l, LeftKind kind, const WCHAR *path, const WCHAR *value, int conf, LeftReason reason, const WCHAR *detail);

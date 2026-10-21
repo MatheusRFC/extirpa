@@ -53,8 +53,12 @@ bool is_generic_word(const WCHAR *norm) {
 
 WCHAR *norm_alnum(const WCHAR *s) {
     StrBuf b = {0};
-    for (; s && *s; s++)
+    for (; s && *s; s++) {
         if (w_is_alnum(*s)) sb_addc(&b, wfold(*s));
+        // "+" e "#" fazem parte do nome: o Notepad++ não pode virar o Bloco de Notas ("Notepad")
+        else if (*s == '+') sb_add(&b, u"plus");
+        else if (*s == '#') sb_add(&b, u"sharp");
+    }
     return sb_take(&b);
 }
 
@@ -277,7 +281,9 @@ void identity_add_exe(Identity *id, const WCHAR *exe_path) {
     WCHAR *parent = path_parent(p);
     if (parent && !protect_dir_blocked(parent)) {
         WCHAR *base = path_strip_ext(path_leaf(p)), *nb = norm_alnum(base);
-        if (wlen(nb) >= 4 && !wistarts(nb, u"unins") && !wistarts(nb, u"setup")) identity_add_exact(id, base);
+        // nomes de 3 letras só quando o nome do programa começa com eles ("vlc" do VLC media player)
+        bool longo = wlen(nb) >= 4 || (wlen(nb) == 3 && wistarts(id->name_norm, nb));
+        if (longo && !wistarts(nb, u"unins") && !wistarts(nb, u"setup")) identity_add_exact(id, base);
         xfree(base), xfree(nb);
     }
     xfree(parent), xfree(p);
@@ -317,6 +323,27 @@ int match_name(const Identity *id, const WCHAR *candidate) {
         }
     }
 done:
+    xfree(c);
+    return r;
+}
+
+// O nome é um nome exato do programa seguido só de um número (versão da configuração),
+// como "WinSCP 2" para o WinSCP 6.7. Para não pegar outra versão do mesmo programa
+// ("IntelliJ IDEA 2023" desinstalando a 2024), o número tem de ser um dígito só ou o começo
+// da versão do programa.
+static bool versioned_of(const WCHAR *c, const WCHAR *base, const WCHAR *vtag) {
+    size_t lb = wlen(base), lc = wlen(c);
+    if (lb < 4 || lc <= lb || !wistarts(c, base)) return false;
+    const WCHAR *suf = c + lb;
+    for (const WCHAR *p = suf; *p; p++)
+        if (*p < '0' || *p > '9') return false;
+    return wlen(suf) == 1 || (vtag && wistarts(vtag, suf));
+}
+
+bool match_name_versioned(const Identity *id, const WCHAR *candidate) {
+    WCHAR *c = norm_alnum(candidate);
+    bool r = versioned_of(c, id->name_norm, id->vtag) || (id->primary && versioned_of(c, id->primary, id->vtag));
+    for (size_t i = 0; !r && i < id->exact.n; i++) r = versioned_of(c, id->exact.items[i], id->vtag);
     xfree(c);
     return r;
 }

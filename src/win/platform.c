@@ -325,6 +325,8 @@ void log_fmt(const WCHAR *pattern, ...) {
             sb_add_u64(&b, va_arg(ap, unsigned));
         } else if (*p == 'U') {
             sb_add_u64(&b, va_arg(ap, uint64_t));
+        } else if (*p == 'c') {
+            sb_addc(&b, (WCHAR)va_arg(ap, int));
         } else {
             sb_addc(&b, '%');
             if (*p != '%') sb_addc(&b, *p);
