@@ -7,7 +7,7 @@
 #include "../core/wstr.h"
 #include "win32.h"
 
-#define EXTIRPA_VERSION u"1.0.0"
+#define EXTIRPA_VERSION u"1.0.1"
 
 // Pastas do sistema e do usuário (todas normalizadas, sem '\' no fim; NULL se não existir)
 typedef struct {

@@ -10,6 +10,13 @@ void pv_push(PtrVec *v, void *item) {
     v->items[v->n++] = item;
 }
 
+void pv_insert(PtrVec *v, size_t pos, void *item) {
+    pv_push(v, item);
+    if (pos >= v->n - 1) return;
+    mem_move(v->items + pos + 1, v->items + pos, (v->n - 1 - pos) * sizeof(void *));
+    v->items[pos] = item;
+}
+
 void pv_free(PtrVec *v) {
     xfree(v->items);
     v->items = NULL;

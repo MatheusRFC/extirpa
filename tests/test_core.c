@@ -140,6 +140,17 @@ static void test_sort(void) {
     }
     CHECK(ok && v.n == 200);
     pv_free(&v);
+    // inserção no meio, no começo e no fim (mais de uma realocação)
+    static int nums[40];
+    for (int i = 0; i < 40; i++) nums[i] = i;
+    for (int i = 0; i < 40; i += 2) pv_push(&v, &nums[i]);
+    for (int i = 1; i < 40; i += 2) pv_insert(&v, (size_t)i, &nums[i]);
+    ok = v.n == 40;
+    for (size_t i = 0; i < v.n && ok; i++) ok = *(int *)v.items[i] == (int)i;
+    pv_insert(&v, 0, &nums[5]);
+    pv_insert(&v, v.n, &nums[7]);
+    CHECK(ok && v.n == 42 && *(int *)v.items[0] == 5 && *(int *)v.items[1] == 0 && *(int *)v.items[41] == 7);
+    pv_free(&v);
 }
 
 // ---------------------------------------------------------------- caminhos

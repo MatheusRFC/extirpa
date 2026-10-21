@@ -1339,7 +1339,8 @@ static void test_gridcraft_msi(void) {
         CHECK(plain->dirs.n == 0);  // sem os componentes não há pasta: era o defeito
         identity_free(plain);
         Identity *id = program_identity_target(p);
-        CHECK(p->msi_files.n == 2);  // só os dois arquivos que são só dele
+        // só os arquivos que são só dele: nem o componente compartilhado nem a pasta do menu Iniciar
+        CHECK(p->msi_dirs && p->msi_dirs->lca[0] && weq(p->msi_dirs->lca[0], u"C:\\Program Files\\GridCraft") && !p->msi_dirs->lca[1] && p->msi_dirs->outside.n == 0);
         CHECK(id->dirs.n >= 1 && weq(id->dirs.items[0], u"C:\\Program Files\\GridCraft"));
         for (size_t i = 0; i < id->dirs.n; i++) CHECK(!wifind(id->dirs.items[i], u"Common Files") && !wifind(id->dirs.items[i], u"Planilha"));
         LeftList l = {0};
@@ -1389,6 +1390,7 @@ static void test_gridcraft_msi(void) {
     p = find_program(&v, u"GridCraft");
     if (p) {
         Identity *id = program_identity_target(p);
+        CHECK(!p->msi_dirs);  // os componentes do caso anterior não valem mais (o Registro mudou)
         CHECK(id->dirs.n >= 1 && weq(id->dirs.items[0], u"C:\\Program Files\\GridCraft"));
         identity_free(id);
         // e, sem App Paths, pelo atalho do menu Iniciar
