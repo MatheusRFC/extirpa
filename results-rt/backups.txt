@@ -1,0 +1,13 @@
+
+Name                                               Length
+----                                               ------
+20261021-180139 - Extirpa Selftest Widget.reg        1394
+20261021-180622 - Notepad++ (64-bit x64).reg         2814
+20261021-180632 - VLC media player.reg               9424
+20261021-180640 - KeePass Password Safe 2.61.1.reg   2308
+20261021-180647 - FileZilla 3.71.1.reg               1194
+20261021-180656 - WinSCP 6.7.reg                    41766
+20261021-180703 - 7-Zip 26.04 (x64).reg              2778
+20261021-180713 - Audacity 3.7.9.reg                 3482
+20261021-180726 - PuTTY release 0.85 (64-bit).reg    6050
+
