@@ -1020,6 +1020,10 @@ static void test_real_cases(void) {
     fake_str(u"HKCU\\Software\\Martin Prikryl\\WinSCP 2\\Configuration", u"x", u"1");
     fake_str(u"HKCU\\Software\\Martin Prikryl\\WinSCP 2023", u"x", u"1");
     fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\winscp.rnd", "x", 1);
+    // a entrada de inicialização já saiu com o desinstalador; o aviso do Windows sobre ela ficou
+    fake_str(u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunNotification", u"StartupTNotiWinSCP", u"");
+    fake_str(u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunNotification", u"StartupTNotiOneDrive", u"");
+    fake_str(u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run", u"WinSCP", u"x");
     fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\winscpx.log", "x", 1);  // outro nome: não
     v = programs_load();
     p = find_program(&v, u"WinSCP 6.7");
@@ -1038,6 +1042,11 @@ static void test_real_cases(void) {
         Leftover *rnd = find_item(&l, LK_FILE, u"C:\\Users\\ana\\AppData\\Roaming\\winscp.rnd", NULL);
         CHECK(rnd && rnd->checked);
         CHECK(!any_path_contains(&l, u"winscpx.log"));
+        Leftover *rn = find_item(&l, LK_VALUE, u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunNotification", u"StartupTNotiWinSCP");
+        CHECK(rn && rn->checked);
+        CHECK(!find_item(&l, LK_VALUE, u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunNotification", u"StartupTNotiOneDrive"));
+        Leftover *ap = find_item(&l, LK_VALUE, u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run", u"WinSCP");
+        CHECK(ap && ap->checked);
         if (g_fail) dump(&l);
         left_free(&l);
         identity_free(id);

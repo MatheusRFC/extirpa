@@ -620,6 +620,8 @@ static int realtest(int argc, WCHAR **argv) {
         section(argv[a]);
         PtrVec progs = programs_load();
         Program *p = NULL;
+        for (size_t i = 0; i < progs.n && !p; i++)  // primeiro o nome exato, depois parte do nome
+            if (wieq(((Program *)progs.items[i])->name, argv[a])) p = progs.items[i];
         for (size_t i = 0; i < progs.n && !p; i++)
             if (wifind(((Program *)progs.items[i])->name, argv[a])) p = progs.items[i];
         if (!p) {

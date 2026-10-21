@@ -322,6 +322,40 @@ static void scan_run(Scan *sc) {
         reg_values_free(&vals);
         RegCloseKey(k);
     }
+    // Registros que o Windows guarda por entrada de inicialização e que ficam depois que o
+    // desinstalador apaga a entrada: o "ativado/desativado" (StartupApproved) e o aviso de
+    // "novo aplicativo de inicialização" (RunNotification, "StartupTNoti" + nome)
+    static const WCHAR *const ORPHAN[] = {u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run",
+                                          u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run32",
+                                          u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run",
+                                          u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunNotification"};
+    for (size_t o = 0; o < COUNT(ORPHAN); o++) {
+        HKEY k = reg_open(ORPHAN[o], KEY_READ);
+        if (!k) continue;
+        PtrVec names = reg_value_names(k);
+        bool noti = wiends(ORPHAN[o], u"RunNotification");
+        for (size_t i = 0; i < names.n; i++) {
+            const WCHAR *n = names.items[i];
+            if (noti && !wistarts(n, u"StartupTNoti")) continue;
+            const WCHAR *run_name = noti ? n + 12 : n;
+            bool alive = false, ours = false;
+            for (size_t r = 0; r < COUNT(RUN); r++) {
+                if (value_exists(RUN[r].key, run_name)) alive = true;
+                for (size_t j = 0; j < sc->out->items.n && !ours; j++) {
+                    const Leftover *it = sc->out->items.items[j];
+                    ours = it->kind == LK_VALUE && it->reason == LR_RUN && path_eq(it->path, RUN[r].key) && wieq(it->value, run_name);
+                }
+            }
+            int conf = ours ? CONF_HIGH : CONF_NONE;
+            if (!conf && !alive) {
+                conf = match_name(sc->id, run_name);
+                if (conf == CONF_HIGH && !name_is_ours(sc, run_name)) conf = CONF_LOW;
+            }
+            if (conf && conf >= sc->thr) left_add(sc->out, LK_VALUE, ORPHAN[o], n, conf, LR_RUN, NULL);
+        }
+        strings_free(&names);
+        RegCloseKey(k);
+    }
 }
 
 static void scan_app_paths(Scan *sc) {
