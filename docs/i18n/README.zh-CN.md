@@ -43,7 +43,7 @@ EXTIRPA 先用程序自己的卸载程序正确地移除它，然后再寻找残
 
 - **卸载：** 运行程序的卸载程序，并等待它及其启动的所有进程结束（job object），然后查找残留。
 - **三种搜索模式：** 安全（精确名称和安装文件夹）、适中（还包括启动项、服务、快捷方式、计划任务、防火墙规则、文件类型以及一切指向程序文件夹的内容；推荐）、高级（还包括相似名称，以及对注册表中任何指向该程序的值的深度扫描）。
-- **搜索位置：** 安装文件夹；Program Files、ProgramData、AppData（Roaming、Local、LocalLow）及发布者的文件夹；SOFTWARE 下的注册表项（64 位和 32 位，计算机和用户）；Run、RunOnce 及任务管理器的启动开关；服务；计划任务；Windows 防火墙规则；PATH 变量（系统和用户）；App Paths 和 SharedDLLs；文件类型（ProgID）、“打开方式”列表和默认关联；COM 组件和类型库；右键菜单项和资源管理器扩展（处理程序、图标覆盖、已批准的扩展）；Software\Clients 和 RegisteredApplications；桌面、开始菜单、启动文件夹中的快捷方式以及固定到任务栏的快捷方式；Windows 为每个程序保存的使用痕迹（MuiCache、兼容性设置）。以 8.3 短格式写入的路径（`C:\PROGRA~1\...`）也能识别。
+- **搜索位置：** 安装文件夹（以及包含它的发布者文件夹，如果变空）；Program Files、ProgramData、AppData（Roaming、Local、LocalLow）及发布者的文件夹；SOFTWARE 下的注册表项（64 位和 32 位，计算机和用户）；Run、RunOnce 及任务管理器的启动开关；服务；计划任务；Windows 防火墙规则；PATH 变量（系统和用户）；App Paths 和 SharedDLLs；文件类型（ProgID）、“打开方式”列表和默认关联；COM 组件和类型库；右键菜单项和资源管理器扩展（处理程序、图标覆盖、已批准的扩展）；自动播放（AutoPlay）处理程序；程序注册的 Windows 包（例如 Windows 11 右键菜单包）；Software\Clients 和 RegisteredApplications；桌面、开始菜单、启动文件夹中的快捷方式以及固定到任务栏的快捷方式；Windows 为每个程序保存的使用痕迹（MuiCache、兼容性设置、UserAssist、跳转列表）。以 8.3 短格式写入的路径（`C:\PROGRA~1\...`）也能识别。
 - **快速卸载和批量卸载：** 选择多个程序并依次卸载。如果卸载程序支持，它会静默运行：自动识别 Windows Installer（MSI）、Inno Setup 和 NSIS，以及部分程序注册的 `QuietUninstallString`。
 - **强制卸载：** 移除已被删除、已损坏或没有卸载程序的软件的残留。输入名称、文件夹或两者。
 - **安装追踪：** 对注册表和文件夹拍摄快照，运行安装程序，再拍一次快照，并保存安装创建的内容。之后，“Uninstall using trace”会精确地移除这些内容。

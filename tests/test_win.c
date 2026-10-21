@@ -1019,6 +1019,8 @@ static void test_real_cases(void) {
     fake_str(WS, u"UninstallString", u"\"C:\\Program Files (x86)\\WinSCP\\unins000.exe\"");
     fake_str(u"HKCU\\Software\\Martin Prikryl\\WinSCP 2\\Configuration", u"x", u"1");
     fake_str(u"HKCU\\Software\\Martin Prikryl\\WinSCP 2023", u"x", u"1");
+    fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\winscp.rnd", "x", 1);
+    fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\winscpx.log", "x", 1);  // outro nome: não
     v = programs_load();
     p = find_program(&v, u"WinSCP 6.7");
     CHECK(p != NULL);
@@ -1033,6 +1035,9 @@ static void test_real_cases(void) {
         CHECK(k && k->conf == CONF_HIGH && k->checked);
         Leftover *other = find_item(&l, LK_KEY, u"HKCU\\Software\\Martin Prikryl\\WinSCP 2023", NULL);
         CHECK(!other || !other->checked);
+        Leftover *rnd = find_item(&l, LK_FILE, u"C:\\Users\\ana\\AppData\\Roaming\\winscp.rnd", NULL);
+        CHECK(rnd && rnd->checked);
+        CHECK(!any_path_contains(&l, u"winscpx.log"));
         if (g_fail) dump(&l);
         left_free(&l);
         identity_free(id);
@@ -1140,7 +1145,11 @@ static void test_real_cases(void) {
     }
     fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\Notepad++\\config.xml", "x", 1);
     // pacote esparso do menu de contexto do Windows 11, que o desinstalador do Notepad++ deixou
-    fake_str(APPX_PACKAGES_KEY u"\\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww", u"Path", u"C:\\Program Files\\Notepad++\\contextMenu");
+    fake_str(APPX_PACKAGES_KEY u"\\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww", u"Path", u"C:\\ProgramData\\Packages\\NotepadPlusPlus_2247w0b46hfww");
+    fake_dir(u"C:\\ProgramData\\Packages\\NotepadPlusPlus_2247w0b46hfww");
+    // aplicativo da Loja com o mesmo nome: desmarcado
+    fake_str(APPX_PACKAGES_KEY u"\\NotepadPlusPlus_9.0.0.0_x64__abcdefghjkmnp", u"Path", u"C:\\Program Files\\WindowsApps\\NotepadPlusPlus_9.0.0.0_x64__abcdefghjkmnp");
+    fake_dir(u"C:\\Program Files\\WindowsApps\\NotepadPlusPlus_9.0.0.0_x64__abcdefghjkmnp");
     fake_str(APPX_PACKAGES_KEY u"\\Microsoft.WindowsNotepad_11.2507.26.0_x64__8wekyb3d8bbwe", u"Path",
              u"C:\\Program Files\\WindowsApps\\Microsoft.WindowsNotepad_11.2507.26.0_x64__8wekyb3d8bbwe");
     v = programs_load();
@@ -1157,6 +1166,8 @@ static void test_real_cases(void) {
         CHECK(!any_path_contains(&l, u"WindowsNotepad"));
         Leftover *pk = find_item(&l, LK_APPX, u"NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww", NULL);
         CHECK(pk && pk->checked);
+        Leftover *store = find_item(&l, LK_APPX, u"NotepadPlusPlus_9.0.0.0_x64__abcdefghjkmnp", NULL);
+        CHECK(store && !store->checked);
         DelResult r;
         delete_leftovers(&l, u"Notepad++", NULL, &r);
         CHECK(r.failed == 0);

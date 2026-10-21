@@ -596,8 +596,11 @@ static void scan_appx(Scan *sc) {
         int conf = CONF_NONE;
         if (owns(sc, path)) conf = CONF_HIGH;
         else if (name_is_ours(sc, name) && !foreign(sc, path)) {
-            // só pelo nome: marcado se a pasta do pacote já não existe (registro órfão)
-            conf = (!path || !path[0] || !dir_exists(path)) ? CONF_HIGH : CONF_MEDIUM;
+            // só pelo nome: desmarcado se for um aplicativo da Loja de verdade (arquivos em
+            // WindowsApps); marcado se a pasta já não existe (registro órfão) ou está fora dali
+            // (pacote esparso, cujos arquivos são os do próprio programa)
+            bool store = path && wifind(path, u"\\WindowsApps\\") && dir_exists(path);
+            conf = store ? CONF_MEDIUM : CONF_HIGH;
         }
         if (conf) left_add(sc->out, LK_APPX, full, NULL, conf, LR_PACKAGE, path);
         xfree(name), xfree(path);
@@ -1189,6 +1192,17 @@ static void scan_dir_names(Scan *sc, const WCHAR *root, bool microsoft_only) {
     PtrVec v = fs_list(root);
     for (size_t i = 0; i < v.n; i++) {
         DirEntry *e = v.items[i];
+        if (!e->is_dir && !microsoft_only && !e->is_link) {
+            // arquivo solto com o nome exato do programa ("winscp.rnd" direto no AppData)
+            WCHAR *base = path_strip_ext(e->name);
+            if (name_is_ours(sc, base)) {
+                WCHAR *fp = path_join(root, e->name);
+                left_add(sc->out, LK_FILE, fp, NULL, CONF_HIGH, LR_NAME, NULL);
+                xfree(fp);
+            }
+            xfree(base);
+            continue;
+        }
         if (!e->is_dir || e->is_link) continue;
         WCHAR *path = path_join(root, e->name);
         if (microsoft_only) {

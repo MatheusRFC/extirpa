@@ -140,8 +140,8 @@ static void dump_left(LeftList *l, size_t limit) {
         static const WCHAR *const kinds[] = {u"chave", u"valor", u"chave-se-vazia", u"pasta", u"arquivo", u"pasta-se-vazia",
                                              u"serviço", u"tarefa", u"firewall", u"PATH", u"pacote"};
         _Static_assert(COUNT(kinds) == LK_APPX + 1, "um nome para cada LeftKind");
-        linef(wfmt(u"    [%s conf=%d %s] %s%s%s", kinds[it->kind], it->conf, it->checked ? u"x" : u" ", it->path, it->value ? u" -> " : u"",
-                   it->value ? it->value : u""));
+        linef(wfmt(u"    [%s conf=%d %s] %s%s%s%s%s%s", kinds[it->kind], it->conf, it->checked ? u"x" : u" ", it->path, it->value ? u" -> " : u"",
+                   it->value ? it->value : u"", it->detail ? u"  (" : u"", it->detail ? it->detail : u"", it->detail ? u")" : u""));
     }
     if (l->items.n > limit) linef(wfmt(u"    ... mais %u", (unsigned)(l->items.n - limit)));
 }
@@ -688,11 +688,11 @@ static int realtest(int argc, WCHAR **argv) {
                     PtrVec files = fs_list(it->path);
                     for (size_t j = 0; j < files.n && j < 20; j++) {
                         DirEntry *f = files.items[j];
-                        DWORD attr = GetFileAttributesW(it->path);
-                        (void)attr;
                         linef(wfmt(u"      contém: %s%s", f->name, f->is_dir ? u"\\" : u""));
                     }
                     fs_list_free(&files);
+                    // o que a janela de sobras oferece nesse caso
+                    linef(wfmt(u"      agendado para apagar na reinicialização: %s", fs_delete_on_reboot(it->path) ? u"sim" : u"NÃO"));
                 }
             }
         }
