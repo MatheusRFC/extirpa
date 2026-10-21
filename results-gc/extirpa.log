@@ -1,0 +1,64 @@
+2026-10-21 17:45:09    foto: HKLM\SOFTWARE\Classes levou 3844 ms (187056 entradas)
+2026-10-21 17:45:11    foto: 262144 entradas, 5860 ms, em HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\SideBySide\Winners\wow64_microsoft-windows-security-netlogon-mof_31bf3856ad364e35_none_d625af205197d8cb\10.0
+2026-10-21 17:45:12    foto: HKLM\SOFTWARE\Microsoft levou 2813 ms (93455 entradas)
+2026-10-21 17:45:14    foto: HKLM\SOFTWARE\Wow6432Node levou 2172 ms (101396 entradas)
+2026-10-21 17:45:14    foto: HKLM\SOFTWARE pronto, 382233 entradas, 8829 ms
+2026-10-21 17:45:14    foto: HKCU\Software pronto, 383901 entradas, 8860 ms
+2026-10-21 17:45:17    foto: C:\Program Files\Amazon\AWSCLIV2 levou 2282 ms (7128 entradas)
+2026-10-21 17:45:18    foto: C:\Program Files\Amazon levou 3172 ms (9483 entradas)
+2026-10-21 17:45:23    foto: C:\Program Files\dotnet\packs levou 3015 ms (9358 entradas)
+2026-10-21 17:45:33    foto: C:\Program Files\dotnet\sdk levou 9469 ms (23927 entradas)
+2026-10-21 17:45:34    foto: C:\Program Files\dotnet levou 14093 ms (38828 entradas)
+2026-10-21 17:45:42    foto: C:\Program Files pronto, 482620 entradas, 36719 ms
+2026-10-21 17:45:46    foto: 524288 entradas, 40016 ms, em C:\Program Files (x86)\Android\android-sdk\platforms\android-37.1\data\res\values-mcc001-mnc01-bs
+2026-10-21 17:45:47    foto: C:\Program Files (x86)\Android\android-sdk levou 4438 ms (56569 entradas)
+2026-10-21 17:45:48    foto: C:\Program Files (x86)\Android levou 5250 ms (57469 entradas)
+2026-10-21 17:45:57    foto: C:\Program Files (x86)\Microsoft SDKs\NuGetPackages levou 8609 ms (12142 entradas)
+2026-10-21 17:46:01    foto: C:\Program Files (x86)\Microsoft SDKs\UWPNuGetPackages levou 3891 ms (8744 entradas)
+2026-10-21 17:46:01    foto: C:\Program Files (x86)\Microsoft SDKs levou 12719 ms (21832 entradas)
+2026-10-21 17:46:06    foto: C:\Program Files (x86) pronto, 585930 entradas, 60016 ms
+2026-10-21 17:46:11    foto: C:\ProgramData\Microsoft\VisualStudio levou 4671 ms (3453 entradas)
+2026-10-21 17:46:11    foto: C:\ProgramData\Microsoft levou 4891 ms (5099 entradas)
+2026-10-21 17:46:11    foto: C:\ProgramData pronto, 593146 entradas, 65704 ms
+2026-10-21 17:46:11    foto: C:\Users\runneradmin\AppData\Roaming pronto, 593268 entradas, 65704 ms
+2026-10-21 17:46:12    foto: C:\Users\runneradmin\AppData\Local pronto, 596872 entradas, 66469 ms
+2026-10-21 17:46:12    foto: C:\Users\runneradmin\AppData\LocalLow pronto, 596900 entradas, 66469 ms
+2026-10-21 17:46:12    foto: C:\Users\runneradmin\Desktop pronto, 596901 entradas, 66469 ms
+2026-10-21 17:46:12    foto: C:\Users\Public\Desktop pronto, 596907 entradas, 66469 ms
+2026-10-21 17:46:12  Foto do sistema (antes): 596907 entradas lidas em 66469 ms
+2026-10-21 17:52:48  Windows Installer: 176168 componentes lidos em 4422 ms para 1 programa(s)
+2026-10-21 17:52:48  Busca de sobras: "GridCraft" (modo 1, 1 pastas do programa)
+2026-10-21 17:52:53  Windows Installer: 176168 componentes lidos em 4454 ms para 42 programa(s)
+2026-10-21 17:52:53  Busca de sobras: 20 itens encontrados
+2026-10-21 17:52:53  Busca de sobras: "GridCraft" (modo 2, 1 pastas do programa)
+2026-10-21 17:52:58  Windows Installer: 176168 componentes lidos em 4578 ms para 42 programa(s)
+2026-10-21 17:52:59  Busca de sobras: 20 itens encontrados
+2026-10-21 17:53:03  Windows Installer: 176168 componentes lidos em 4453 ms para 1 programa(s)
+2026-10-21 17:53:03  Executando: "C:\Windows\system32\msiexec.exe" /X{923A99B5-32DE-4270-ABCE-026019B0C12F} /passive /norestart
+2026-10-21 17:53:04    terminou: código 0
+2026-10-21 17:53:07  Busca de sobras: "GridCraft" (modo 1, 1 pastas do programa)
+2026-10-21 17:53:12  Windows Installer: 176164 componentes lidos em 4672 ms para 41 programa(s)
+2026-10-21 17:53:13  Busca de sobras: 4 itens encontrados
+2026-10-21 17:53:13  Exclusão de sobras: "GridCraft"
+2026-10-21 17:53:13    backup do Registro: C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261021-175313 - GridCraft.reg
+2026-10-21 17:53:13    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\TevqPensg\tevqpensg.rkr
+2026-10-21 17:53:13    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{F4E57C4B-2036-45F0-A9AB-443BCFE33D9F}\Count -> {0139Q44R-6NSR-49S2-8690-3QNSPNR6SSO8}\TevqPensg.yax
+2026-10-21 17:53:13    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 63
+2026-10-21 17:53:13    apagado: pasta C:\Users\runneradmin\AppData\Roaming\GridCraft
+2026-10-21 17:53:13  Exclusão de sobras: 4 apagados, 0 falharam, 0 mantidos
+2026-10-21 17:53:16    foto: HKLM\SOFTWARE\Classes levou 3578 ms (187056 entradas)
+2026-10-21 17:53:18    foto: 262144 entradas, 5328 ms, em HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\SideBySide\Winners\wow64_microsoft-windows-security-ngc-credprov_31bf3856ad364e35_none_df44bf7a11b89a2a
+2026-10-21 17:53:19    foto: HKLM\SOFTWARE\Microsoft levou 2546 ms (93461 entradas)
+2026-10-21 17:53:21    foto: HKLM\SOFTWARE\Wow6432Node levou 2157 ms (101396 entradas)
+2026-10-21 17:53:21    foto: HKLM\SOFTWARE pronto, 382239 entradas, 8297 ms
+2026-10-21 17:53:21    foto: HKCU\Software pronto, 383984 entradas, 8328 ms
+2026-10-21 17:53:22    foto: C:\Program Files pronto, 482703 entradas, 8969 ms
+2026-10-21 17:53:22    foto: 524288 entradas, 9062 ms, em C:\Program Files (x86)\Android\android-sdk\platforms\android-37.1\data\res\values-h720dp
+2026-10-21 17:53:23    foto: C:\Program Files (x86) pronto, 586013 entradas, 9812 ms
+2026-10-21 17:53:23    foto: C:\ProgramData pronto, 593229 entradas, 9984 ms
+2026-10-21 17:53:23    foto: C:\Users\runneradmin\AppData\Roaming pronto, 593353 entradas, 10000 ms
+2026-10-21 17:53:23    foto: C:\Users\runneradmin\AppData\Local pronto, 596959 entradas, 10015 ms
+2026-10-21 17:53:23    foto: C:\Users\runneradmin\AppData\LocalLow pronto, 596995 entradas, 10015 ms
+2026-10-21 17:53:23    foto: C:\Users\runneradmin\Desktop pronto, 596996 entradas, 10015 ms
+2026-10-21 17:53:23    foto: C:\Users\Public\Desktop pronto, 597002 entradas, 10015 ms
+2026-10-21 17:53:23  Foto do sistema (depois): 597002 entradas lidas em 10015 ms

@@ -1,0 +1,151 @@
+===== depois =====
+--- Registro com 'gridcraft' (HKCU e HKLM\SOFTWARE)
+
+End of search: 0 match(es) found.
+End of search: 0 match(es) found.
+--- Registro com o código compactado do produto
+End of search: 0 match(es) found.
+End of search: 0 match(es) found.
+--- Registro com o código do produto
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\Folders
+    C:\Windows\Installer\{923A99B5-32DE-4270-ABCE-026019B0C12F}\    REG_SZ    
+End of search: 1 match(es) found.
+--- UFH\SHC
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\UFH\SHC
+    0    REG_MULTI_SZ    C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Windows 
+PowerShell\Windows PowerShell (x86).lnk\0C:\Windows\syswow64\WindowsPowerShell\v1.0\powershell.exe
+    1    REG_MULTI_SZ    C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Windows 
+PowerShell\Windows PowerShell.lnk\0C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe
+    2    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Microsoft Web Platform 
+Installer.lnk\0C:\Program Files\Microsoft\Web Platform Installer\WebPlatformInstaller.exe
+    3    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\WSL Settings.lnk\0C:\Program 
+Files\WSL\wslsettings\wslsettings.exe
+    4    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\7-Zip\7-Zip File Manager.lnk\0C:\Program 
+Files\7-Zip\7zFM.exe
+    5    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Azure Cosmos DB Emulator\Azure Cosmos DB 
+Emulator.lnk\0C:\Program Files\Azure Cosmos DB Emulator\Microsoft.Azure.Cosmos.Emulator.exe
+    6    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\CMake\CMake (cmake-gui).lnk\0C:\Program 
+Files\CMake\bin\cmake-gui.exe
+    7    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\CMake\Uninstall 
+CMake.lnk\0C:\Windows\SysWOW64\msiexec.exe\0/x {0DEA00BE-9AC0-4348-839D-8EFDCCBD3205}
+    8    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Git\Git Bash.lnk\0C:\Program 
+Files\Git\git-bash.exe\0--cd-to-home
+    9    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Git\Git CMD.lnk\0C:\Program 
+Files\Git\git-cmd.exe\0--cd-to-home
+    10    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Git\Git GUI.lnk\0C:\Program 
+Files\Git\cmd\git-gui.exe
+    11    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\LLVM\Uninstall.lnk\0C:\Program 
+Files\LLVM\Uninstall.exe
+    12    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\MySQL\MySQL Server 8.0\MySQL 8.0 
+Command Line Client - Unicode.lnk\0C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe\0"--defaults-file=C:\Program 
+Files\MySQL\MySQL Server 8.0\my.ini" "-uroot" "-p" "--default-character-set=utf8mb4"
+    13    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\MySQL\MySQL Server 8.0\MySQL 8.0 
+Command Line Client.lnk\0C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe\0"--defaults-file=C:\Program 
+Files\MySQL\MySQL Server 8.0\my.ini" "-uroot" "-p"
+    14    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Node.js\Install Additional Tools for 
+Node.js.lnk\0C:\Windows\System32\cmd.exe\0/d /c "C:\Program Files\nodejs\install_tools.bat"
+    15    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Node.js\Node.js command 
+prompt.lnk\0C:\Windows\System32\cmd.exe\0/k "C:\Program Files\nodejs\nodevars.bat"
+    16    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Node.js\Node.js.lnk\0C:\Program 
+Files\nodejs\node.exe
+    17    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Node.js\Uninstall 
+Node.js.lnk\0C:\Windows\SysWOW64\msiexec.exe\0/x {8077DB9D-18D9-4DAF-8CA6-B8CAE42EB734}
+    19    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\PostgreSQL 17\Application Stack 
+Builder.lnk\0C:\Program Files\PostgreSQL\17\bin\stackbuilder.exe
+    20    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\PostgreSQL 17\pgAdmin 4.lnk\0C:\Program 
+Files\PostgreSQL\17\pgAdmin 4\runtime\pgAdmin4.exe
+    21    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\PostgreSQL 17\Reload 
+Configuration.lnk\0C:\Program Files\PostgreSQL\17\bin\pg_ctl.exe\0-D "C:\PostgreSQL\17\data" reload
+    22    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\PowerShell\PowerShell 7 
+(x64).lnk\0C:\Program Files\PowerShell\7\pwsh.exe\0-WorkingDirectory ~
+    23    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 3.11\IDLE (Python 3.11 64-bit).ln
+k\0C:\hostedtoolcache\windows\Python\3.11.9\x64\pythonw.exe\0"C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\idlelib\
+idle.pyw"
+    24    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 3.11\Python 3.11 
+(64-bit).lnk\0C:\hostedtoolcache\windows\Python\3.11.9\x64\python.exe
+    25    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 3.11\Python 3.11 Module Docs 
+(64-bit).lnk\0C:\hostedtoolcache\windows\Python\3.11.9\x64\python.exe\0-m pydoc -b
+    26    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 3.12\IDLE (Python 3.12 64-bit).ln
+k\0C:\hostedtoolcache\windows\Python\3.12.10\x64\pythonw.exe\0"C:\hostedtoolcache\windows\Python\3.12.10\x64\Lib\idleli
+b\idle.pyw"
+    27    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 3.12\Python 3.12 
+(64-bit).lnk\0C:\hostedtoolcache\windows\Python\3.12.10\x64\python.exe
+    28    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 3.12\Python 3.12 Module Docs 
+(64-bit).lnk\0C:\hostedtoolcache\windows\Python\3.12.10\x64\python.exe\0-m pydoc -b
+    29    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 3.13\IDLE (Python 3.13 64-bit).ln
+k\0C:\hostedtoolcache\windows\Python\3.13.16\x64\pythonw.exe\0"C:\hostedtoolcache\windows\Python\3.13.16\x64\Lib\idleli
+b\idle.pyw"
+    30    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 3.13\Python 3.13 
+(64-bit).lnk\0C:\hostedtoolcache\windows\Python\3.13.16\x64\python.exe
+    31    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 3.13\Python 3.13 Module Docs 
+(64-bit).lnk\0C:\hostedtoolcache\windows\Python\3.13.16\x64\python.exe\0-m pydoc -b
+    32    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 3.14\IDLE (Python 3.14 64-bit).ln
+k\0C:\hostedtoolcache\windows\Python\3.14.8\x64\pythonw.exe\0"C:\hostedtoolcache\windows\Python\3.14.8\x64\Lib\idlelib\
+idle.pyw"
+    33    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 3.14\Python 3.14 
+(64-bit).lnk\0C:\hostedtoolcache\windows\Python\3.14.8\x64\python.exe
+    34    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 3.14\Python 3.14 Module Docs 
+(64-bit).lnk\0C:\hostedtoolcache\windows\Python\3.14.8\x64\python.exe\0-m pydoc -b
+    35    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 3.15\IDLE (Python 3.15 64-bit).ln
+k\0C:\hostedtoolcache\windows\Python\3.15.0\x64\pythonw.exe\0"C:\hostedtoolcache\windows\Python\3.15.0\x64\Lib\idlelib\
+idle.pyw"
+    36    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 3.15\Python 3.15 
+(64-bit).lnk\0C:\hostedtoolcache\windows\Python\3.15.0\x64\python.exe
+    37    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 3.15\Python 3.15 Module Docs 
+(64-bit).lnk\0C:\hostedtoolcache\windows\Python\3.15.0\x64\python.exe\0-m pydoc -b
+    38    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\R\R 4.6.1.lnk\0C:\Program 
+Files\R\R-4.6.1\bin\x64\Rgui.exe\0--cd-to-userdocs
+    39    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Rtools 4.5\Rtools45 
+Bash.lnk\0C:\rtools45\msys2.exe
+    41    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start 
+Menu\Programs\ServiceFabricLocalClusterManager\Service Fabric Local Cluster Manager.lnk\0C:\Program Files\Microsoft 
+SDKs\Service Fabric\Tools\ServiceFabricLocalClusterManager\ServiceFabricLocalClusterManager.exe
+    42    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Strawberry Perl (64-bit)\Perl (command 
+line).lnk\0C:\Windows\SysWOW64\cmd.exe
+    43    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio\Visual Studio 
+Tools\Developer Command Prompt for VS.lnk\0C:\Windows\system32\cmd.exe\0/k "C:\Program Files\Microsoft Visual 
+Studio\18\Enterprise\Common7\Tools\VsDevCmd.bat"
+    44    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio\Visual Studio 
+Tools\Developer PowerShell for VS.lnk\0C:\Windows\SysWOW64\WindowsPowerShell\v1.0\powershell.exe\0-noe -c 
+"&{Import-Module """C:\Program Files\Microsoft Visual 
+Studio\18\Enterprise\Common7\Tools\Microsoft.VisualStudio.DevShell.dll"""; Enter-VsDevShell 3237b29e}"
+    45    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio 2026\Visual Studio 
+Tools\Debuggable Package Manager.lnk\0C:\Windows\SysWOW64\WindowsPowerShell\v1.0\powershell.exe\0-NoExit -Command "& { 
+Import-Module Appx; Import-Module .\AppxDebug.dll; Show-AppxDebug}"
+    46    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio 2026\Visual Studio 
+Tools\VC\x64 Native Tools Command Prompt for VS.lnk\0C:\Windows\system32\cmd.exe\0/k "C:\Program Files\Microsoft 
+Visual Studio\18\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+    47    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio 2026\Visual Studio 
+Tools\VC\x64_x86 Cross Tools Command Prompt for VS.lnk\0C:\Windows\system32\cmd.exe\0/k "C:\Program Files\Microsoft 
+Visual Studio\18\Enterprise\VC\Auxiliary\Build\vcvarsamd64_x86.bat"
+    48    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio 2026\Visual Studio 
+Tools\VC\x86 Native Tools Command Prompt for VS.lnk\0C:\Windows\system32\cmd.exe\0/k "C:\Program Files\Microsoft 
+Visual Studio\18\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
+    49    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio 2026\Visual Studio 
+Tools\VC\x86_x64 Cross Tools Command Prompt for VS.lnk\0C:\Windows\system32\cmd.exe\0/k "C:\Program Files\Microsoft 
+Visual Studio\18\Enterprise\VC\Auxiliary\Build\vcvarsx86_amd64.bat"
+    50    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Kits\Application Verifier 
+(X64)\Application Verifier (X64).lnk\0C:\Windows\System32\appverif.exe
+    51    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Kits\Application Verifier 
+(X86)\Application Verifier (WOW).lnk\0C:\Windows\SysWOW64\appverif.exe
+    52    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Kits\Debugging Tools for 
+Windows (ARM64)\Global Flags (ARM64).lnk\0C:\Program Files (x86)\Windows Kits\10\Debuggers\arm64\gflags.exe
+    53    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Kits\Debugging Tools for 
+Windows (ARM64)\WinDbg (ARM64).lnk\0C:\Program Files (x86)\Windows Kits\10\Debuggers\arm64\windbg.exe
+    54    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Kits\Debugging Tools for 
+Windows (X64)\Global Flags (X64).lnk\0C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe
+    55    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Kits\Debugging Tools for 
+Windows (X64)\WinDbg (X64).lnk\0C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\windbg.exe
+    56    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Kits\Debugging Tools for 
+Windows (X86)\Global Flags (X86).lnk\0C:\Program Files (x86)\Windows Kits\10\Debuggers\x86\gflags.exe
+    57    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Kits\Debugging Tools for 
+Windows (X86)\WinDbg (X86).lnk\0C:\Program Files (x86)\Windows Kits\10\Debuggers\x86\windbg.exe
+    58    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Kits\Windows App Certification 
+Kit\Windows App Cert Kit.lnk\0C:\Program Files (x86)\Windows Kits\10\App Certification Kit\appcertui.exe
+    59    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Kits\Windows Performance 
+Toolkit\GPUView.lnk\0C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\gpuview\GPUView.exe
+    60    REG_MULTI_SZ    C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Kits\Windows Performance 
+Toolkit\Windows Performance Analyzer.lnk\0C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\wpa.exe
+--- Disco
+INSTALLER C:\Windows\Installer\{923A99B5-32DE-4270-ABCE-026019B0C12F} 10/21/2026 17:46:14
+
