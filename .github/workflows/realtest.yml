@@ -106,7 +106,7 @@ jobs:
           & { try { $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--realtest','C:\snap.bin','Notepad++','"VLC media player"','KeePass','FileZilla','WinSCP','7-Zip','Audacity','PuTTY' -PassThru
                     if (-not $p.WaitForExit(2400000)) { "REALTEST TRAVADO"; $p | Stop-Process -Force } else { "realtest exit: $($p.ExitCode)" } }
               catch { "realtest error: $_" } } *>&1 | Tee-Object -FilePath results-rt\steps.txt -Append
-      - name: Collect results-rt
+      - name: Collect results
         if: always()
         shell: pwsh
         run: |
@@ -120,7 +120,7 @@ jobs:
             $img.Dispose(); Remove-Item $_.FullName }
           git config user.name "extirpa-ci"
           git config user.email "extirpa-ci@users.noreply.github.com"
-          git add results-rt-rt
+          git add results-rt
           git commit -m "realtest results [skip ci]"
           git pull --rebase origin ci-teste-real
           git push origin HEAD:ci-teste-real
