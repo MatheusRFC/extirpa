@@ -27,6 +27,26 @@ jobs:
         continue-on-error: true
         run: |
           python tools/build.py all *>&1 | Tee-Object -FilePath results\build-windows.txt
+      - name: Start the release executable
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          & {
+            "sha256 extirpa.exe: " + (Get-FileHash bin\extirpa.exe -Algorithm SHA256).Hash
+            $p = Start-Process -FilePath bin\extirpa.exe -PassThru
+            Start-Sleep 10
+            if ($p.HasExited) { "extirpa.exe SAIU: 0x{0:X8}" -f $p.ExitCode }
+            else {
+              "extirpa.exe rodando: " + (Get-Process -Id $p.Id).MainWindowTitle + ", memória privada " + [int]((Get-Process -Id $p.Id).PrivateMemorySize64 / 1KB) + " KB"
+              Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+              $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+              $bmp = New-Object System.Drawing.Bitmap $b.Width, $b.Height
+              [System.Drawing.Graphics]::FromImage($bmp).CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
+              $bmp.Save("$PWD\results\release-exe.png")
+              $p.CloseMainWindow() | Out-Null
+              if (-not $p.WaitForExit(10000)) { "não fechou pela janela"; $p | Stop-Process -Force } else { "fechou pela janela: código $($p.ExitCode)" }
+            }
+          } *>&1 | Tee-Object -FilePath results\steps.txt -Append
       - name: General self-test
         shell: pwsh
         continue-on-error: true
