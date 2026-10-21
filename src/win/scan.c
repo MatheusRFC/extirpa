@@ -263,6 +263,7 @@ static void scan_reg_names(Scan *sc) {
                         bool any = false;
                         for (size_t j = 0; j < subs2.n; j++) {
                             int c2 = match_name(id, subs2.items[j]);
+                            if (c2 < CONF_HIGH && match_name_versioned(id, subs2.items[j])) c2 = CONF_HIGH;
                             if (c2 && c2 >= sc->thr) {
                                 WCHAR *p2 = path_join(path, subs2.items[j]);
                                 any = left_add(sc->out, LK_KEY, p2, NULL, c2, LR_NAME, NULL) != NULL || any;
@@ -956,6 +957,7 @@ static void scan_dir_names(Scan *sc, const WCHAR *root, bool microsoft_only) {
                     DirEntry *e2 = v2.items[j];
                     if (!e2->is_dir || e2->is_link) continue;
                     int c2 = match_name(id, e2->name);
+                    if (c2 < CONF_HIGH && match_name_versioned(id, e2->name)) c2 = CONF_HIGH;
                     if (c2 && c2 >= sc->thr) {
                         WCHAR *p2 = path_join(path, e2->name);
                         any = left_add(sc->out, LK_DIR, p2, NULL, c2, LR_NAME, NULL) != NULL || any;

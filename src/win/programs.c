@@ -181,6 +181,17 @@ void identity_add_short_names(Identity *id) {
 Identity *program_identity(const Program *p) {
     Identity *id = identity_new(p->name, p->publisher);
     identity_set_version(id, p->version);
+    // O nome da chave de desinstalação também é um nome do programa quando contém o nome
+    // dele ("FileZilla Client" para o FileZilla 3.71.1); códigos do Windows Installer ({GUID})
+    // não contam, e o "_is1" do Inno Setup sai.
+    if (p->key_path) {
+        const WCHAR *leaf = path_leaf(p->key_path);
+        WCHAR *k = wiends(leaf, u"_is1") ? wdupn(leaf, wlen(leaf) - 4) : wdup(leaf);
+        WCHAR *kn = norm_alnum(k);
+        bool related = (wlen(id->name_norm) >= 4 && wifind(kn, id->name_norm)) || (id->primary && wifind(kn, id->primary));
+        if (k[0] != '{' && related) identity_add_exact(id, k);
+        xfree(k), xfree(kn);
+    }
     if (p->install_location) {
         WCHAR *loc = expand_env(p->install_location), *n = path_norm(loc);
         // pasta criada pelo instalador em Arquivos de Programas: o nome dela é o do programa

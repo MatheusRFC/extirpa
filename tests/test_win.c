@@ -256,6 +256,18 @@ static void test_programs_load(void) {
     c = uninstall_command(code, true, &q);
     CHECK_WEQ(c, u"\"C:\\Users\\ana\\AppData\\Local\\Programs\\Microsoft VS Code\\unins000.exe\" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART");
     xfree(c);
+    // Inno Setup com QuietUninstallString /SILENT (que ainda faz perguntas): vale o tipo do executável
+    fake_str(u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Code", u"QuietUninstallString",
+             u"\"%LOCALAPPDATA%\\Programs\\Microsoft VS Code\\unins000.exe\" /SILENT");
+    fake_file(u"C:\\Users\\ana\\AppData\\Local\\Programs\\Microsoft VS Code\\unins000.exe", "MZ..Inno Setup Uninstall", 24);
+    {
+        PtrVec v2 = programs_load();
+        c = uninstall_command(find_program(&v2, u"Visual Studio Code (User)"), true, &q);
+        CHECK_WEQ(c, u"\"C:\\Users\\ana\\AppData\\Local\\Programs\\Microsoft VS Code\\unins000.exe\" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART");
+        CHECK(q);
+        xfree(c);
+        programs_free(&v2);
+    }
     c = uninstall_command(ff, true, &q);  // desinstalador desconhecido: o normal
     CHECK_WEQ(c, u"\"C:\\Program Files\\Mozilla Firefox\\uninstall\\helper.exe\"");
     CHECK(!q);
@@ -949,6 +961,112 @@ static void test_two_versions(void) {
     xfree(key);
 }
 
+// Casos vistos com programas reais (teste no Windows do GitHub Actions)
+static void test_real_cases(void) {
+    // FileZilla: a chave do programa tem o nome da chave de desinstalação ("FileZilla Client")
+    base_system();
+    const WCHAR FZ[] = u"HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\FileZilla Client";
+    fake_str(FZ, u"DisplayName", u"FileZilla 3.71.1");
+    fake_str(FZ, u"DisplayVersion", u"3.71.1");
+    fake_str(FZ, u"Publisher", u"Tim Kosse");
+    fake_str(FZ, u"UninstallString", u"\"C:\\Program Files\\FileZilla FTP Client\\uninstall.exe\"");
+    fake_str(FZ, u"DisplayIcon", u"C:\\Program Files\\FileZilla FTP Client\\filezilla.exe");
+    fake_file(u"C:\\Program Files\\FileZilla FTP Client\\filezilla.exe", "MZ", 2);
+    fake_str(u"HKLM\\SOFTWARE\\WOW6432Node\\FileZilla Client", u"", u"C:\\Program Files\\FileZilla FTP Client");
+    fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\FileZilla\\filezilla.xml", "x", 1);
+    PtrVec v = programs_load();
+    Program *p = find_program(&v, u"FileZilla 3.71.1");
+    CHECK(p != NULL);
+    if (p) {
+        Identity *id = program_identity(p);
+        WCHAR *key = wdup(p->key_path);
+        reg_delete_key(key);
+        LeftList l = {0};
+        scan_leftovers(&l, id, key, SCAN_MODERATE, NULL);
+        left_finalize(&l);
+        Leftover *k = find_item(&l, LK_KEY, u"HKLM\\SOFTWARE\\WOW6432Node\\FileZilla Client", NULL);
+        CHECK(k && k->conf == CONF_HIGH && k->checked);
+        Leftover *d = find_item(&l, LK_DIR, u"C:\\Users\\ana\\AppData\\Roaming\\FileZilla", NULL);
+        CHECK(d && d->checked);
+        if (g_fail) dump(&l);
+        left_free(&l);
+        identity_free(id);
+        xfree(key);
+    }
+    programs_free(&v);
+
+    // WinSCP: configuração em "Martin Prikryl\WinSCP 2" (nome + número); "WinSCP 2023" seria outra coisa
+    base_system();
+    const WCHAR WS[] = u"HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\winscp3_is1";
+    fake_str(WS, u"DisplayName", u"WinSCP 6.7");
+    fake_str(WS, u"DisplayVersion", u"6.7");
+    fake_str(WS, u"Publisher", u"Martin Prikryl");
+    fake_str(WS, u"InstallLocation", u"C:\\Program Files (x86)\\WinSCP\\");
+    fake_str(WS, u"UninstallString", u"\"C:\\Program Files (x86)\\WinSCP\\unins000.exe\"");
+    fake_str(u"HKCU\\Software\\Martin Prikryl\\WinSCP 2\\Configuration", u"x", u"1");
+    fake_str(u"HKCU\\Software\\Martin Prikryl\\WinSCP 2023", u"x", u"1");
+    v = programs_load();
+    p = find_program(&v, u"WinSCP 6.7");
+    CHECK(p != NULL);
+    if (p) {
+        Identity *id = program_identity(p);
+        WCHAR *key = wdup(p->key_path);
+        reg_delete_key(key);
+        LeftList l = {0};
+        scan_leftovers(&l, id, key, SCAN_MODERATE, NULL);
+        left_finalize(&l);
+        Leftover *k = find_item(&l, LK_KEY, u"HKCU\\Software\\Martin Prikryl\\WinSCP 2", NULL);
+        CHECK(k && k->conf == CONF_HIGH && k->checked);
+        Leftover *other = find_item(&l, LK_KEY, u"HKCU\\Software\\Martin Prikryl\\WinSCP 2023", NULL);
+        CHECK(!other || !other->checked);
+        if (g_fail) dump(&l);
+        left_free(&l);
+        identity_free(id);
+        xfree(key);
+    }
+    programs_free(&v);
+
+    // Notepad++: o atalho do Bloco de Notas do Windows ("Notepad.lnk", sem destino) não é dele
+    base_system();
+    const WCHAR NP[] = u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Notepad++";
+    fake_str(NP, u"DisplayName", u"Notepad++ (64-bit x64)");
+    fake_str(NP, u"DisplayVersion", u"8.9.8.1");
+    fake_str(NP, u"Publisher", u"Notepad++ Team");
+    fake_str(NP, u"UninstallString", u"\"C:\\Program Files\\Notepad++\\uninstall.exe\"");
+    fake_str(NP, u"DisplayIcon", u"C:\\Program Files\\Notepad++\\notepad++.exe");
+    fake_file(u"C:\\Program Files\\Notepad++\\notepad++.exe", "MZ", 2);
+    fake_key(u"HKLM\\SOFTWARE\\WOW6432Node\\Notepad++");
+    {
+        uint8_t hdr[76] = {0};
+        static const uint8_t clsid[16] = {0x01, 0x14, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46};
+        put32(hdr, 0x4C);
+        memcpy(hdr + 4, clsid, 16);
+        fake_file(u"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Notepad.lnk", hdr, sizeof(hdr));
+    }
+    fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\Notepad++\\config.xml", "x", 1);
+    v = programs_load();
+    p = find_program(&v, u"Notepad++ (64-bit x64)");
+    CHECK(p != NULL);
+    if (p) {
+        Identity *id = program_identity(p);
+        WCHAR *key = wdup(p->key_path);
+        reg_delete_key(key);
+        LeftList l = {0};
+        scan_leftovers(&l, id, key, SCAN_MODERATE, NULL);
+        left_finalize(&l);
+        CHECK(!any_path_contains(&l, u"Notepad.lnk"));
+        Leftover *k = find_item(&l, LK_KEY, u"HKLM\\SOFTWARE\\WOW6432Node\\Notepad++", NULL);
+        CHECK(k && k->checked);
+        Leftover *d = find_item(&l, LK_DIR, u"C:\\Users\\ana\\AppData\\Roaming\\Notepad++", NULL);
+        CHECK(d && d->checked);
+        if (g_fail) dump(&l);
+        left_free(&l);
+        identity_free(id);
+        xfree(key);
+    }
+    programs_free(&v);
+}
+
 int main(void) {
     test_programs_load();
     test_scan_safe();
@@ -962,6 +1080,7 @@ int main(void) {
     test_monitor();
     test_full_cleanup();
     test_two_versions();
+    test_real_cases();
     printf("%d verificações (Windows simulado), %d falhas\n", g_checks, g_fail);
     return g_fail ? 1 : 0;
 }

@@ -58,7 +58,7 @@ jobs:
         shell: pwsh
         continue-on-error: true
         run: |
-          choco install notepadplusplus vlc putty keepass filezilla winscp -y --no-progress *>&1 | Select-Object -Last 40 | Tee-Object -FilePath results\steps.txt -Append
+          choco install notepadplusplus vlc keepass filezilla winscp 7zip audacity -y --no-progress *>&1 | Select-Object -Last 40 | Tee-Object -FilePath results\steps.txt -Append
       - name: Use each program once (creates user data)
         shell: pwsh
         continue-on-error: true
@@ -71,16 +71,18 @@ jobs:
             "${env:ProgramFiles(x86)}\KeePass Password Safe 2\KeePass.exe",
             "$env:ProgramFiles\FileZilla FTP Client\filezilla.exe",
             "${env:ProgramFiles(x86)}\WinSCP\WinSCP.exe",
-            "$env:ProgramFiles\WinSCP\WinSCP.exe")
+            "$env:ProgramFiles\WinSCP\WinSCP.exe",
+            "$env:ProgramFiles\7-Zip\7zFM.exe",
+            "$env:ProgramFiles\Audacity\Audacity.exe")
           foreach ($a in $apps) { if (Test-Path $a) { "start $a"; Start-Process $a; Start-Sleep 6 } }
           Start-Sleep 5
-          Get-Process notepad++, vlc, putty, KeePass, filezilla, WinSCP -ErrorAction SilentlyContinue | Stop-Process -Force
+          Get-Process notepad++, vlc, KeePass, filezilla, WinSCP, 7zFM, Audacity -ErrorAction SilentlyContinue | Stop-Process -Force
           Start-Sleep 3
       - name: Uninstall with EXTIRPA and measure what is left
         shell: pwsh
         continue-on-error: true
         run: |
-          & { try { $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--realtest','C:\snap.bin','Notepad++','VLC media player','PuTTY','KeePass','FileZilla','WinSCP' -PassThru
+          & { try { $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--realtest','C:\snap.bin','Notepad++','"VLC media player"','KeePass','FileZilla','WinSCP','7-Zip','Audacity' -PassThru
                     if (-not $p.WaitForExit(2400000)) { "REALTEST TRAVADO"; $p | Stop-Process -Force } else { "realtest exit: $($p.ExitCode)" } }
               catch { "realtest error: $_" } } *>&1 | Tee-Object -FilePath results\steps.txt -Append
       - name: Collect results

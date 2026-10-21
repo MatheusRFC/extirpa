@@ -47,6 +47,9 @@ void identity_add_exact(Identity *id, const WCHAR *name);     // qualquer outro 
 void identity_free(Identity *id);
 
 int match_name(const Identity *id, const WCHAR *candidate);       // CONF_*
+// Nome exato do programa mais um número de versão ("WinSCP 2"). Só vale dentro da pasta ou
+// chave do editor, onde o contexto já é do programa.
+bool match_name_versioned(const Identity *id, const WCHAR *candidate);
 bool match_publisher(const Identity *id, const WCHAR *candidate);  // pasta/chave do editor
 // O texto (comando, caminho, valor do Registro) aponta para dentro de uma pasta do programa?
 bool match_path_ref(const Identity *id, const WCHAR *text);

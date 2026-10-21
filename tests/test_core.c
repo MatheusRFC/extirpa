@@ -245,6 +245,8 @@ static void test_clean_names(void) {
     CHECK_WEQ_FREE(clean_publisher(u"Igor Pavlov"), u"Igor Pavlov");
     CHECK_WEQ_FREE(clean_publisher(u"Foo, Inc."), u"Foo");
     CHECK_WEQ_FREE(norm_alnum(u"Mozilla-Firefox 2!"), u"mozillafirefox2");
+    CHECK_WEQ_FREE(norm_alnum(u"Notepad++"), u"notepadplusplus");  // não pode virar "notepad"
+    CHECK_WEQ_FREE(norm_alnum(u"C# Tools"), u"csharptools");
     CHECK(is_generic_word(u"update"));
     CHECK(is_generic_word(u"2024"));
     CHECK(is_generic_word(u"ab"));
@@ -733,6 +735,7 @@ static void test_fmt(void) {
     CHECK(!parse_install_date(NULL, &y, &m, &d));
     CHECK_WEQ_FREE(wfmt(u"%s tem %d itens (%u, %U) 100%% %x", u"Lista", -42, 7u, (uint64_t)1 << 40), u"Lista tem -42 itens (7, 1099511627776) 100% %x");
     CHECK_WEQ_FREE(wfmt(u"%s|%s", NULL, u"b"), u"|b");
+    CHECK_WEQ_FREE(wfmt(u"[%c] %s", (WCHAR)'K', u"HKCU"), u"[K] HKCU");
     CHECK_WEQ_FREE(base64_utf16le(u"dir"), u"ZABpAHIA");
     CHECK_WEQ_FREE(base64_utf16le(u"a"), u"YQA=");
     CHECK_WEQ_FREE(base64_utf16le(u""), u"");

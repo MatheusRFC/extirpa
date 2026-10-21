@@ -110,6 +110,7 @@ WCHAR *wfmt(const WCHAR *pattern, ...) {
         }
         case 'u': sb_add_u64(&b, va_arg(ap, unsigned)); break;
         case 'U': sb_add_u64(&b, va_arg(ap, uint64_t)); break;
+        case 'c': sb_addc(&b, (WCHAR)va_arg(ap, int)); break;
         case '%': sb_addc(&b, '%'); break;
         default: sb_addc(&b, '%'), sb_addc(&b, *p); break;
         }
