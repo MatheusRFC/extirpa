@@ -1,0 +1,82 @@
+
+Name             Source
+----             ------
+clang.exe        C:\Program Files\LLVM\bin\clang.exe
+lld-link.exe     C:\Program Files\LLVM\bin\lld-link.exe
+llvm-rc.exe      C:\Program Files\LLVM\bin\llvm-rc.exe
+llvm-dlltool.exe C:\Program Files\LLVM\bin\llvm-dlltool.exe
+llvm-lib.exe     C:\Program Files\LLVM\bin\llvm-lib.exe
+python.exe       C:\hostedtoolcache\windows\Python\3.12.10\x64\python.exe
+
+
+
+Platform ServicePack Version      VersionString
+-------- ----------- -------      -------------
+ Win32NT             10.0.26100.0 Microsoft Windows NT 10.0.26100.0
+
+
+
+Everyone                                                      Well-known group S-1-1-0      Mandatory group, Enabled by default, Enabled group             
+NT AUTHORITY\Local account and member of Administrators group Well-known group S-1-5-114    Mandatory group, Enabled by default, Enabled group             
+BUILTIN\Administrators                                        Alias            S-1-5-32-544 Mandatory group, Enabled by default, Enabled group, Group owner
+BUILTIN\Users                                                 Alias            S-1-5-32-545 Mandatory group, Enabled by default, Enabled group             
+NT AUTHORITY\INTERACTIVE                                      Well-known group S-1-5-4      Mandatory group, Enabled by default, Enabled group             
+CONSOLE LOGON                                                 Well-known group S-1-2-1      Mandatory group, Enabled by default, Enabled group             
+NT AUTHORITY\Authenticated Users                              Well-known group S-1-5-11     Mandatory group, Enabled by default, Enabled group             
+NT AUTHORITY\This Organization                                Well-known group S-1-5-15     Mandatory group, Enabled by default, Enabled group             
+NT AUTHORITY\Local account                                    Well-known group S-1-5-113    Mandatory group, Enabled by default, Enabled group             
+LOCAL                                                         Well-known group S-1-2-0      Mandatory group, Enabled by default, Enabled group             
+NT AUTHORITY\NTLM Authentication                              Well-known group S-1-5-64-10  Mandatory group, Enabled by default, Enabled group             
+Mandatory Label\High Mandatory Level                          Label            S-1-16-12288                                                                
+
+
+elevated: True
+
+SessionId
+---------
+        2
+
+
+selftest exit: 0
+snapshot exit: 0 em 7 s
+
+7zip v26.4.0 [Approved]
+7zip package files install completed. Performing other installation steps.
+ The install of 7zip was successful.
+  Deployed to 'C:\ProgramData\chocolatey\lib\7zip'
+Downloading package from source 'https://community.chocolatey.org/api/v2/'
+
+vcredist2015 v14.0.24215.20170201 [Approved]
+vcredist2015 package files install completed. Performing other installation steps.
+ The install of vcredist2015 was successful.
+  Deployed to 'C:\ProgramData\chocolatey\lib\vcredist2015'
+Downloading package from source 'https://community.chocolatey.org/api/v2/'
+
+audacity v3.7.9 [Approved]
+audacity package files install completed. Performing other installation steps.
+Installing 64-bit audacity...
+audacity has been installed.
+WARNING: No registry key found based on  'audacity'
+audacity installed to 'C:\Program Files\Audacity'
+audacity registered as audacity
+  audacity can be automatically uninstalled.
+ The install of audacity was successful.
+  Deployed to 'C:\Program Files\Audacity\'
+
+Chocolatey installed 12/12 packages. 
+ See the log for details (C:\ProgramData\chocolatey\logs\chocolatey.log).
+
+Installed:
+ - 7zip v26.4.0
+ - audacity v3.7.9
+ - filezilla v3.71.1
+ - keepass v2.61.1
+ - keepass.install v2.61.1
+ - notepadplusplus v8.9.8.1
+ - notepadplusplus.install v8.9.8.1
+ - vcredist2015 v14.0.24215.20170201
+ - vlc v3.0.24
+ - vlc.install v3.0.24
+ - winscp v6.7.0
+ - winscp.install v6.7.0
+realtest exit: 6
