@@ -1,5 +1,0 @@
-debuggers: True
-Current Registry Settings for extirpa.exe executable are: 00000002 : 00000000
-    sls - Show Loader Snaps
-cdb ainda rodando depois de 90 s
-Current Registry Settings for extirpa.exe executable are: 00000000 : 00000000

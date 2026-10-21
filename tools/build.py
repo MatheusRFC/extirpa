@@ -119,7 +119,9 @@ def build_exe(selftest=False):
     res = os.path.join(BUILD, "app.res")
     rodar([rc, "/nologo", "/FO", res, "app.rc"], cwd=os.path.join(RAIZ, "assets"))
     exe = os.path.join(BUILD, "extirpa-selftest.exe" if selftest else "extirpa.exe")
-    rodar([lld, "/nologo", "/subsystem:windows,10.0", "/entry:WinMainCRTStartup", "/nodefaultlib", "/opt:ref", "/opt:icf",
+    # Versão de subsistema 6.0 (o padrão): com 10.0 o Windows recusa o executável na partida
+    # (0xc000007b, conferido no Windows Server 2025). As APIs usadas já exigem o Windows 10.
+    rodar([lld, "/nologo", "/subsystem:windows,6.0", "/entry:WinMainCRTStartup", "/nodefaultlib", "/opt:ref", "/opt:icf",
            "/dynamicbase", "/nxcompat", "/highentropyva", "/guard:no", f"/out:{exe}"] + objs + libs() + [res])
     print(f"{os.path.relpath(exe, RAIZ)}: {os.path.getsize(exe)} bytes")
     return exe
