@@ -1,0 +1,283 @@
+
+==== Notepad++ ====
+  programa: Notepad++ (64-bit x64) 8.9.8.1 (Notepad++ Team)
+  entrada: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Notepad++
+  pasta: C:\Program Files\Notepad++
+  pasta (8.3): C:\PROGRA~1\NOTEPA~1
+  desinstalador: "C:\Program Files\Notepad++\uninstall.exe" /S  [silencioso]
+  rodou: sim, código 0, 1937 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 3 itens em 922 ms
+    [pacote conf=3 x] NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww  (C:\Program Files\WindowsApps\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww)
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\Abgrcnq++\abgrcnq++.rkr  (C:\Program Files\Notepad++\notepad++.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Notepad++
+  exclusão: 3 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== VLC media player ====
+  programa: VLC media player 3.0.24 (VideoLAN)
+  entrada: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\VLC media player
+  pasta: C:\Program Files\VideoLAN\VLC
+  pasta (8.3): C:\PROGRA~1\VideoLAN\VLC
+  desinstalador: "C:\Program Files\VideoLAN\VLC\uninstall.exe" /S  [silencioso]
+  rodou: sim, código 0, 1546 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 6 itens em 1157 ms
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\IvqrbYNA\IYP\iyp.rkr  (C:\Program Files\VideoLAN\VLC\vlc.exe)
+    [valor conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayBluRayOnArrival -> VLCPlayBlurayOnArrival
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayBlurayOnArrival  ("C:\Program Files\VideoLAN\VLC\vlc.exe",0)
+    [valor conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayBluRayOnArrival -> VLCPlayBlurayOnArrival
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayBlurayOnArrival  ("C:\Program Files\VideoLAN\VLC\vlc.exe",0)
+    [pasta-se-vazia conf=3 x] C:\Program Files\VideoLAN
+  exclusão: 6 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== KeePass ====
+  programa: KeePass Password Safe 2.61.1 2.61.1 (Dominik Reichl)
+  entrada: HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\KeePassPasswordSafe2_is1
+  pasta: C:\Program Files\KeePass Password Safe 2
+  pasta (8.3): C:\PROGRA~1\KEEPAS~1
+  desinstalador: "C:\Program Files\KeePass Password Safe 2\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART  [silencioso]
+  rodou: sim, código 0, 4281 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 1 itens em 1078 ms
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Search\JumplistData -> C:\Program Files\KeePass Password Safe 2\KeePass.exe  (C:\Program Files\KeePass Password Safe 2\KeePass.exe)
+  exclusão: 1 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== FileZilla ====
+  programa: FileZilla 3.71.1 3.71.1 (Tim Kosse)
+  entrada: HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\FileZilla Client
+  pasta: C:\Program Files\FileZilla FTP Client
+  pasta (8.3): C:\PROGRA~1\FILEZI~1
+  desinstalador: "C:\Program Files\FileZilla FTP Client\uninstall.exe" /S  [silencioso]
+  rodou: sim, código 0, 672 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 4 itens em 1062 ms
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> SvyrMvyyn.Pyvrag.NccVQ  (FileZilla.Client.AppID)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\FileZilla Client
+    [pasta conf=3 x] C:\Users\runneradmin\AppData\Local\FileZilla
+    [pasta conf=3 x] C:\Users\runneradmin\AppData\Roaming\FileZilla
+  exclusão: 4 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== WinSCP ====
+  programa: WinSCP 6.7 6.7 (Martin Prikryl)
+  entrada: HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\winscp3_is1
+  pasta: C:\Program Files (x86)\WinSCP
+  pasta (8.3): C:\PROGRA~2\WinSCP
+  desinstalador: "C:\Program Files (x86)\WinSCP\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART  [silencioso]
+  rodou: sim, código 0, 2391 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 12 itens em 1156 ms
+    [chave conf=3 x] HKCU\Software\Martin Prikryl\WinSCP 2
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {7P5N40RS-N0SO-4OSP-874N-P0S2R0O9SN8R}\JvaFPC\JvaFPC.rkr  (C:\Program Files (x86)\WinSCP\WinSCP.exe)
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Search\JumplistData -> {7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}\WinSCP\WinSCP.exe  (C:\Program Files (x86)\WinSCP\WinSCP.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\Martin Prikryl\WinSCP 2
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\winscp.exe  (C:\Program Files (x86)\WinSCP\winscp.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Martin Prikryl\WinSCP 2
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\winscp.exe  (C:\Program Files (x86)\WinSCP\winscp.exe)
+    [chave-se-vazia conf=2 x] HKCU\Software\Martin Prikryl
+    [chave-se-vazia conf=2 x] HKLM\SOFTWARE\Martin Prikryl
+    [chave-se-vazia conf=2 x] HKLM\SOFTWARE\WOW6432Node\Martin Prikryl
+    [pasta conf=3 x] C:\Program Files (x86)\WinSCP
+    [arquivo conf=3 x] C:\Users\runneradmin\AppData\Roaming\winscp.rnd
+  exclusão: 11 apagados, 1 falharam, 0 mantidos, 0 sem Lixeira
+    falhou: C:\Program Files (x86)\WinSCP : Access is denied (5)
+      contém: DragExt64.dll
+      agendado para apagar na reinicialização: sim
+
+==== 7-Zip ====
+  programa: 7-Zip 26.04 (x64) 26.04 (Igor Pavlov)
+  entrada: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\7-Zip
+  pasta: C:\Program Files\7-Zip
+  pasta (8.3): C:\PROGRA~1\7-Zip
+  desinstalador: "C:\Program Files\7-Zip\Uninstall.exe" /S  [silencioso]
+  rodou: sim, código 0, 110 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 2 itens em 1203 ms
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\7-Mvc\7mSZ.rkr  (C:\Program Files\7-Zip\7zFM.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\7-Zip
+  exclusão: 2 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== Audacity ====
+  programa: Audacity 3.7.9 3.7.9 (Audacity Team)
+  entrada: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Audacity_is1
+  pasta: C:\Program Files\Audacity
+  pasta (8.3): C:\PROGRA~1\Audacity
+  desinstalador: "C:\Program Files\Audacity\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART  [silencioso]
+  rodou: sim, código 0, 938 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 6 itens em 1109 ms
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\Nhqnpvgl\Nhqnpvgl.rkr  (C:\Program Files\Audacity\Audacity.exe)
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Search\JumplistData -> C:\Program Files\Audacity\Audacity.exe  (C:\Program Files\Audacity\Audacity.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\audacity.exe  (C:\Program Files\Audacity\audacity.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\audacity.exe  (C:\Program Files\Audacity\audacity.exe)
+    [pasta conf=3 x] C:\Users\runneradmin\AppData\Local\audacity
+    [pasta conf=3 x] C:\Users\runneradmin\AppData\Roaming\audacity
+  exclusão: 6 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== PuTTY ====
+  programa: PuTTY release 0.85 (64-bit) 0.85.0.0 (Simon Tatham)
+  entrada: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{3B0346D3-155D-43E5-9561-B9BE51CF2EB6}
+  desinstalador: "C:\Windows\system32\msiexec.exe" /X{3B0346D3-155D-43E5-9561-B9BE51CF2EB6} /passive /norestart  [silencioso]
+  rodou: sim, código 0, 1704 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 1 itens em 594 ms
+    [arquivo conf=3 x] C:\Users\runneradmin\AppData\Local\PUTTY.RND
+  exclusão: 1 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== O que a instalação criou e ainda existe (segunda foto) ====
+  outro  V HKLM\SOFTWARE\Classes\CLSID\{5FFAB5C8-9A36-4B65-9FC6-FB69F451F99C} -> LocalizedString
+  outro  K HKLM\SOFTWARE\Classes\CLSID\{5FFAB5C8-9A36-4B65-9FC6-FB69F451F99C}\Elevation
+         Enabled = (binário)
+         IconReference = @\\?\C:\Windows\System32\SecurityHealth\10.0.29628.1000-0\SecurityHealthAgent.dll,-101
+  outro  K HKLM\SOFTWARE\Classes\dav
+         (padrão) = URL: dav Protocol
+         URL Protocol = 
+         EditFlags = (binário)
+         BrowserFlags = (binário)
+  outro  K HKLM\SOFTWARE\Classes\davs
+         (padrão) = URL: davs Protocol
+         URL Protocol = 
+         EditFlags = (binário)
+         BrowserFlags = (binário)
+  outro  K HKLM\SOFTWARE\Classes\DVD\shell
+  outro  V HKLM\SOFTWARE\Classes\ftp -> 
+  outro  V HKLM\SOFTWARE\Classes\ftp -> EditFlags
+  outro  V HKLM\SOFTWARE\Classes\ftp -> BrowserFlags
+  outro  K HKLM\SOFTWARE\Classes\ftpes
+         (padrão) = URL: ftpes Protocol
+         URL Protocol = 
+         EditFlags = (binário)
+         BrowserFlags = (binário)
+  outro  K HKLM\SOFTWARE\Classes\ftps
+         (padrão) = URL: ftps Protocol
+         URL Protocol = 
+         EditFlags = (binário)
+         BrowserFlags = (binário)
+  outro  K HKLM\SOFTWARE\Classes\Interface\{310D6E68-14B2-4997-AE2C-59CD42AAA5BA}
+         (padrão) = IAccountProtectionShield2
+         [NumMethods]
+         [ProxyStubClsid32]
+  outro  K HKLM\SOFTWARE\Classes\Interface\{520CC469-8FD0-40C5-B922-9BA5E33E7CD7}
+         (padrão) = IDefenderShield4
+         [NumMethods]
+         [ProxyStubClsid32]
+  outro  K HKLM\SOFTWARE\Classes\Interface\{5D310596-4358-44E4-9FD3-11F0AE54ACD9}
+         (padrão) = IHardwareShield16
+         [NumMethods]
+         [ProxyStubClsid32]
+  outro  K HKLM\SOFTWARE\Classes\s3
+         (padrão) = URL: s3 Protocol
+         URL Protocol = 
+         EditFlags = (binário)
+         BrowserFlags = (binário)
+  outro  K HKLM\SOFTWARE\Classes\scp
+         (padrão) = URL: scp Protocol
+         URL Protocol = 
+         EditFlags = (binário)
+         BrowserFlags = (binário)
+  outro  K HKLM\SOFTWARE\Classes\sftp
+         (padrão) = URL: sftp Protocol
+         URL Protocol = 
+         EditFlags = (binário)
+         BrowserFlags = (binário)
+  outro  K HKLM\SOFTWARE\Classes\ssh
+         (padrão) = URL: ssh Protocol
+         URL Protocol = 
+         EditFlags = (binário)
+         BrowserFlags = (binário)
+  outro  K HKLM\SOFTWARE\Classes\楖敤䱯乁嘮䍌汐杵湩.2
+         (padrão) = 䱖⁃捁楴敶⁘汐杵湩愠摮䤠⁅敗⁢汐杵湩 v2
+         [CLSID]
+  outro  K HKLM\SOFTWARE\Microsoft\IdentityCRL\NegativeCache
+  outro  K HKLM\SOFTWARE\Microsoft\IdentityCRL\ThrottleCache
+  outro  V HKLM\SOFTWARE\Microsoft\Provisioning\Sessions\cWgW+2dnPUa2Et+A.0 -> NextSession
+  outro  K HKLM\SOFTWARE\Microsoft\Provisioning\Sessions\u8be8j1Lt0Gvb4SB.0
+  outro  K HKLM\SOFTWARE\Microsoft\Provisioning\FirstBootRun
+  outro  K HKLM\SOFTWARE\Microsoft\Provisioning\LogonTaskCompleted
+  outro  K HKLM\SOFTWARE\Microsoft\Wbem\Tracing\Providers\NetAdapterCim @ ROOT/StandardCimv2
+  outro  K HKLM\SOFTWARE\Microsoft\Wbem\Tracing\Providers\Win32_DeviceGuard @ root/Microsoft/Windows/DeviceGuard
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\Activation\Data\9c
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\Activation\Index\ActivationKey\0rgh4vmwpnkd808tnh1xb1frvkezpvz5ap6r1cgv2t22dwxy4pag
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\Application\Index\Package\40
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Index\Application\76
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Index\ApplicationAndCategory\76^windows.comServer
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Index\ApplicationAndCategory\76^windows.fileExplorerContextMenus
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Index\Application\76
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Index\PackageUser\143
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Index\UserAndApplicationUserModelId\4^NotepadPlusPlus_2247w0b46hfww!NotepadPlusPlus
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\Package\Index\PackageFamily\37
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageFamily\Data\37
+  FICOU [Notepad++ (64-bit x64)] K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageFamily\Index\PackageFamilyName\NotepadPlusPlus_2247w0b46hfww
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageFamily\Index\PackageSID\S-1-15-2-2557016000-3416274266-3014759505-2624777461-3676268001-1533065058-806985695
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageFamilyUser\Index\PackageFamily\37
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageProperty\Index\Package\40
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageProperty\Index\PackageAndName\40^AllowExternalContent
+  outro  V HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartPage -> FavoritesRemovedChanges
+  FICOU [Notepad++ (64-bit x64)] K HKLM\SOFTWARE\Microsoft\Windows Search\UninstalledStoreApps\S-1-5-21-4159254826-2043646976-2705649753-500\NotepadPlusPlus_2247w0b46hfww
+  outro  K HKLM\SOFTWARE\Microsoft\Windows Security Health\Updates
+  outro  K HKLM\SOFTWARE\Microsoft\Windows Security Health\UserAckedErrors
+  outro  V HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer -> GlobalAssocChangedCounter
+  outro  V HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\StartPage -> FavoritesRemovedChanges
+  FICOU [Notepad++ (64-bit x64)] K HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows Search\UninstalledStoreApps\S-1-5-21-4159254826-2043646976-2705649753-500\NotepadPlusPlus_2247w0b46hfww
+  outro  K HKCU\Software\Microsoft\SystemCertificates\CA\Certificates\7A2146EDB29E2EAD64AFBE7CEAD0B6085D437A32
+  outro  K HKCU\Software\Microsoft\UserData
+  FICOU [Notepad++ (64-bit x64)] K HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications\NotepadPlusPlus_2247w0b46hfww
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> FvzbaGngunz.ChGGL
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\ChGGL\chggltra.rkr
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VirtualDesktops -> VDSoftLandingCampaignDone
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Ext\Stats
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings -> QuietHoursTelemetryLastRun
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\SmartOptOut -> LastWeeklyTelemetryTimestamp
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\RunNotification -> StartupTNotiKeePass 2 PreLoad
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\Search\JumplistData -> Microsoft.AutoGenerated.{B8D7FC10-1942-FCCF-F55C-1759C910CDE3}
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Cached -> {E15E1D68-0D1C-49F7-BEB8-812B1E00FA60} {000214FC-0000-0000-C000-000000000046} 0xFFFF
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\StorageSense
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 63
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 64
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 65
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 66
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 67
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 69
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 70
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 71
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 72
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 73
+  outro  K HKCU\Software\Microsoft\Windows\Windows Error Reporting\ExcludedApplications
+  outro  K HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags
+  outro  V HKCU\Software\Microsoft\Windows NT\CurrentVersion\Winlogon -> ParseAutoexec
+  outro  K HKCU\Software\Microsoft\RestartManager
+  FICOU [WinSCP 6.7] D C:\Program Files (x86)\WinSCP
+  outro  F C:\ProgramData\Microsoft\DiagnosticLogCSP\Collectors\DiagnosticLogCSP_Collector_DeviceProvisioning_2026_10_21_2_20_20.etl
+  outro  F C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\2c9c22f1faf51072.automaticDestinations-ms
+  outro  F C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\44f3bee4c7729cfd.automaticDestinations-ms
+  outro  F C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\48d6f6cb9494d625.automaticDestinations-ms
+  outro  F C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\6bb54d82fa42128d.automaticDestinations-ms
+  outro  F C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\9390ee5b658e96e.automaticDestinations-ms
+  outro  F C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\c05563e05247f023.automaticDestinations-ms
+  outro  F C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\c8d12b97888aa1fc.automaticDestinations-ms
+  outro  F C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\fb0ab812998ba87b.automaticDestinations-ms
+  outro  F C:\Users\runneradmin\AppData\Local\Microsoft\Windows\Caches\{3DA71D5A-20CC-432F-A115-DFE92379E91F}.3.ver0x000000000000001b.db
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\07CEF2F654E3ED6050FFC9B6EB844250_71A3756DBB32C004799210B766A7AFA4
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\103621DE9CD5414CC2538780B4B75751
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\18E6B4A57A6BC7EC9B861CDF2D6D0D02_C3B142D2C5374581DC2FDFFDEDBDEDDB
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\1B1495DD322A24490E2BF2FAABAE1C61
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\22D536C4B4AD2CEF7AC6B7789FD235E3
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\307B56A7272241190849219D861B1A86
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\8B9DC743D29AB9DE072DD80446DE9B31
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\9CB4373A4252DE8D2212929836304EC5_6C354C532D063DF5607A63BA827F5164
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\A1D627669EFC8CD4F21BCF387D97F9B5_AB1B00F707521C22B07C077113A83DC3
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\AEACCDA8653DD8D7B2EA32F21D15D44F_D665BA8E68FA19E17C77043D2120E619
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\B32D6C54752EEFFBC4C0D9E5E2C0CF9A
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\07CEF2F654E3ED6050FFC9B6EB844250_71A3756DBB32C004799210B766A7AFA4
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\103621DE9CD5414CC2538780B4B75751
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\18E6B4A57A6BC7EC9B861CDF2D6D0D02_C3B142D2C5374581DC2FDFFDEDBDEDDB
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\1B1495DD322A24490E2BF2FAABAE1C61
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\22D536C4B4AD2CEF7AC6B7789FD235E3
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\307B56A7272241190849219D861B1A86
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\8B9DC743D29AB9DE072DD80446DE9B31
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\9CB4373A4252DE8D2212929836304EC5_6C354C532D063DF5607A63BA827F5164
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\A1D627669EFC8CD4F21BCF387D97F9B5_AB1B00F707521C22B07C077113A83DC3
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\AEACCDA8653DD8D7B2EA32F21D15D44F_D665BA8E68FA19E17C77043D2120E619
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\B32D6C54752EEFFBC4C0D9E5E2C0CF9A
+
+resultado: 5 itens dos programas testados ficaram, 105 itens novos de outros (ruído do Windows), 53 do Chocolatey, 1 problemas
