@@ -11,12 +11,28 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      - name: Build variants with MSVC and the SDK libraries
+        shell: cmd
+        continue-on-error: true
+        run: |
+          for /f "usebackq delims=" %%i in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath`) do set VS=%%i
+          call "%VS%\VC\Auxiliary\Build\vcvars64.bat" > nul
+          mkdir results
+          cd diag
+          (
+          echo int main(void^) { return 7; }
+          ) > crt.c
+          cl /nologo crt.c /Fe:m4-msvc-crt.exe
+          cl /nologo /GS- hello.c /Fe:m1-msvc-nocrt.exe /link /entry:WinMainCRTStartup /nodefaultlib /subsystem:windows kernel32.lib
+          link /nologo hello.obj kernel32-dlltool.lib /entry:WinMainCRTStartup /nodefaultlib /subsystem:windows /out:m2-msvclink-dlltoollib.exe
+          "C:\Program Files\LLVM\bin\lld-link.exe" /nologo hello.obj kernel32.lib /entry:WinMainCRTStartup /nodefaultlib /subsystem:windows /out:m3-lld-sdklib.exe
+          dir *.exe
       - name: Start each variant
         shell: pwsh
         continue-on-error: true
         run: |
-          Remove-Item -Recurse -Force results -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Force results | Out-Null
+          Get-ProcessMitigation -System | Out-String -Width 300 | Out-File results\mitigation.txt
           Add-Type -Namespace W -Name K -MemberDefinition '[DllImport("kernel32.dll")] public static extern uint SetErrorMode(uint m);'
           [W.K]::SetErrorMode(0x8003) | Out-Null
           & {
