@@ -1,0 +1,26 @@
+# Changelog
+
+All notable changes to EXTIRPA. Dates are in the author's time zone.
+
+## [Unreleased]
+
+## [1.0.0] — DATA
+
+First release.
+
+### Added
+- **Uninstall** with the program's own uninstaller, waiting for it and every process it starts (job object), then a search for leftovers in three modes: Safe, Moderate (recommended) and Advanced.
+- **Leftover search** in the install folder; Program Files, ProgramData, AppData (Roaming, Local, LocalLow) and the publisher's folders; registry keys under SOFTWARE (64 and 32 bits, machine and user); Run, RunOnce and the Task Manager's startup switches; services; scheduled tasks; Windows Firewall rules; the PATH variable (system and user); App Paths and SharedDLLs; file types (ProgIDs), "Open with" lists and default associations; COM components and type libraries; context menu entries and Explorer extensions (handlers, icon overlays, approved extensions, browser helper objects); Software\Clients and RegisteredApplications; shortcuts on the desktop, Start menu, Startup folder and taskbar pins; usage traces (MuiCache, compatibility settings). Paths in short 8.3 form are recognized. The Advanced mode adds similar names and a deep registry scan for any value that points into the program's folders.
+- Every leftover shows its type, a confidence level (high items come checked; medium and low come unchecked) and why it was found.
+- **Protection rules:** a protection list for system folders and Windows registry areas, checked twice; the most specific folder decides who owns a path; names shared with another installed program come unchecked and are narrowed down to the part of the program being removed; folders that contain another installed program are removed item by item; Windows' own scheduled tasks are never touched.
+- **Backups:** a `.reg` file before every registry deletion, the Recycle Bin for files, `.xml` for removed scheduled tasks and an optional Windows restore point before each uninstall. The Backups tab restores or deletes them.
+- **Quick and batch uninstall**, silent when the uninstaller allows it: Windows Installer (MSI), Inno Setup, NSIS and `QuietUninstallString`.
+- **Forced uninstall** for programs that are already gone, broken or have no uninstaller, by name, folder or both.
+- **Install tracing:** snapshots of the registry and folders before and after an installer runs; "Uninstall using trace" removes exactly what it created.
+- **Hunter mode:** a crosshair that can be dropped on any window to uninstall that program, open its folder, end it or remove it from startup.
+- **Windows apps:** lists and removes Microsoft Store and built-in apps, for the current user or all users.
+- **Startup manager:** enable, disable or delete what starts with Windows.
+- Before deleting leftovers, lists the programs still running from the folders about to be deleted and offers to close them.
+- Log of every deletion, failure and backup in `%LOCALAPPDATA%\EXTIRPA\extirpa.log`.
+- Interface in Portuguese (Brazil) and English, per-monitor DPI.
+- A single native executable of about 240 KB, written in C without a C library, built with LLVM only.

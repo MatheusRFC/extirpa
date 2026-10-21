@@ -1434,7 +1434,9 @@ static void delete_fw_rules(PtrVec *items) {
         const WCHAR *id = ((Leftover *)items->items[i])->path;
         sb_add(&s, i ? u",'" : u"'");
         for (const WCHAR *p = id; *p; p++) {
-            if (*p == '\'') sb_addc(&s, '\'');  // aspas simples dobradas: literal do PowerShell
+            // aspas simples dobradas: literal do PowerShell, que também aceita as aspas tipográficas
+            // (U+2018 a U+201B) como aspas simples
+            if (*p == '\'' || (*p >= 0x2018 && *p <= 0x201B)) sb_addc(&s, *p);
             sb_addc(&s, *p);
         }
         sb_addc(&s, '\'');

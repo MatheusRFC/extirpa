@@ -703,6 +703,8 @@ static void super_editor_installed(void) {
     task_file(u"\\Microsoft\\Windows\\Fake\\Task", SE_DIR u"\\se.exe");  // do Windows: nunca
     fake_str(FW_KEY, u"{AAAA-SE}", u"v2.30|Action=Allow|Active=TRUE|Dir=In|App=%ProgramFiles%\\Nimbus\\Super Editor\\se.exe|Name=Super Editor|");
     fake_str(FW_KEY, u"TCP Query User{B}C:\\program files\\nimbus\\super editor\\se.exe", u"v2.30|Action=Block|Dir=In|App=C:\\program files\\nimbus\\super editor\\se.exe|");
+    // nome com aspas simples e tipográficas: não pode quebrar o literal do script do PowerShell
+    fake_str(FW_KEY, u"Ana's \u2019rule\u2019", u"v2.30|Action=Allow|Dir=In|App=" SE_DIR u"\\se.exe|");
     fake_str(FW_KEY, u"{BBBB-UP}", u"v2.30|Action=Allow|Dir=Out|App=" UP_DIR u"\\nu.exe|Name=Updater|");
     const WCHAR path_val[] = u"C:\\Users\\ana\\bin;%ProgramFiles%\\Nimbus\\Super Editor\\bin;" UP_DIR u";";
     fake_val(u"HKCU\\Environment", u"Path", REG_EXPAND_SZ, path_val, sizeof(path_val));
@@ -758,6 +760,7 @@ static void test_full_cleanup(void) {
         {LK_TASK, u"\\Nimbus\\SuperEditorUpdate", NULL},
         {LK_FWRULE, u"{AAAA-SE}", NULL},
         {LK_FWRULE, u"TCP Query User{B}C:\\program files\\nimbus\\super editor\\se.exe", NULL},
+        {LK_FWRULE, u"Ana's \u2019rule\u2019", NULL},
         {LK_PATHENTRY, u"HKCU\\Environment", u"%ProgramFiles%\\Nimbus\\Super Editor\\bin"},
         {LK_VALUE, MUI, SE_DIR u"\\se.exe.FriendlyAppName"},
         {LK_SERVICE, u"SuperEditorSvc", NULL},
@@ -805,6 +808,7 @@ static void test_full_cleanup(void) {
     CHECK(!fake_exists(u"C:\\Windows\\System32\\Tasks\\Nimbus\\SuperEditorUpdate"));
     CHECK(!fake_val_exists(FW_KEY, u"{AAAA-SE}"));
     CHECK(!fake_val_exists(FW_KEY, u"TCP Query User{B}C:\\program files\\nimbus\\super editor\\se.exe"));
+    CHECK(!fake_val_exists(FW_KEY, u"Ana's \u2019rule\u2019"));
     CHECK(!fake_val_exists(MUI, SE_DIR u"\\se.exe.FriendlyAppName"));
     CHECK(!fake_key_exists(u"HKLM\\SYSTEM\\CurrentControlSet\\Services\\SuperEditorSvc"));
     // o PATH perdeu só a entrada do programa (e manteve o tipo REG_EXPAND_SZ)
