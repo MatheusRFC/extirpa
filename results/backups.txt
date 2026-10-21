@@ -1,0 +1,10 @@
+
+Name                                          Length
+----                                          ------
+20261021-014019 - Extirpa Selftest Widget.reg   1394
+20261021-014434 - Notepad++ (64-bit x64).reg     376
+20261021-014446 - FileZilla 3.71.1.reg           412
+20261021-014451 - WinSCP 6.7.reg               39010
+20261021-014455 - 7-Zip 26.04 (x64).reg          278
+20261021-014459 - Audacity 3.7.9.reg             762
+
