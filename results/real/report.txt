@@ -1,0 +1,396 @@
+
+==== Notepad++ ====
+  programa: Notepad++ (64-bit x64) 8.9.8.1 (Notepad++ Team)
+  entrada: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Notepad++
+  pasta: C:\Program Files\Notepad++
+  pasta (8.3): C:\PROGRA~1\NOTEPA~1
+  desinstalador: "C:\Program Files\Notepad++\uninstall.exe" /S  [silencioso]
+  rodou: sim, código 0, 531 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 3 itens em 609 ms
+    [pacote conf=2  ] NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww  (C:\Program Files\WindowsApps\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww)
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\Abgrcnq++\abgrcnq++.rkr  (C:\Program Files\Notepad++\notepad++.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Notepad++
+  exclusão: 2 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== VLC media player ====
+  programa: VLC media player 3.0.24 (VideoLAN)
+  entrada: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\VLC media player
+  pasta: C:\Program Files\VideoLAN\VLC
+  pasta (8.3): C:\PROGRA~1\VideoLAN\VLC
+  desinstalador: "C:\Program Files\VideoLAN\VLC\uninstall.exe" /S  [silencioso]
+  rodou: sim, código 0, 578 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 65 itens em 610 ms
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.3g2\OpenWithProgids -> VLC.3g2
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.3gp2\OpenWithProgids -> VLC.3gp2
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.3gp\OpenWithProgids -> VLC.3gp
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.3gpp\OpenWithProgids -> VLC.3gpp
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.aac\OpenWithProgids -> VLC.aac
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ac3\OpenWithProgids -> VLC.ac3
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.adt\OpenWithProgids -> VLC.adt
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.adts\OpenWithProgids -> VLC.adts
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.aif\OpenWithProgids -> VLC.aif
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.aifc\OpenWithProgids -> VLC.aifc
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.aiff\OpenWithProgids -> VLC.aiff
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.asf\OpenWithProgids -> VLC.asf
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.asx\OpenWithProgids -> VLC.asx
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.au\OpenWithProgids -> VLC.au
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.avi\OpenWithProgids -> VLC.avi
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.DVR-MS\OpenWithProgids -> VLC.dvr-ms
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.flac\OpenWithProgids -> VLC.flac
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.m1v\OpenWithProgids -> VLC.m1v
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.m2t\OpenWithProgids -> VLC.m2t
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.m2ts\OpenWithProgids -> VLC.m2ts
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.M2V\OpenWithProgids -> VLC.m2v
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.m3u\OpenWithProgids -> VLC.m3u
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.m4a\OpenWithProgids -> VLC.m4a
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.m4p\OpenWithProgids -> VLC.m4p
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.m4v\OpenWithProgids -> VLC.m4v
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.MKA\OpenWithProgids -> VLC.mka
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mkv\OpenWithProgids -> VLC.mkv
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mod\OpenWithProgids -> VLC.mod
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mov\OpenWithProgids -> VLC.mov
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.MP2\OpenWithProgids -> VLC.mp2
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mp2v\OpenWithProgids -> VLC.mp2v
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mp3\OpenWithProgids -> VLC.mp3
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mp4\OpenWithProgids -> VLC.mp4
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mp4v\OpenWithProgids -> VLC.mp4v
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mpa\OpenWithProgids -> VLC.mpa
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.MPE\OpenWithProgids -> VLC.mpe
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mpeg\OpenWithProgids -> VLC.mpeg
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mpg\OpenWithProgids -> VLC.mpg
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mpv2\OpenWithProgids -> VLC.mpv2
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mts\OpenWithProgids -> VLC.mts
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.oga\OpenWithProgids -> VLC.oga
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ogg\OpenWithProgids -> VLC.ogg
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ogm\OpenWithProgids -> VLC.ogm
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ogv\OpenWithProgids -> VLC.ogv
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ogx\OpenWithProgids -> VLC.ogx
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.opus\OpenWithProgids -> VLC.opus
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.rmi\OpenWithProgids -> VLC.rmi
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.snd\OpenWithProgids -> VLC.snd
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tod\OpenWithProgids -> VLC.tod
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.TS\OpenWithProgids -> VLC.ts
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.TTS\OpenWithProgids -> VLC.tts
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.vob\OpenWithProgids -> VLC.vob
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.wav\OpenWithProgids -> VLC.wav
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.webm\OpenWithProgids -> VLC.webm
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.wma\OpenWithProgids -> VLC.wma
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.wmv\OpenWithProgids -> VLC.wmv
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.WPL\OpenWithProgids -> VLC.wpl
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.WTV\OpenWithProgids -> VLC.wtv
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.wvx\OpenWithProgids -> VLC.wvx
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\IvqrbYNA\IYP\iyp.rkr  (C:\Program Files\VideoLAN\VLC\vlc.exe)
+    [valor conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayBluRayOnArrival -> VLCPlayBlurayOnArrival
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayBlurayOnArrival  ("C:\Program Files\VideoLAN\VLC\vlc.exe",0)
+    [valor conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayBluRayOnArrival -> VLCPlayBlurayOnArrival
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayBlurayOnArrival  ("C:\Program Files\VideoLAN\VLC\vlc.exe",0)
+    [pasta-se-vazia conf=3 x] C:\Program Files\VideoLAN
+  exclusão: 65 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== KeePass ====
+  programa: KeePass Password Safe 2.61.1 2.61.1 (Dominik Reichl)
+  entrada: HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\KeePassPasswordSafe2_is1
+  pasta: C:\Program Files\KeePass Password Safe 2
+  pasta (8.3): C:\PROGRA~1\KEEPAS~1
+  desinstalador: "C:\Program Files\KeePass Password Safe 2\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART  [silencioso]
+  rodou: sim, código 0, 1172 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 1 itens em 562 ms
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Search\JumplistData -> C:\Program Files\KeePass Password Safe 2\KeePass.exe  (C:\Program Files\KeePass Password Safe 2\KeePass.exe)
+  exclusão: 1 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== FileZilla ====
+  programa: FileZilla 3.71.1 3.71.1 (Tim Kosse)
+  entrada: HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\FileZilla Client
+  pasta: C:\Program Files\FileZilla FTP Client
+  pasta (8.3): C:\PROGRA~1\FILEZI~1
+  desinstalador: "C:\Program Files\FileZilla FTP Client\uninstall.exe" /S  [silencioso]
+  rodou: sim, código 0, 297 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 3 itens em 563 ms
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\FileZilla Client
+    [pasta conf=3 x] C:\Users\runneradmin\AppData\Local\FileZilla
+    [pasta conf=3 x] C:\Users\runneradmin\AppData\Roaming\FileZilla
+  exclusão: 3 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== WinSCP ====
+  programa: WinSCP 6.7 6.7 (Martin Prikryl)
+  entrada: HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\winscp3_is1
+  pasta: C:\Program Files (x86)\WinSCP
+  pasta (8.3): C:\PROGRA~2\WinSCP
+  desinstalador: "C:\Program Files (x86)\WinSCP\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART  [silencioso]
+  rodou: sim, código 0, 1781 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 12 itens em 547 ms
+    [chave conf=3 x] HKCU\Software\Martin Prikryl\WinSCP 2
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {7P5N40RS-N0SO-4OSP-874N-P0S2R0O9SN8R}\JvaFPC\JvaFPC.rkr  (C:\Program Files (x86)\WinSCP\WinSCP.exe)
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Search\JumplistData -> {7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}\WinSCP\WinSCP.exe  (C:\Program Files (x86)\WinSCP\WinSCP.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\Martin Prikryl\WinSCP 2
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\winscp.exe  (C:\Program Files (x86)\WinSCP\winscp.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Martin Prikryl\WinSCP 2
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\winscp.exe  (C:\Program Files (x86)\WinSCP\winscp.exe)
+    [chave-se-vazia conf=2 x] HKCU\Software\Martin Prikryl
+    [chave-se-vazia conf=2 x] HKLM\SOFTWARE\Martin Prikryl
+    [chave-se-vazia conf=2 x] HKLM\SOFTWARE\WOW6432Node\Martin Prikryl
+    [pasta conf=3 x] C:\Program Files (x86)\WinSCP
+    [arquivo conf=3 x] C:\Users\runneradmin\AppData\Roaming\winscp.rnd
+  exclusão: 11 apagados, 1 falharam, 0 mantidos, 0 sem Lixeira
+    falhou: C:\Program Files (x86)\WinSCP : Access is denied (5)
+      contém: DragExt64.dll
+      agendado para apagar na reinicialização: sim
+
+==== 7-Zip ====
+  programa: 7-Zip 26.04 (x64) 26.04 (Igor Pavlov)
+  entrada: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\7-Zip
+  pasta: C:\Program Files\7-Zip
+  pasta (8.3): C:\PROGRA~1\7-Zip
+  desinstalador: "C:\Program Files\7-Zip\Uninstall.exe" /S  [silencioso]
+  rodou: sim, código 0, 78 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 2 itens em 531 ms
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\7-Mvc\7mSZ.rkr  (C:\Program Files\7-Zip\7zFM.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\7-Zip
+  exclusão: 2 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== Audacity ====
+  programa: Audacity 3.7.9 3.7.9 (Audacity Team)
+  entrada: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Audacity_is1
+  pasta: C:\Program Files\Audacity
+  pasta (8.3): C:\PROGRA~1\Audacity
+  desinstalador: "C:\Program Files\Audacity\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART  [silencioso]
+  rodou: sim, código 0, 797 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 6 itens em 531 ms
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\Nhqnpvgl\Nhqnpvgl.rkr  (C:\Program Files\Audacity\Audacity.exe)
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Search\JumplistData -> C:\Program Files\Audacity\Audacity.exe  (C:\Program Files\Audacity\Audacity.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\audacity.exe  (C:\Program Files\Audacity\audacity.exe)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\audacity.exe  (C:\Program Files\Audacity\audacity.exe)
+    [pasta conf=3 x] C:\Users\runneradmin\AppData\Local\audacity
+    [pasta conf=3 x] C:\Users\runneradmin\AppData\Roaming\audacity
+  exclusão: 6 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== O que a instalação criou e ainda existe (segunda foto) ====
+  outro  K HKLM\SOFTWARE\Classes\dav
+         (padrão) = URL: dav Protocol
+         URL Protocol = 
+         EditFlags = (binário)
+         BrowserFlags = (binário)
+  outro  K HKLM\SOFTWARE\Classes\davs
+         (padrão) = URL: davs Protocol
+         URL Protocol = 
+         EditFlags = (binário)
+         BrowserFlags = (binário)
+  outro  K HKLM\SOFTWARE\Classes\DVD\shell
+  outro  V HKLM\SOFTWARE\Classes\ftp -> 
+  outro  V HKLM\SOFTWARE\Classes\ftp -> EditFlags
+  outro  V HKLM\SOFTWARE\Classes\ftp -> BrowserFlags
+  outro  K HKLM\SOFTWARE\Classes\ftpes
+         (padrão) = URL: ftpes Protocol
+         URL Protocol = 
+         EditFlags = (binário)
+         BrowserFlags = (binário)
+  outro  K HKLM\SOFTWARE\Classes\ftps
+         (padrão) = URL: ftps Protocol
+         URL Protocol = 
+         EditFlags = (binário)
+         BrowserFlags = (binário)
+  FICOU [Notepad++ (64-bit x64)] K HKLM\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\PackageRepository\Packages\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww
+  outro  K HKLM\SOFTWARE\Classes\PackagedCom\ClassIndex\{E6950302-61F0-4FEB-97DB-855E30D4A991}
+  FICOU [Notepad++ (64-bit x64)] K HKLM\SOFTWARE\Classes\PackagedCom\Package\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww
+  outro  K HKLM\SOFTWARE\Classes\s3
+         (padrão) = URL: s3 Protocol
+         URL Protocol = 
+         EditFlags = (binário)
+         BrowserFlags = (binário)
+  outro  K HKLM\SOFTWARE\Classes\scp
+         (padrão) = URL: scp Protocol
+         URL Protocol = 
+         EditFlags = (binário)
+         BrowserFlags = (binário)
+  outro  K HKLM\SOFTWARE\Classes\sftp
+         (padrão) = URL: sftp Protocol
+         URL Protocol = 
+         EditFlags = (binário)
+         BrowserFlags = (binário)
+  outro  K HKLM\SOFTWARE\Classes\ssh
+         (padrão) = URL: ssh Protocol
+         URL Protocol = 
+         EditFlags = (binário)
+         BrowserFlags = (binário)
+  outro  K HKLM\SOFTWARE\Classes\楖敤䱯乁嘮䍌汐杵湩.2
+         (padrão) = 䱖⁃捁楴敶⁘汐杵湩愠摮䤠⁅敗⁢汐杵湩 v2
+         [CLSID]
+  FICOU [Notepad++ (64-bit x64)] K HKLM\SOFTWARE\Microsoft\SecurityManager\CapAuthz\ApplicationsEx\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww
+  FICOU [Notepad++ (64-bit x64)] K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StagingInfo\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\Activation\Data\9c
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\Activation\Index\ActivationKey\0rgh4vmwpnkd808tnh1xb1frvkezpvz5ap6r1cgv2t22dwxy4pag
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\Application\Data\76
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\Application\Index\Package\40
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\Application\Index\PackageAndPackageRelativeApplicationId\40^NotepadPlusPlus
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Data\197
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Data\198
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Index\Application\76
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Index\ApplicationAndCategory\76^windows.comServer
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Index\ApplicationAndCategory\76^windows.fileExplorerContextMenus
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Index\Category\windows.comServer\198
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationExtension\Index\Category\windows.fileExplorerContextMenus\197
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Data\245
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Index\Application\76
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Index\PackageUser\143
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Index\PackageUserAndApplication\143^76
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Index\User\4\245
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Index\UserAndApplication\4^76
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\ApplicationUser\Index\UserAndApplicationUserModelId\4^NotepadPlusPlus_2247w0b46hfww!NotepadPlusPlus
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\Package\Data\40
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\Package\Index\PackageFamily\37
+  FICOU [Notepad++ (64-bit x64)] K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\Package\Index\PackageFullName\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageExternalLocation\Data\3
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageExternalLocation\Index\UserAndPackage\4^40
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageFamily\Data\37
+  FICOU [Notepad++ (64-bit x64)] K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageFamily\Index\PackageFamilyName\NotepadPlusPlus_2247w0b46hfww
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageFamily\Index\PackageSID\S-1-15-2-2557016000-3416274266-3014759505-2624777461-3676268001-1533065058-806985695
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageFamilyUser\Data\85
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageFamilyUser\Index\PackageFamily\37
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageFamilyUser\Index\User\4\85
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageFamilyUser\Index\UserAndPackageFamily\4^37
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageProperty\Data\24
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageProperty\Index\Name\AllowExternalContent\24
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageProperty\Index\Package\40
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageProperty\Index\PackageAndName\40^AllowExternalContent
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageUser\Data\143
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageUser\Index\User\4\143
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModel\StateRepository\Cache\PackageUser\Index\UserAndPackage\4^40
+  FICOU [Notepad++ (64-bit x64)] K HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\PackageState\S-1-5-21-4159254826-2043646976-2705649753-500\NotepadPlusPlus_2247w0b46hfww
+  outro  V HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Fcon -> PE
+  outro  V HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Wosc\Client\Persistent\ClientState\MUSE -> ETagBackup
+  outro  K HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting\TermReason\3360
+  outro  V HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Notifications -> 41C64E6DA3BA98E5
+  outro  V HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Notifications\Data -> 418A073AA3BC2C75
+  outro  V HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer -> GlobalAssocChangedCounter
+  outro  V HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\StartPage -> FavoritesRemovedChanges
+  FICOU [Notepad++ (64-bit x64)] K HKLM\SOFTWARE\Wow6432Node\Microsoft\SecurityManager\CapAuthz\ApplicationsEx\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww
+  outro  K HKCU\Software\Microsoft\SystemCertificates\CA\Certificates\7A2146EDB29E2EAD64AFBE7CEAD0B6085D437A32
+  FICOU [Notepad++ (64-bit x64)] K HKCU\Software\Microsoft\Windows\CurrentVersion\AppHost\IndexedDB\NotepadPlusPlus_2247w0b46hfww
+  FICOU [Notepad++ (64-bit x64)] K HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications\NotepadPlusPlus_2247w0b46hfww
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\CloudStore\Store\DefaultAccount\Cloud\default$windows.data.input.text.roamingdictionary
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\CloudStore\Store\DefaultAccount\Current\default$windows.data.input.text.roamingdictionary
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.7z
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ac3
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.aif
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.aifc
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.aiff
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.asf
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.asx
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.au
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.bz2
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.cdxml
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.datasource
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.dds
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.DVR-MS
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.dwfx
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.easmx
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.edrwx
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.emf
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.eprtx
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.fon
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.gz
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.jtx
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.m1v
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.M2V
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.m4p
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mid
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.midi
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.MK3D
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.MKA
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mp2v
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ocx
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.oga
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ogg
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ogm
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ogv
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ogx
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.opus
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.otf
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.oxps
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.pano
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.pl
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ps1xml
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.pssc
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.py
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.pyw
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.rle
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.rmi
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.scf
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.search-ms
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.shtml\OpenWithProgids
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.snd
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.sys
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tar
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tbz2
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tgz
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tod
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ttc
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txz
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tzst
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.vob
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.wax
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.webm
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.wmf
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.wmx
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.WTV
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.wvx
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.xps
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.xsl
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.xz
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.zst
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> SvyrMvyyn.Pyvrag.NccVQ
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VirtualDesktops -> VDSoftLandingCampaignDone
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Ext\Stats
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.StartupApp
+  FICOU [Notepad++ (64-bit x64)] K HKCU\Software\Microsoft\Windows\CurrentVersion\PushNotifications\Backup\NotepadPlusPlus_2247w0b46hfww!NotepadPlusPlus
+  outro  K HKCU\Software\Microsoft\Windows\CurrentVersion\RunNotification
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\Search\JumplistData -> Microsoft.AutoGenerated.{B8D7FC10-1942-FCCF-F55C-1759C910CDE3}
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Cached -> {E15E1D68-0D1C-49F7-BEB8-812B1E00FA60} {000214FC-0000-0000-C000-000000000046} 0xFFFF
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 63
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 64
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 65
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 66
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 67
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 69
+  outro  V HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 70
+  outro  K HKCU\Software\Microsoft\Windows\Windows Error Reporting\ExcludedApplications
+  outro  K HKCU\Software\Microsoft\RestartManager
+  outro  K HKCU\Software\Mozilla
+  FICOU [Notepad++ (64-bit x64)] K HKCU\Software\Classes\PackagedCom\Package\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww
+  FICOU [WinSCP 6.7] D C:\Program Files (x86)\WinSCP
+  outro  F C:\ProgramData\Microsoft\Windows\AppRepository\5afe0e24-877a-4d1b-8732-f51e7b9e784f_S-1-5-21-4159254826-2043646976-2705649753-500_5.rslc
+  FICOU [Notepad++ (64-bit x64)] F C:\ProgramData\Microsoft\Windows\AppRepository\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww.xml
+  FICOU [Notepad++ (64-bit x64)] D C:\ProgramData\Microsoft\Windows\AppRepository\Packages\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww
+  FICOU [Notepad++ (64-bit x64)] D C:\ProgramData\Packages\NotepadPlusPlus_2247w0b46hfww
+  outro  F C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\44f3bee4c7729cfd.automaticDestinations-ms
+  outro  F C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\48d6f6cb9494d625.automaticDestinations-ms
+  outro  F C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\6bb54d82fa42128d.automaticDestinations-ms
+  outro  F C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\c05563e05247f023.automaticDestinations-ms
+  outro  D C:\Users\runneradmin\AppData\Roaming\Mozilla
+  outro  F C:\Users\runneradmin\AppData\Local\Microsoft\Windows\Caches\{3DA71D5A-20CC-432F-A115-DFE92379E91F}.3.ver0x0000000000000017.db
+  outro  D C:\Users\runneradmin\AppData\Local\Mozilla
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\103621DE9CD5414CC2538780B4B75751
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\1B1495DD322A24490E2BF2FAABAE1C61
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\22D536C4B4AD2CEF7AC6B7789FD235E3
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\307B56A7272241190849219D861B1A86
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\59D76868C250B3240414CE3EFBB12518_02F238D737DDE39558F0B4A5EF423834
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\8B9DC743D29AB9DE072DD80446DE9B31
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\9CB4373A4252DE8D2212929836304EC5_6C354C532D063DF5607A63BA827F5164
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\A1D627669EFC8CD4F21BCF387D97F9B5_AB1B00F707521C22B07C077113A83DC3
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\103621DE9CD5414CC2538780B4B75751
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\1B1495DD322A24490E2BF2FAABAE1C61
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\22D536C4B4AD2CEF7AC6B7789FD235E3
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\307B56A7272241190849219D861B1A86
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\59D76868C250B3240414CE3EFBB12518_02F238D737DDE39558F0B4A5EF423834
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\8B9DC743D29AB9DE072DD80446DE9B31
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\9CB4373A4252DE8D2212929836304EC5_6C354C532D063DF5607A63BA827F5164
+  outro  F C:\Users\runneradmin\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\A1D627669EFC8CD4F21BCF387D97F9B5_AB1B00F707521C22B07C077113A83DC3
+
+resultado: 16 itens dos programas testados ficaram, 170 itens novos de outros (ruído do Windows), 49 do Chocolatey, 1 problemas
