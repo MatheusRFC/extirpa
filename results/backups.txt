@@ -1,0 +1,7 @@
+
+Name                                          Length
+----                                          ------
+20261021-012315 - Extirpa Selftest Widget.reg   1394
+20261021-012701 - Notepad++ (64-bit x64).reg     376
+20261021-013520 - WinSCP 6.7.reg                1064
+

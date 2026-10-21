@@ -1,0 +1,81 @@
+
+==== Notepad++ ====
+  programa: Notepad++ (64-bit x64) 8.9.8.1 (Notepad++ Team)
+  entrada: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Notepad++
+  pasta: C:\Program Files\Notepad++
+  pasta (8.3): C:\PROGRA~1\NOTEPA~1
+  desinstalador: "C:\Program Files\Notepad++\uninstall.exe" /S  [silencioso]
+  rodou: sim, código 0, 640 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 2 itens em 719 ms
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Notepad++
+    [arquivo conf=2  ] C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Notepad.lnk
+  exclusão: 1 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== VLC ====
+  programa: VLC media player 3.0.24 (VideoLAN)
+  entrada: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\VLC media player
+  pasta: C:\Program Files\VideoLAN\VLC
+  pasta (8.3): C:\PROGRA~1\VideoLAN\VLC
+  desinstalador: "C:\Program Files\VideoLAN\VLC\uninstall.exe" /S  [silencioso]
+  rodou: sim, código 0, 796 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 0 itens em 1094 ms
+  exclusão: 0 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== media ====
+  NÃO ENCONTRADO na lista de programas: media
+
+==== player ====
+  NÃO ENCONTRADO na lista de programas: player
+
+==== PuTTY ====
+  NÃO ENCONTRADO na lista de programas: PuTTY
+
+==== KeePass ====
+  programa: KeePass Password Safe 2.61.1 2.61.1 (Dominik Reichl)
+  entrada: HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\KeePassPasswordSafe2_is1
+  pasta: C:\Program Files\KeePass Password Safe 2
+  pasta (8.3): C:\PROGRA~1\KEEPAS~1
+  desinstalador: "C:\Program Files\KeePass Password Safe 2\unins000.exe" /SILENT  [silencioso]
+  rodou: sim, código 0, 2234 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 0 itens em 734 ms
+  exclusão: 0 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== FileZilla ====
+  programa: FileZilla 3.71.1 3.71.1 (Tim Kosse)
+  entrada: HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\FileZilla Client
+  pasta: C:\Program Files\FileZilla FTP Client
+  pasta (8.3): C:\PROGRA~1\FILEZI~1
+  desinstalador: "C:\Program Files\FileZilla FTP Client\uninstall.exe" /S  [silencioso]
+  rodou: sim, código 0, 516 ms
+  entrada ainda existe depois do desinstalador: não
+  sobras: 3 itens em 687 ms
+    [chave conf=2  ] HKLM\SOFTWARE\WOW6432Node\FileZilla Client
+    [pasta conf=3 x] C:\Users\runneradmin\AppData\Local\FileZilla
+    [pasta conf=3 x] C:\Users\runneradmin\AppData\Roaming\FileZilla
+  exclusão: 2 apagados, 0 falharam, 0 mantidos, 0 sem Lixeira
+
+==== WinSCP ====
+  programa: WinSCP 6.7 6.7 (Martin Prikryl)
+  entrada: HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\winscp3_is1
+  pasta: C:\Program Files (x86)\WinSCP
+  pasta (8.3): C:\PROGRA~2\WinSCP
+  desinstalador: "C:\Program Files (x86)\WinSCP\unins000.exe" /SILENT  [silencioso]
+  rodou: sim, código 0, 480078 ms (TEMPO ESGOTADO)
+  entrada ainda existe depois do desinstalador: não
+  sobras: 9 itens em 656 ms
+    [chave conf=2  ] HKCU\Software\Martin Prikryl\WinSCP 2
+    [chave conf=2  ] HKLM\SOFTWARE\Martin Prikryl\WinSCP 2
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\winscp.exe
+    [chave conf=2  ] HKLM\SOFTWARE\WOW6432Node\Martin Prikryl\WinSCP 2
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\winscp.exe
+    [chave-se-vazia conf=2 x] HKCU\Software\Martin Prikryl
+    [chave-se-vazia conf=2 x] HKLM\SOFTWARE\Martin Prikryl
+    [chave-se-vazia conf=2 x] HKLM\SOFTWARE\WOW6432Node\Martin Prikryl
+    [pasta conf=3 x] C:\Program Files (x86)\WinSCP
+  exclusão: 2 apagados, 1 falharam, 3 mantidos, 0 sem Lixeira
+    falhou: C:\Program Files (x86)\WinSCP : Access is denied (5)
+
+==== O que a instalação criou e ainda existe (segunda foto) ====
