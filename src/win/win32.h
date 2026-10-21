@@ -39,7 +39,7 @@ typedef short SHORT;
 typedef long long LONGLONG, INT64;
 typedef unsigned long long ULONGLONG;
 typedef long long LONG_PTR, INT_PTR;
-typedef unsigned long long ULONG_PTR, UINT_PTR, SIZE_T, DWORD_PTR, *PULONG_PTR;
+typedef unsigned long long ULONG_PTR, UINT_PTR, SIZE_T, DWORD_PTR, *PULONG_PTR, *PDWORD_PTR;
 typedef UINT_PTR WPARAM;
 typedef LONG_PTR LPARAM, LRESULT;
 typedef DWORD COLORREF, ACCESS_MASK, REGSAM;
@@ -373,6 +373,29 @@ typedef struct _GUID {
 } GUID, KNOWNFOLDERID;
 typedef const GUID *REFKNOWNFOLDERID;
 
+typedef struct tagBITMAPINFOHEADER {
+    DWORD biSize;
+    LONG biWidth;
+    LONG biHeight;
+    WORD biPlanes;
+    WORD biBitCount;
+    DWORD biCompression;
+    DWORD biSizeImage;
+    LONG biXPelsPerMeter;
+    LONG biYPelsPerMeter;
+    DWORD biClrUsed;
+    DWORD biClrImportant;
+} BITMAPINFOHEADER;
+
+typedef struct tagRGBQUAD {
+    BYTE rgbBlue, rgbGreen, rgbRed, rgbReserved;
+} RGBQUAD;
+
+typedef struct tagBITMAPINFO {
+    BITMAPINFOHEADER bmiHeader;
+    RGBQUAD bmiColors[1];
+} BITMAPINFO;
+
 typedef struct _RTL_SRWLOCK {
     PVOID Ptr;
 } SRWLOCK, *PSRWLOCK;
@@ -541,6 +564,8 @@ typedef enum _JOBOBJECTINFOCLASS { JobObjectAssociateCompletionPortInformation =
 #define SWP_NOACTIVATE 0x0010
 #define SWP_SHOWWINDOW 0x0040
 #define HWND_TOPMOST ((HWND)-1)
+#define HWND_BROADCAST ((HWND)0xffff)
+#define SMTO_ABORTIFHUNG 0x0002
 #define LWA_ALPHA 0x00000002
 #define MONITOR_DEFAULTTONEAREST 0x00000002
 #define SM_CXSCREEN 0
@@ -671,6 +696,10 @@ typedef enum _JOBOBJECTINFOCLASS { JobObjectAssociateCompletionPortInformation =
 #define DT_WORDBREAK 0x00000010
 #define DT_CALCRECT 0x00000400
 #define FW_BOLD 700
+#define BI_RGB 0
+#define DIB_RGB_COLORS 0
+#define PW_CLIENTONLY 0x00000001
+#define PW_RENDERFULLCONTENT 0x00000002
 
 // controles comuns
 #define ICC_LISTVIEW_CLASSES 0x00000001
@@ -844,6 +873,8 @@ W32IMP BOOL WINAPI WriteFile(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfByte
 W32IMP BOOL WINAPI CloseHandle(HANDLE hObject);
 W32IMP BOOL WINAPI CreateDirectoryW(LPCWSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurityAttributes);
 W32IMP DWORD WINAPI GetFileAttributesW(LPCWSTR lpFileName);
+W32IMP DWORD WINAPI GetShortPathNameW(LPCWSTR lpszLongPath, LPWSTR lpszShortPath, DWORD cchBuffer);
+W32IMP BOOL WINAPI K32EnumProcesses(DWORD *lpidProcess, DWORD cb, LPDWORD lpcbNeeded);
 W32IMP BOOL WINAPI GetFileAttributesExW(LPCWSTR lpFileName, GET_FILEEX_INFO_LEVELS fInfoLevelId, LPVOID lpFileInformation);
 W32IMP BOOL WINAPI SetFileAttributesW(LPCWSTR lpFileName, DWORD dwFileAttributes);
 W32IMP HANDLE WINAPI FindFirstFileExW(LPCWSTR lpFileName, FINDEX_INFO_LEVELS fInfoLevelId, LPVOID lpFindFileData, FINDEX_SEARCH_OPS fSearchOp,
@@ -915,6 +946,7 @@ W32IMP BOOL WINAPI IsDialogMessageW(HWND hDlg, LPMSG lpMsg);
 W32IMP VOID WINAPI PostQuitMessage(int nExitCode);
 W32IMP BOOL WINAPI PostMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 W32IMP LRESULT WINAPI SendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+W32IMP LRESULT WINAPI SendMessageTimeoutW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, UINT fuFlags, UINT uTimeout, PDWORD_PTR lpdwResult);
 W32IMP int WINAPI MessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
 W32IMP HCURSOR WINAPI LoadCursorW(HINSTANCE hInstance, LPCWSTR lpCursorName);
 W32IMP HICON WINAPI LoadIconW(HINSTANCE hInstance, LPCWSTR lpIconName);
@@ -974,6 +1006,9 @@ W32IMP HWND WINAPI GetShellWindow(void);
 W32IMP int WINAPI DrawTextW(HDC hdc, LPCWSTR lpchText, int cchText, LPRECT lprc, UINT format);
 W32IMP BOOL WINAPI AdjustWindowRectEx(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle);
 W32IMP int WINAPI GetDlgCtrlID(HWND hWnd);
+W32IMP HDC WINAPI GetDC(HWND hWnd);
+W32IMP int WINAPI ReleaseDC(HWND hWnd, HDC hDC);
+W32IMP BOOL WINAPI PrintWindow(HWND hwnd, HDC hdcBlt, UINT nFlags);
 
 // gdi32
 W32IMP HFONT WINAPI CreateFontIndirectW(const LOGFONTW *lplf);
@@ -988,6 +1023,9 @@ W32IMP HPEN WINAPI CreatePen(int iStyle, int cWidth, COLORREF color);
 W32IMP BOOL WINAPI Ellipse(HDC hdc, int left, int top, int right, int bottom);
 W32IMP BOOL WINAPI MoveToEx(HDC hdc, int x, int y, LPPOINT lppt);
 W32IMP BOOL WINAPI LineTo(HDC hdc, int x, int y);
+W32IMP HDC WINAPI CreateCompatibleDC(HDC hdc);
+W32IMP BOOL WINAPI DeleteDC(HDC hdc);
+W32IMP HBITMAP WINAPI CreateDIBSection(HDC hdc, const BITMAPINFO *pbmi, UINT usage, VOID **ppvBits, HANDLE hSection, DWORD offset);
 
 // comctl32
 W32IMP BOOL WINAPI InitCommonControlsEx(const INITCOMMONCONTROLSEX *picce);

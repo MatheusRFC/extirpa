@@ -154,7 +154,7 @@ bool op_uninstall(HWND owner, Program *const *progs, size_t n, bool quick) {
 
 // ---------------------------------------------------------------- desinstalação forçada
 
-bool op_forced(HWND owner, const WCHAR *name, const WCHAR *folder) {
+bool op_forced(HWND owner, const Program *prog, const WCHAR *name, const WCHAR *folder) {
     WCHAR *n = name ? wdup(name) : NULL, *f = folder ? wdup(folder) : NULL;
     ScanMode mode = SCAN_MODERATE;
     if (!dlg_forced(owner, &n, &f, &mode)) {
@@ -168,15 +168,22 @@ bool op_forced(HWND owner, const WCHAR *name, const WCHAR *folder) {
     job.t = xalloc(sizeof(Target));
     const WCHAR *label = n[0] ? n : path_leaf(f);
     job.t[0].name = wdup(label);
-    job.t[0].id = identity_new(label, NULL);
+    if (prog && wieq(n, prog->name)) {
+        // um programa da lista: usa tudo o que o Windows sabe dele, e a entrada dele também sai
+        job.t[0].id = program_identity(prog);
+        job.t[0].key = wdup(prog->key_path);
+    } else {
+        job.t[0].id = identity_new(label, NULL);
+    }
     if (f[0]) {
-        identity_add_dir(job.t[0].id, f);
+        identity_add_dir(job.t[0].id, f, true);  // escolhida pelo usuário: o nome da pasta conta
         identity_add_exact(job.t[0].id, path_leaf(f));
+        identity_add_short_names(job.t[0].id);
     }
     log_fmt(u"Desinstalação forçada: nome \"%s\", pasta \"%s\"", n, f);
     progress_run(owner, T(S_FORCED_TITLE), uninstall_work, &job);
     show_result(owner, label, &job, job.cancelled);
-    xfree(job.t[0].name);
+    xfree(job.t[0].name), xfree(job.t[0].key);
     identity_free(job.t[0].id);
     xfree(job.t);
     left_free(&job.list);
@@ -308,6 +315,21 @@ static bool item_exists(const Leftover *it) {
     case LK_DIR:
     case LK_FILE:
     case LK_DIR_IF_EMPTY: return file_exists(it->path);
+    case LK_TASK: {
+        WCHAR *f = g_paths.system32 ? wcat3(g_paths.system32, u"\\Tasks", it->path) : wdup(u"");
+        bool ok = file_exists(f);
+        xfree(f);
+        return ok;
+    }
+    case LK_FWRULE: {
+        HKEY k = reg_open(FIREWALL_RULES_KEY, KEY_QUERY_VALUE);
+        if (!k) return false;
+        DWORD t, sz = 0;
+        bool ok = RegQueryValueExW(k, it->path, NULL, &t, NULL, &sz) == ERROR_SUCCESS;
+        RegCloseKey(k);
+        return ok;
+    }
+    case LK_PATHENTRY: return true;  // entradas de PATH não vêm de rastreamentos
     }
     return false;
 }

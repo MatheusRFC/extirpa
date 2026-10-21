@@ -108,6 +108,16 @@ static const char *const KEY_TREES[] = {
     "%C\\Local Settings",
 };
 
+// Chaves dentro de árvores proibidas onde o Windows guarda rastros de uso por programa:
+// cada valor tem o caminho de um executável no nome. Aqui (e só aqui) valores podem sair;
+// as chaves em si continuam intocáveis.
+static const char *const USAGE_VALUE_KEYS[] = {
+    "HKCU\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\MuiCache",
+    "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Compatibility Assistant\\Store",
+    "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers",
+    "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers",
+};
+
 static const char *const SOFTWARE_ROOTS[] = {"HKLM\\SOFTWARE", "HKLM\\SOFTWARE\\WOW6432Node", "HKCU\\Software", "HKCU\\Software\\WOW6432Node"};
 static const char *const CLASSES_ROOTS[] = {"HKLM\\SOFTWARE\\Classes", "HKLM\\SOFTWARE\\WOW6432Node\\Classes", "HKCU\\Software\\Classes",
                                             "HKCU\\Software\\Classes\\WOW6432Node", "HKCR"};
@@ -181,8 +191,22 @@ bool protect_key_blocked(const WCHAR *key) {
     return blocked;
 }
 
+bool protect_usage_key(const WCHAR *key) {
+    for (size_t i = 0; i < COUNT(USAGE_VALUE_KEYS); i++) {
+        WCHAR *u = w_from_ascii(USAGE_VALUE_KEYS[i]);
+        bool eq = path_eq(key, u);
+        xfree(u);
+        if (eq) return true;
+    }
+    return false;
+}
+
 bool protect_value_blocked(const WCHAR *key) {
     WCHAR *k = path_norm(key);
+    if (protect_usage_key(k)) {
+        xfree(k);
+        return false;
+    }
     bool blocked = !wfindc(k, '\\');
     for (size_t i = 0; !blocked && i < COUNT(KEY_TREES); i++) blocked = each_expansion(KEY_TREES[i], in_tree_strict, k);
     xfree(k);

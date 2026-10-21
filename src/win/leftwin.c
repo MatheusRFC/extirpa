@@ -28,6 +28,9 @@ static const WCHAR *kind_text(LeftKind k) {
     case LK_FILE: return T(S_KIND_FILE);
     case LK_DIR_IF_EMPTY: return T(S_KIND_DIR_IF_EMPTY);
     case LK_SERVICE: return T(S_KIND_SERVICE);
+    case LK_TASK: return T(S_KIND_TASK);
+    case LK_FWRULE: return T(S_KIND_FWRULE);
+    case LK_PATHENTRY: return T(S_KIND_PATHENTRY);
     }
     return u"";
 }
@@ -37,12 +40,15 @@ static const WCHAR *conf_text(int c) { return c >= CONF_HIGH ? T(S_CONF_HIGH) : 
 static const WCHAR *reason_text(LeftReason r) {
     static const StrId ids[] = {S_REASON_UNINSTALL_KEY, S_REASON_INSTALL_DIR, S_REASON_NAME,   S_REASON_PUBLISHER, S_REASON_PATH_REF,
                                 S_REASON_RUN,           S_REASON_APP_PATHS,   S_REASON_SHARED, S_REASON_SERVICE,   S_REASON_SHORTCUT,
-                                S_REASON_COM,           S_REASON_FILE_ASSOC,  S_REASON_TRACE,  S_REASON_USER};
+                                S_REASON_COM,           S_REASON_FILE_ASSOC,  S_REASON_TRACE,  S_REASON_USER,      S_REASON_TASK,
+                                S_REASON_FIREWALL,      S_REASON_PATH_VAR,    S_REASON_USAGE,  S_REASON_SHELL_EXT, S_REASON_REFERENCE};
+    _Static_assert(COUNT(ids) == LR_REFERENCE + 1, "um texto para cada LeftReason");
     return (unsigned)r < COUNT(ids) ? T(ids[r]) : u"";
 }
 
 static WCHAR *item_text(const Leftover *it) {
     if (it->kind == LK_VALUE) return wfmt(u"%s  →  %s", it->path, it->value && it->value[0] ? it->value : T(S_DEFAULT_VALUE));
+    if (it->kind == LK_PATHENTRY) return wfmt(u"PATH  →  %s  (%s)", it->value, it->path);
     return wdup(it->path);
 }
 
@@ -144,6 +150,38 @@ static void do_delete(LeftState *st, HWND h) {
     xfree(q);
     if (ans != IDYES) return;
 
+    // programas abertos a partir das pastas que vão sair seguram os arquivos: oferece fechar
+    PtrVec paths = {0};
+    for (size_t i = 0; i < st->list->items.n; i++) {
+        Leftover *it = st->list->items.items[i];
+        if (it->checked && it->status != LS_DELETED && (it->kind == LK_DIR || it->kind == LK_FILE || it->kind == LK_DIR_IF_EMPTY)) pv_push(&paths, it->path);
+    }
+    PtrVec procs = processes_under(&paths);
+    pv_free(&paths);
+    if (procs.n) {
+        StrBuf list = {0};
+        for (size_t i = 0; i < procs.n && i < 15; i++) {
+            ProcInfo *p = procs.items[i];
+            WCHAR *line = wfmt(u"%s (PID %u)\n", p->exe, (unsigned)p->pid);
+            sb_add(&list, line);
+            xfree(line);
+        }
+        WCHAR *t = wfmt(T(S_ASK_KILL), sb_str(&list));
+        int a = msg(h, t, MB_YESNOCANCEL | MB_ICONWARNING);
+        xfree(t);
+        sb_free(&list);
+        if (a == IDCANCEL) {
+            processes_free(&procs);
+            return;
+        }
+        if (a == IDYES)
+            for (size_t i = 0; i < procs.n; i++) {
+                ProcInfo *p = procs.items[i];
+                log_fmt(u"Encerrando %s (PID %u): %s", p->exe, (unsigned)p->pid, process_kill(p->pid) ? u"ok" : u"falhou");
+            }
+    }
+    processes_free(&procs);
+
     DeleteJob job;
     mem_set(&job, 0, sizeof(job));
     job.list = st->list;
@@ -159,6 +197,11 @@ static void do_delete(LeftState *st, HWND h) {
         WCHAR *k = wfmt(T(S_DELETE_KEPT), job.res.kept);
         sb_add(&b, u"\n"), sb_add(&b, k);
         xfree(k);
+    }
+    if (job.res.permanent) {
+        WCHAR *pm = wfmt(T(S_DELETE_PERMANENT), job.res.permanent);
+        sb_add(&b, u"\n"), sb_add(&b, pm);
+        xfree(pm);
     }
     if (job.res.backup_failed) sb_add(&b, u"\n\n"), sb_add(&b, T(S_BACKUP_FAILED));
     else if (job.res.backup_path) {

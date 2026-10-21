@@ -24,6 +24,9 @@ bool fs_dir_empty(const WCHAR *dir);
 
 // Manda para a Lixeira (sem perguntas). Em unidades sem Lixeira o Windows apaga direto.
 DWORD fs_recycle(const WCHAR *path);
+// Apaga de vez (sem Lixeira), com suporte a caminhos longos; tira o "somente leitura" antes.
+// Junções e links simbólicos são removidos sem entrar neles.
+DWORD fs_delete_tree(const WCHAR *path);
 // Agenda a exclusão para a próxima reinicialização (pastas: o conteúdo antes).
 bool fs_delete_on_reboot(const WCHAR *path);
 

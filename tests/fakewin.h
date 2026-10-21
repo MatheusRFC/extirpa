@@ -22,6 +22,9 @@ void fake_file(const WCHAR *path, const void *data, size_t size);
 bool fake_exists(const WCHAR *path);
 bool fake_read(const WCHAR *path, uint8_t **data, size_t *len);
 size_t fake_recycled_count(void);
+void fake_short_name(const WCHAR *long_path, const WCHAR *short_path);  // para GetShortPathNameW
+size_t fake_command_count(void);                                          // programas chamados (schtasks, PowerShell)
+const WCHAR *fake_command(size_t i);
 const WCHAR *fake_recycled(size_t i);
 
 #endif

@@ -29,6 +29,7 @@ void leftovers_measure(LeftList *l, Ctl *ctl);
 
 typedef struct {
     int deleted, failed, kept;
+    int permanent;       // apagados direto, sem passar pela Lixeira
     WCHAR *backup_path;  // .reg criado (NULL se não havia nada do Registro)
     bool backup_failed;  // o backup não pôde ser gravado: nada do Registro foi apagado
 } DelResult;

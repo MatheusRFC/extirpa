@@ -218,6 +218,10 @@ static void test_protect(void) {
     CHECK(protect_value_blocked(u"HKLM\\SYSTEM\\CurrentControlSet\\Services\\Foo"));
     CHECK(protect_value_blocked(u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\Folders"));
     CHECK(protect_value_blocked(u"HKLM"));
+    CHECK(!protect_value_blocked(u"HKCU\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\MuiCache"));
+    CHECK(!protect_value_blocked(u"HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Compatibility Assistant\\Store"));
+    CHECK(protect_value_blocked(u"HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags"));
+    CHECK(protect_key_blocked(u"HKCU\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\MuiCache"));
 }
 
 // ---------------------------------------------------------------- identificação
@@ -250,10 +254,10 @@ static void test_clean_names(void) {
 static void test_match(void) {
     setup_protect();
     Identity *ff = identity_new(u"Mozilla Firefox (x64 pt-BR)", u"Mozilla");
-    identity_add_dir(ff, u"C:\\Program Files\\Mozilla Firefox");
+    identity_add_dir(ff, u"C:\\Program Files\\Mozilla Firefox", true);
     identity_add_exe(ff, u"C:\\Program Files\\Mozilla Firefox\\firefox.exe,0");
-    identity_add_dir(ff, u"C:\\Program Files");                      // protegida: ignorada
-    identity_add_dir(ff, u"C:\\Program Files\\Mozilla Firefox\\bin");  // já coberta
+    identity_add_dir(ff, u"C:\\Program Files", true);                      // protegida: ignorada
+    identity_add_dir(ff, u"C:\\Program Files\\Mozilla Firefox\\bin", true);  // já coberta
     CHECK(ff->dirs.n == 1);
     CHECK_WEQ(ff->primary, u"firefox");
     CHECK(match_name(ff, u"Mozilla Firefox") == CONF_HIGH);
@@ -276,7 +280,7 @@ static void test_match(void) {
     identity_free(ff);
 
     Identity *z = identity_new(u"7-Zip 23.01 (x64)", u"Igor Pavlov");
-    identity_add_dir(z, u"C:\\Program Files\\7-Zip\\");
+    identity_add_dir(z, u"C:\\Program Files\\7-Zip\\", true);
     CHECK(match_name(z, u"7-Zip") == CONF_HIGH);
     CHECK(match_name(z, u"7zip") == CONF_HIGH);
     CHECK(match_name(z, u"Zip") == CONF_NONE);
@@ -289,6 +293,24 @@ static void test_match(void) {
     CHECK(match_publisher(st, u"Valve"));
     identity_free(st);
 
+    // nome curto do editor: "Nimbus Software Ltd." usa a pasta "Nimbus"
+    Identity *nb = identity_new(u"Super Editor 4.2.1", u"Nimbus Software Ltd.");
+    CHECK_WEQ(nb->publisher_short, u"nimbus");
+    CHECK(match_publisher(nb, u"Nimbus"));
+    CHECK(match_publisher(nb, u"Nimbus Software"));
+    CHECK(match_name(nb, u"Nimbus") == CONF_NONE);
+    CHECK(match_name(nb, u"Super Editor") == CONF_HIGH);
+    identity_free(nb);
+    Identity *ea = identity_new(u"Origin", u"Electronic Arts");
+    CHECK(ea->publisher_short == NULL);
+    identity_free(ea);
+    Identity *ad = identity_new(u"Adobe Acrobat", u"Adobe Systems Incorporated");
+    CHECK_WEQ(ad->publisher_short, u"adobe");
+    identity_free(ad);
+    Identity *gs = identity_new(u"X", u"Digital Media Group");  // só palavras de empresa: não vira nome curto
+    CHECK(gs->publisher_short == NULL);
+    identity_free(gs);
+
     // editor Microsoft nunca vira pasta de editor
     Identity *ms = identity_new(u"Microsoft Teams", u"Microsoft Corporation");
     CHECK(ms->publisher_norm == NULL);
@@ -296,6 +318,45 @@ static void test_match(void) {
     CHECK(match_name(ms, u"Microsoft Teams") == CONF_HIGH);
     CHECK(match_name(ms, u"Teams") == CONF_HIGH);  // pasta AppData\Local\Microsoft\Teams
     identity_free(ms);
+
+    // pasta genérica escolhida pelo usuário: o nome dela só vira nome do programa se for dito
+    Identity *g = identity_new(u"Jogo Legal", u"Estúdio X");
+    identity_add_dir(g, u"C:\\Jogos", false);
+    CHECK(match_name(g, u"Jogos") == CONF_NONE);
+    CHECK(match_path_ref(g, u"C:\\Jogos\\jogo.exe"));
+    identity_add_dir(g, u"D:\\JogoLegalFiles", false);
+    CHECK(match_name(g, u"JogoLegalFiles") == CONF_HIGH);  // parece com o nome: conta
+    identity_free(g);
+    Identity *g2 = identity_new(u"Jogo Legal", NULL);
+    identity_add_dir(g2, u"C:\\Jogos", true);
+    CHECK(match_name(g2, u"Jogos") == CONF_HIGH);
+    identity_free(g2);
+
+    // nomes curtos 8.3 e versão
+    Identity *py = identity_new(u"Python 3.12.0 (64-bit)", u"Python Software Foundation");
+    identity_set_version(py, u"3.12.0");
+    CHECK_WEQ(py->vtag, u"312");
+    identity_add_dir(py, u"C:\\Program Files\\Python312", true);
+    identity_add_alt_dir(py, u"C:\\PROGRA~1\\PYTHON~1");
+    CHECK(match_path_ref(py, u"C:\\PROGRA~1\\PYTHON~1\\python.exe"));
+    CHECK(match_path_ref(py, u"App=C:\\Program Files\\Python312\\python.exe|Name=x"));
+    identity_free(py);
+    Identity *v = identity_new(u"x", NULL);
+    identity_set_version(v, u"2024");
+    CHECK(v->vtag == NULL);
+    identity_set_version(v, u"v131.0.2");
+    CHECK_WEQ(v->vtag, u"1310");
+    identity_free(v);
+
+    // a pasta mais específica decide de quem é a referência
+    PtrVec a = {0}, b = {0};
+    pv_push(&a, u"C:\\Program Files\\Acme");
+    pv_push(&b, u"C:\\Program Files\\Acme\\Other");
+    const WCHAR *t1 = u"\"C:\\Program Files\\Acme\\Other\\o.exe\" /x", *t2 = u"C:\\Program Files\\Acme\\tool.exe";
+    CHECK(path_ref_len(&a, t1) == 21 && path_ref_len(&b, t1) == 27);
+    CHECK(path_ref_len(&a, t2) == 21 && path_ref_len(&b, t2) == 0);
+    CHECK(path_ref_len(&a, u"C:\\Program Files\\Acme2\\x") == 0);
+    pv_free(&a), pv_free(&b);
 
     // executável de desinstalação não vira nome do programa
     Identity *u = identity_new(u"Foo Bar Editor", u"Foo Ltd");
@@ -512,10 +573,25 @@ static void test_leftovers(void) {
     left_add(&l, LK_KEY_IF_EMPTY, u"HKCU\\Software\\FooCorp", NULL, CONF_MEDIUM, LR_PUBLISHER, NULL);
     left_add(&l, LK_SERVICE, u"FooSvc", NULL, CONF_HIGH, LR_SERVICE, NULL);
     CHECK(left_add(&l, LK_SERVICE, u"a\\b", NULL, CONF_HIGH, LR_SERVICE, NULL) == NULL);
+    // tarefas: nunca as do Windows nem nomes com aspas
+    CHECK(left_add(&l, LK_TASK, u"\\Microsoft\\Windows\\Defrag\\ScheduledDefrag", NULL, CONF_HIGH, LR_TASK, NULL) == NULL);
+    CHECK(left_add(&l, LK_TASK, u"\\a\"b", NULL, CONF_HIGH, LR_TASK, NULL) == NULL);
+    CHECK(left_add(&l, LK_TASK, u"semBarra", NULL, CONF_HIGH, LR_TASK, NULL) == NULL);
+    // PATH: só as duas chaves de ambiente, e com a entrada preenchida
+    CHECK(left_add(&l, LK_PATHENTRY, u"HKCU\\Software\\X", u"C:\\Foo", CONF_HIGH, LR_PATH_VAR, NULL) == NULL);
+    CHECK(left_add(&l, LK_PATHENTRY, ENV_KEY_USER, u"", CONF_HIGH, LR_PATH_VAR, NULL) == NULL);
     left_finalize(&l);
-    CHECK(l.items.n == 7);
+    CHECK(left_add(&l, LK_TASK, u"\\FooUpdate", NULL, CONF_HIGH, LR_TASK, NULL) != NULL);
+    CHECK(left_add(&l, LK_FWRULE, u"TCP Query User{1}C:\\foo.exe", NULL, CONF_HIGH, LR_FIREWALL, NULL) != NULL);
+    CHECK(left_add(&l, LK_PATHENTRY, ENV_KEY_USER, u"C:\\Foo\\bin", CONF_HIGH, LR_PATH_VAR, NULL) != NULL);
+    CHECK(left_add(&l, LK_PATHENTRY, ENV_KEY_USER, u"C:\\Foo\\bin", CONF_HIGH, LR_PATH_VAR, NULL) == l.items.items[l.items.n - 1]);  // repetido
+    size_t before = l.items.n;
+    left_add(&l, LK_PATHENTRY, ENV_KEY_MACHINE, u"C:\\Foo\\bin", CONF_HIGH, LR_PATH_VAR, NULL);  // outra chave: outro item
+    CHECK(l.items.n == before + 1);
+    left_finalize(&l);
+    CHECK(l.items.n == 11);
     Leftover *first = l.items.items[0];
-    CHECK(first->kind == LK_SERVICE);
+    CHECK(first->kind == LK_SERVICE || first->kind == LK_TASK || first->kind == LK_FWRULE || first->kind == LK_PATHENTRY);
     bool found_cfg = false, found_dll = false, if_empty_checked = false, low_unchecked = false;
     for (size_t i = 0; i < l.items.n; i++) {
         Leftover *it = l.items.items[i];
@@ -537,18 +613,23 @@ static void test_leftovers(void) {
     trace_add(t, TR_KEY, u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UserData\\S-1\\Products\\X", NULL);
     trace_add(t, TR_DIR, u"C:\\Users\\ana\\AppData\\Local\\Temp\\setup123", NULL);
     trace_add(t, TR_DIR, u"C:\\Program Files\\Foo", NULL);
+    trace_add(t, TR_FILE, u"C:\\Windows\\System32\\Tasks\\Foo\\FooUpdate", NULL);
+    trace_add(t, TR_DIR, u"C:\\Windows\\System32\\Tasks\\Foo", NULL);
+    trace_add(t, TR_VALUE, FIREWALL_RULES_KEY, u"{ABC-123}");
     LeftList m = {0};
     left_add_trace(&m, t);
     left_finalize(&m);
-    int high = 0, low = 0, svc = 0;
+    int high = 0, low = 0, svc = 0, task = 0, fw = 0;
     for (size_t i = 0; i < m.items.n; i++) {
         Leftover *it = m.items.items[i];
         if (it->kind == LK_SERVICE) svc++;
+        if (it->kind == LK_TASK && weq(it->path, u"\\Foo\\FooUpdate")) task++;
+        if (it->kind == LK_FWRULE && weq(it->path, u"{ABC-123}")) fw++;
         if (it->conf == CONF_HIGH) high++;
         if (it->conf == CONF_LOW) low++;
     }
-    CHECK(m.items.n == 7);  // a do Windows Installer é bloqueada
-    CHECK(svc == 1 && high == 5 && low == 2);
+    CHECK(m.items.n == 9);  // a do Windows Installer é bloqueada
+    CHECK(svc == 1 && task == 1 && fw == 1 && high == 7 && low == 2);
     left_free(&m);
     trace_free(t);
 }

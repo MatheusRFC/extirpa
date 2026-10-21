@@ -69,4 +69,9 @@ void ui_end(ModalState *ms, int result);
 void ui_center(HWND w, HWND owner, int cx, int cy);  // tamanho em pixels do DPI atual
 HWND ui_window(const WCHAR *cls, const WCHAR *title, HWND owner, void *state, DWORD style);
 
+#ifdef EXTIRPA_SELFTEST
+// Autoteste (só no extirpa-selftest.exe): chamado ~1 s depois de cada janela modal abrir.
+extern void (*g_modal_hook)(HWND w, ModalState *ms);
+#endif
+
 #endif

@@ -14,6 +14,9 @@ typedef enum {
     LK_FILE,          // arquivo
     LK_DIR_IF_EMPTY,  // pasta do editor: só sai se ficar vazia
     LK_SERVICE,       // serviço do Windows (removido pelo Gerenciador de Serviços, não pelo Registro)
+    LK_TASK,          // tarefa agendada (path = nome completo, "\Pasta\Tarefa"; removida pelo schtasks)
+    LK_FWRULE,        // regra do Firewall do Windows (path = ID da regra; removida pelo PowerShell)
+    LK_PATHENTRY,     // entrada da variável PATH (path = chave do ambiente, value = a entrada)
 } LeftKind;
 
 // Por que o item foi considerado sobra (o texto de cada motivo fica na interface).
@@ -32,6 +35,12 @@ typedef enum {
     LR_FILE_ASSOC,     // tipo de arquivo/aplicativo registrado pelo programa
     LR_TRACE,          // criado durante a instalação rastreada
     LR_USER,           // escolhido na desinstalação forçada
+    LR_TASK,           // tarefa agendada que roda o programa
+    LR_FIREWALL,       // regra do firewall para o programa
+    LR_PATH_VAR,       // pasta do programa na variável PATH
+    LR_USAGE,          // rastro de uso guardado pelo Windows (MuiCache, compatibilidade)
+    LR_SHELL_EXT,      // extensão do Explorer (menu de contexto, ícones) do programa
+    LR_REFERENCE,      // referência a um item do programa que também está sendo removido
 } LeftReason;
 
 typedef struct {
@@ -53,7 +62,13 @@ typedef struct {
     PtrVec items;  // Leftover*
 } LeftList;
 
+// Chaves de ambiente onde fica a variável PATH (as únicas aceitas em LK_PATHENTRY)
+#define ENV_KEY_MACHINE u"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment"
+#define ENV_KEY_USER u"HKCU\\Environment"
+#define FIREWALL_RULES_KEY u"HKLM\\SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\FirewallRules"
+
 bool left_is_registry(LeftKind k);
+bool left_has_value(LeftKind k);  // LK_VALUE e LK_PATHENTRY usam o campo value
 bool left_is_file(LeftKind k);
 // Acrescenta respeitando a lista de proteção; repetido mantém a maior confiança.
 // Devolve o item (novo ou existente) ou NULL se bloqueado.

@@ -36,6 +36,9 @@ bool reg_export_value(StrBuf *out, const WCHAR *path, const WCHAR *value);
 
 DWORD reg_delete_key(const WCHAR *path);
 DWORD reg_delete_value(const WCHAR *path, const WCHAR *value);
+// Valor bruto (o chamador libera); NULL se não existir.
+uint8_t *reg_get_raw(const WCHAR *path, const WCHAR *name, DWORD *type, DWORD *size);
+DWORD reg_set_value(const WCHAR *path, const WCHAR *name, DWORD type, const uint8_t *data, DWORD size);  // chave tem de existir
 DWORD reg_set_binary(const WCHAR *path, const WCHAR *value, const uint8_t *data, DWORD size);  // cria a chave se precisar
 
 #endif

@@ -6,6 +6,13 @@
 
 bool left_is_registry(LeftKind k) { return k == LK_KEY || k == LK_VALUE || k == LK_KEY_IF_EMPTY; }
 bool left_is_file(LeftKind k) { return k == LK_DIR || k == LK_FILE || k == LK_DIR_IF_EMPTY; }
+bool left_has_value(LeftKind k) { return k == LK_VALUE || k == LK_PATHENTRY; }
+
+static bool task_name_ok(const WCHAR *name) {
+    // "\Pasta\Tarefa": nunca as do próprio Windows nem nomes com aspas (vão para a linha de comando)
+    if (!name || name[0] != '\\' || wlen(name) < 2 || wfindc(name, '"')) return false;
+    return !wistarts(name, u"\\Microsoft\\") && !wieq(name, u"\\Microsoft");
+}
 
 static bool blocked(LeftKind kind, const WCHAR *path) {
     switch (kind) {
@@ -16,13 +23,17 @@ static bool blocked(LeftKind kind, const WCHAR *path) {
     case LK_FILE:
     case LK_DIR_IF_EMPTY: return protect_dir_blocked(path);
     case LK_SERVICE: return !path[0] || wfindc(path, '\\') != NULL;
+    case LK_TASK: return !task_name_ok(path);
+    case LK_FWRULE: return !path[0];
+    case LK_PATHENTRY: return !(path_eq(path, ENV_KEY_MACHINE) || path_eq(path, ENV_KEY_USER));
     }
     return true;
 }
 
 Leftover *left_add(LeftList *l, LeftKind kind, const WCHAR *path, const WCHAR *value, int conf, LeftReason reason, const WCHAR *detail) {
-    WCHAR *p = kind == LK_SERVICE ? wtrim_dup(path) : path_norm(path);
-    if (blocked(kind, p)) {
+    // nomes de serviço, tarefa e regra de firewall ficam como vieram; caminhos são normalizados
+    WCHAR *p = (kind == LK_SERVICE || kind == LK_TASK || kind == LK_FWRULE) ? wtrim_dup(path) : path_norm(path);
+    if (blocked(kind, p) || (kind == LK_PATHENTRY && (!value || !value[0]))) {
         xfree(p);
         return NULL;
     }
@@ -30,7 +41,7 @@ Leftover *left_add(LeftList *l, LeftKind kind, const WCHAR *path, const WCHAR *v
         Leftover *o = l->items.items[i];
         bool same_kind = o->kind == kind || (left_is_registry(o->kind) && left_is_registry(kind) && o->kind != LK_VALUE && kind != LK_VALUE) ||
                          (left_is_file(o->kind) && left_is_file(kind) && o->kind != LK_FILE && kind != LK_FILE);
-        if (same_kind && wieq(o->path, p) && (kind != LK_VALUE || wieq(o->value, value ? value : u""))) {
+        if (same_kind && wieq(o->path, p) && (!left_has_value(kind) || wieq(o->value, value ? value : u""))) {
             // o mesmo item achado por dois caminhos: fica a versão mais forte
             if (conf > o->conf) o->conf = conf, o->reason = reason;
             if ((o->kind == LK_KEY_IF_EMPTY && kind == LK_KEY) || (o->kind == LK_DIR_IF_EMPTY && kind == LK_DIR)) o->kind = kind;
@@ -41,7 +52,7 @@ Leftover *left_add(LeftList *l, LeftKind kind, const WCHAR *path, const WCHAR *v
     Leftover *it = xalloc(sizeof(Leftover));
     it->kind = kind;
     it->path = p;
-    it->value = kind == LK_VALUE ? wdup(value) : NULL;
+    it->value = left_has_value(kind) ? wdup(value) : NULL;
     it->conf = conf;
     it->reason = reason;
     it->detail = detail ? wdup(detail) : NULL;
@@ -59,6 +70,9 @@ static bool covers(const Leftover *a, const Leftover *b) {
 
 static int order_kind(LeftKind k) {
     switch (k) {
+    case LK_TASK: return 0;
+    case LK_FWRULE: return 0;
+    case LK_PATHENTRY: return 0;
     case LK_SERVICE: return 0;
     case LK_KEY: return 1;
     case LK_VALUE: return 1;
@@ -149,15 +163,26 @@ void left_add_trace(LeftList *l, const Trace *t) {
             left_add(l, LK_KEY, it->path, NULL, conf, LR_TRACE, NULL);
             break;
         case TR_VALUE:
+            if (path_eq(it->path, FIREWALL_RULES_KEY)) {
+                left_add(l, LK_FWRULE, it->value, NULL, CONF_HIGH, LR_FIREWALL, NULL);
+                continue;
+            }
             if (reg_sensitive(it->path) && !reg_value_ok(it->path)) conf = CONF_LOW;
             left_add(l, LK_VALUE, it->path, it->value, conf, LR_TRACE, NULL);
             break;
         case TR_DIR:
-        case TR_FILE:
+        case TR_FILE: {
+            // arquivo de tarefa agendada (...\System32\Tasks\Pasta\Nome) vira a tarefa ("\Pasta\Nome")
+            const WCHAR *task = wifind(it->path, u"\\System32\\Tasks\\");
+            if (task) {
+                if (it->kind == TR_FILE) left_add(l, LK_TASK, task + 15, NULL, CONF_HIGH, LR_TASK, NULL);
+                break;
+            }
             for (size_t k = 0; k < COUNT(NOISY_FILES); k++)
                 if (wifind(it->path, NOISY_FILES[k])) conf = CONF_LOW;
             left_add(l, it->kind == TR_DIR ? LK_DIR : LK_FILE, it->path, NULL, conf, LR_TRACE, NULL);
             break;
+        }
         }
     }
 }

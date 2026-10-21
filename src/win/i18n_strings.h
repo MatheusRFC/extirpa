@@ -119,6 +119,8 @@ X(S_SCAN_STARTUP, u"Conferindo inicialização, serviços e atalhos…", u"Check
 X(S_SCAN_FILES, u"Procurando sobras em pastas…", u"Searching folders…")
 X(S_SCAN_COM, u"Conferindo tipos de arquivo e componentes COM…", u"Checking file types and COM components…")
 X(S_SCAN_SIZES, u"Calculando tamanhos…", u"Measuring sizes…")
+X(S_SCAN_TASKS, u"Conferindo tarefas agendadas…", u"Checking scheduled tasks…")
+X(S_SCAN_DEEP, u"Varredura profunda do Registro…", u"Deep registry scan…")
 X(S_SCAN_CANCELLED, u"Busca cancelada.", u"Search cancelled.")
 X(S_NO_LEFTOVERS, u"Nenhuma sobra encontrada. O programa saiu por completo.", u"No leftovers found. The program is completely gone.")
 
@@ -169,7 +171,14 @@ X(S_STATUS_DELETED, u"Apagado", u"Deleted")
 X(S_STATUS_FAILED, u"Falhou: %s", u"Failed: %s")
 X(S_STATUS_KEPT, u"Mantido (não ficou vazio)", u"Kept (not empty)")
 X(S_DEFAULT_VALUE, u"(Padrão)", u"(Default)")
-X(S_CONTAINS_OTHER, u"contém a pasta de outro programa instalado (%s)", u"contains another installed program's folder (%s)")
+X(S_CONTAINS_OTHER, u"contém a pasta de outro programa instalado (%s): sai item por item, sem ela",
+  u"contains another installed program's folder (%s): removed item by item, keeping it")
+X(S_ALSO_OTHER, u"o nome também é de outro programa instalado (%s)", u"the name also belongs to another installed program (%s)")
+X(S_KEY_HAS_OTHER, u"guarda dados de outro programa instalado", u"holds data of another installed program")
+X(S_DELETE_PERMANENT, u"%d item(ns) não cabiam na Lixeira (caminho longo demais) e foram apagados direto.",
+  u"%d item(s) did not fit in the Recycle Bin (path too long) and were deleted directly.")
+X(S_ASK_KILL, u"Estes programas estão abertos e usam arquivos que vão ser apagados:\n\n%s\nFechar todos agora? (o que não foi salvo neles será perdido)",
+  u"These programs are running and use files about to be deleted:\n\n%s\nClose them all now? (anything unsaved in them will be lost)")
 
 // tipos, confiança e motivos
 X(S_KIND_KEY, u"Chave do Registro", u"Registry key")
@@ -179,6 +188,9 @@ X(S_KIND_DIR, u"Pasta", u"Folder")
 X(S_KIND_FILE, u"Arquivo", u"File")
 X(S_KIND_DIR_IF_EMPTY, u"Pasta (se ficar vazia)", u"Folder (if left empty)")
 X(S_KIND_SERVICE, u"Serviço", u"Service")
+X(S_KIND_TASK, u"Tarefa agendada", u"Scheduled task")
+X(S_KIND_FWRULE, u"Regra do firewall", u"Firewall rule")
+X(S_KIND_PATHENTRY, u"Entrada do PATH", u"PATH entry")
 X(S_CONF_HIGH, u"Alta", u"High")
 X(S_CONF_MEDIUM, u"Média", u"Medium")
 X(S_CONF_LOW, u"Baixa", u"Low")
@@ -196,6 +208,12 @@ X(S_REASON_COM, u"Componente COM do programa", u"Program's COM component")
 X(S_REASON_FILE_ASSOC, u"Tipo de arquivo registrado pelo programa", u"File type registered by the program")
 X(S_REASON_TRACE, u"Criado durante a instalação rastreada", u"Created during the traced install")
 X(S_REASON_USER, u"Informado na desinstalação forçada", u"Given in the forced uninstall")
+X(S_REASON_TASK, u"Tarefa agendada que roda o programa", u"Scheduled task that runs the program")
+X(S_REASON_FIREWALL, u"Regra do firewall para o programa", u"Firewall rule for the program")
+X(S_REASON_PATH_VAR, u"Pasta do programa na variável PATH", u"Program folder in the PATH variable")
+X(S_REASON_USAGE, u"Rastro de uso guardado pelo Windows", u"Usage trace kept by Windows")
+X(S_REASON_SHELL_EXT, u"Menu de contexto ou extensão do Explorer", u"Context menu or Explorer extension")
+X(S_REASON_REFERENCE, u"Aponta para outro item do programa", u"Points to another item of the program")
 
 // desinstalação forçada
 X(S_FORCED_TITLE, u"Desinstalação forçada", u"Forced uninstall")

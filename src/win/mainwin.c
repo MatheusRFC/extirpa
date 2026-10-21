@@ -284,7 +284,7 @@ static void do_forced(void) {
         folder = expand_env(v[0]->install_location);
         if (protect_dir_blocked(folder)) xfree(folder), folder = NULL;
     }
-    if (op_forced(M.wnd, name, folder)) programs_reload();
+    if (op_forced(M.wnd, n == 1 ? v[0] : NULL, name, folder)) programs_reload();
     xfree(folder), xfree(v);
 }
 
@@ -911,3 +911,12 @@ bool mainwin_pretranslate(MSG *m) {
 }
 
 HWND mainwin_handle(void) { return M.wnd; }
+
+#ifdef EXTIRPA_SELFTEST
+void mainwin_selftest_tab(int tab) {
+    SendMessageW(M.tabs, TCM_SETCURSEL, (WPARAM)tab, 0);
+    show_tab((Tab)tab);
+}
+
+bool mainwin_selftest_apps_ready(void) { return M.apps_loaded && !M.apps_loading; }
+#endif

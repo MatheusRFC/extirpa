@@ -275,3 +275,19 @@ DWORD reg_set_binary(const WCHAR *path, const WCHAR *value, const uint8_t *data,
     RegCloseKey(k);
     return (DWORD)st;
 }
+
+uint8_t *reg_get_raw(const WCHAR *path, const WCHAR *name, DWORD *type, DWORD *size) {
+    HKEY k = reg_open(path, KEY_QUERY_VALUE);
+    if (!k) return NULL;
+    uint8_t *d = query(k, name, type, size);
+    RegCloseKey(k);
+    return d;
+}
+
+DWORD reg_set_value(const WCHAR *path, const WCHAR *name, DWORD type, const uint8_t *data, DWORD size) {
+    HKEY k = reg_open(path, KEY_SET_VALUE);
+    if (!k) return ERROR_ACCESS_DENIED;
+    LSTATUS st = RegSetValueExW(k, name, 0, type, data, size);
+    RegCloseKey(k);
+    return (DWORD)st;
+}

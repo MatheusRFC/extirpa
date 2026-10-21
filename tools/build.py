@@ -4,7 +4,8 @@ no Windows ou no Linux: não usa SDK do Windows, MinGW nem biblioteca C.
 
     python3 tools/build.py          # build/extirpa.exe
     python3 tools/build.py test     # testes do núcleo (com o compilador C do sistema)
-    python3 tools/build.py all      # testes e depois o executável
+    python3 tools/build.py selftest # build/extirpa-selftest.exe (autoteste: --selftest)
+    python3 tools/build.py all      # testes, o executável e o de autoteste
 
 Variáveis de ambiente para apontar ferramentas fora do PATH: CLANG, LLD_LINK, LLVM_RC,
 LLVM_DLLTOOL (ou LLVM_LIB) e, para os testes, CC.
@@ -97,22 +98,27 @@ def fontes():
     return lista
 
 
-def build_exe():
+def build_exe(selftest=False):
+    """selftest=True gera build/extirpa-selftest.exe: o mesmo programa mais o autoteste
+    (src/win/selftest.c, opção --selftest), para conferir num Windows de verdade."""
     clang = achar(["clang"], "CLANG")
     lld = achar(["lld-link"], "LLD_LINK")
     rc = achar(["llvm-rc"], "LLVM_RC")
     for nome, p in (("clang", clang), ("lld-link", lld), ("llvm-rc", rc)):
         if not p:
             sys.exit(f"{nome} não encontrado (instale o LLVM)")
-    os.makedirs(os.path.join(BUILD, "obj"), exist_ok=True)
+    pasta_obj = os.path.join(BUILD, "obj-selftest" if selftest else "obj")
+    os.makedirs(pasta_obj, exist_ok=True)
     objs = []
     for c in fontes():
-        o = os.path.join(BUILD, "obj", os.path.basename(os.path.dirname(c)) + "_" + os.path.basename(c)[:-2] + ".obj")
-        rodar([clang] + CFLAGS + ["-c", c, "-o", o])
+        if os.path.basename(c) == "selftest.c" and not selftest:
+            continue
+        o = os.path.join(pasta_obj, os.path.basename(os.path.dirname(c)) + "_" + os.path.basename(c)[:-2] + ".obj")
+        rodar([clang] + CFLAGS + (["-DEXTIRPA_SELFTEST"] if selftest else []) + ["-c", c, "-o", o])
         objs.append(o)
     res = os.path.join(BUILD, "app.res")
     rodar([rc, "/nologo", "/FO", res, "app.rc"], cwd=os.path.join(RAIZ, "assets"))
-    exe = os.path.join(BUILD, "extirpa.exe")
+    exe = os.path.join(BUILD, "extirpa-selftest.exe" if selftest else "extirpa.exe")
     rodar([lld, "/nologo", "/subsystem:windows,10.0", "/entry:WinMainCRTStartup", "/nodefaultlib", "/opt:ref", "/opt:icf",
            "/dynamicbase", "/nxcompat", "/highentropyva", "/guard:no", f"/out:{exe}"] + objs + libs() + [res])
     print(f"{os.path.relpath(exe, RAIZ)}: {os.path.getsize(exe)} bytes")
@@ -156,6 +162,8 @@ def main():
         build_tests()
     if alvo in ("exe", "all"):
         build_exe()
+    if alvo in ("selftest", "all"):
+        build_exe(selftest=True)
 
 
 if __name__ == "__main__":

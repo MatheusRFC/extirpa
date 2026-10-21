@@ -25,6 +25,11 @@ static const char *const PUB_SUFFIX[] = {"inc", "incorporated", "llc", "ltd", "l
                                          "srl", "sl", "sas", "plc", "pty", "oy", "ab", "as", "kft", "sro", "spa", "ltda", "eireli", "me", "kk", "nv",
                                          "the", "llp", "lp", "sarl", "se", "pvt", "private"};
 
+// Palavras de empresa que muitos editores tiram do nome da pasta ("Adobe Systems" -> "Adobe").
+static const char *const COMPANY_WORDS[] = {"software", "systems", "system", "technologies", "technology", "tech", "studios", "studio", "games",
+                                            "interactive", "labs", "lab", "group", "solutions", "digital", "media", "entertainment", "development",
+                                            "developers", "international", "global", "networks", "computing", "corporation", "incorporated"};
+
 static const char *const ARCH[] = {"x64",   "x86",   "x86_64", "amd64", "arm64",   "ia64",  "64-bit", "32-bit",
                                    "64bit", "32bit", "win64",  "win32", "version", "build", "rev",    "release"};
 
@@ -160,6 +165,31 @@ Identity *identity_new(const WCHAR *display_name, const WCHAR *publisher) {
     WCHAR *pn = norm_alnum(id->publisher);
     if (wlen(pn) >= 3 && !wistarts(pn, u"microsoft") && !wieq(pn, u"windows")) id->publisher_norm = pn;
     else xfree(pn);
+    if (id->publisher_norm) {
+        // tira palavras de empresa do fim, uma de cada vez, enquanto sobrar um nome próprio
+        WCHAR *words = wdup(id->publisher);
+        for (;;) {
+            WCHAR *sp = (WCHAR *)wrfindc(words, ' ');
+            if (!sp) break;
+            WCHAR *last = norm_alnum(sp + 1);
+            bool company = false;
+            for (size_t i = 0; i < COUNT(COMPANY_WORDS); i++)
+                if (ascii_ieq(last, COMPANY_WORDS[i])) company = true;
+            xfree(last);
+            if (!company) break;
+            *sp = 0;
+        }
+        WCHAR *ps = norm_alnum(words);
+        xfree(words);
+        // nomes de fabricantes conhecidos (adobe, intel...) servem; palavras de estrutura não
+        static const char *const STRUCTURAL[] = {"program", "programs", "programfiles", "files", "common", "update", "data", "apps", "application",
+                                                 "windows", "system32", "users", "public"};
+        bool bad = wlen(ps) < 4 || wieq(ps, id->publisher_norm);
+        for (size_t i = 0; !bad && i < COUNT(STRUCTURAL); i++) bad = ascii_ieq(ps, STRUCTURAL[i]);
+        for (size_t i = 0; !bad && i < COUNT(COMPANY_WORDS); i++) bad = ascii_ieq(ps, COMPANY_WORDS[i]);
+        if (!bad) id->publisher_short = ps;
+        else xfree(ps);
+    }
 
     if (wlen(id->name_norm) >= 3) {
         identity_add_exact(id, id->clean);
@@ -192,7 +222,36 @@ Identity *identity_new(const WCHAR *display_name, const WCHAR *publisher) {
     return id;
 }
 
-void identity_add_dir(Identity *id, const WCHAR *dir) {
+void identity_set_version(Identity *id, const WCHAR *version) {
+    // "3.12.0" -> "312"; "131.0" -> "1310"; "2024" (sem ponto) -> nada
+    if (!version || id->vtag) return;
+    const WCHAR *p = version;
+    while (*p && !w_is_digit(*p)) p++;
+    StrBuf b = {0};
+    int parts = 0;
+    while (*p && parts < 2) {
+        size_t start = b.len;
+        while (w_is_digit(*p)) sb_addc(&b, *p++);
+        if (b.len == start) break;
+        parts++;
+        if (*p != '.') break;
+        p++;
+    }
+    if (parts == 2 && b.len >= 2) id->vtag = sb_take(&b);
+    else sb_free(&b);
+}
+
+void identity_add_alt_dir(Identity *id, const WCHAR *dir) {
+    if (!dir || !*dir) return;
+    WCHAR *d = path_norm(dir);
+    if (wlen(d) < 4 || vec_has(&id->dirs, d) || vec_has(&id->alt_dirs, d) || protect_dir_blocked(d)) {
+        xfree(d);
+        return;
+    }
+    pv_push(&id->alt_dirs, d);
+}
+
+void identity_add_dir(Identity *id, const WCHAR *dir, bool leaf_is_name) {
     if (!dir || !*dir) return;
     WCHAR *d = path_norm(dir);
     if (wlen(d) < 4 || protect_dir_blocked(d) || vec_has(&id->dirs, d)) {
@@ -206,7 +265,7 @@ void identity_add_dir(Identity *id, const WCHAR *dir) {
             return;
         }
     pv_push(&id->dirs, d);
-    identity_add_exact(id, path_leaf(d));
+    if (leaf_is_name || match_name(id, path_leaf(d)) >= CONF_LOW) identity_add_exact(id, path_leaf(d));
 }
 
 void identity_add_exe(Identity *id, const WCHAR *exe_path) {
@@ -226,11 +285,13 @@ void identity_add_exe(Identity *id, const WCHAR *exe_path) {
 
 void identity_free(Identity *id) {
     if (!id) return;
-    xfree(id->display), xfree(id->clean), xfree(id->name_norm), xfree(id->publisher), xfree(id->publisher_norm), xfree(id->pub_name_norm);
+    xfree(id->display), xfree(id->clean), xfree(id->name_norm), xfree(id->publisher), xfree(id->publisher_norm), xfree(id->publisher_short), xfree(id->pub_name_norm);
     for (size_t i = 0; i < id->tokens.n; i++) xfree(id->tokens.items[i]);
     for (size_t i = 0; i < id->exact.n; i++) xfree(id->exact.items[i]);
     for (size_t i = 0; i < id->dirs.n; i++) xfree(id->dirs.items[i]);
-    pv_free(&id->tokens), pv_free(&id->exact), pv_free(&id->dirs);
+    for (size_t i = 0; i < id->alt_dirs.n; i++) xfree(id->alt_dirs.items[i]);
+    pv_free(&id->tokens), pv_free(&id->exact), pv_free(&id->dirs), pv_free(&id->alt_dirs);
+    xfree(id->vtag);
     xfree(id);
 }
 
@@ -239,7 +300,7 @@ int match_name(const Identity *id, const WCHAR *candidate) {
     int r = CONF_NONE;
     size_t lc = wlen(c);
     // o nome do editor sozinho é a pasta dele, não uma sobra do programa (ver match_publisher)
-    if (is_generic_word(c) || (id->publisher_norm && wieq(c, id->publisher_norm))) goto done;
+    if (is_generic_word(c) || (id->publisher_norm && wieq(c, id->publisher_norm)) || (id->publisher_short && wieq(c, id->publisher_short))) goto done;
     if (vec_has(&id->exact, c) || (id->primary && wieq(c, id->primary)) || (id->pub_name_norm && wieq(c, id->pub_name_norm))) {
         r = CONF_HIGH;
         goto done;
@@ -263,7 +324,7 @@ done:
 bool match_publisher(const Identity *id, const WCHAR *candidate) {
     if (!id->publisher_norm) return false;
     WCHAR *c = norm_alnum(candidate);
-    bool r = wieq(c, id->publisher_norm);
+    bool r = wieq(c, id->publisher_norm) || (id->publisher_short && wieq(c, id->publisher_short));
     if (!r) {
         WCHAR *raw = clean_publisher(candidate), *nr = norm_alnum(raw);
         r = wieq(nr, id->publisher_norm);
@@ -273,17 +334,27 @@ bool match_publisher(const Identity *id, const WCHAR *candidate) {
     return r;
 }
 
-static bool boundary(WCHAR c) { return !c || c == '\\' || c == '/' || c == '"' || c == '\'' || c == ',' || c == ';' || c == '\t'; }
+static bool boundary(WCHAR c) { return !c || c == '\\' || c == '/' || c == '"' || c == '\'' || c == ',' || c == ';' || c == '\t' || c == '|'; }
 
-bool match_path_ref(const Identity *id, const WCHAR *text) {
-    if (!text) return false;
-    for (size_t i = 0; i < id->dirs.n; i++) {
-        const WCHAR *d = id->dirs.items[i];
-        size_t ld = wlen(d);
-        for (const WCHAR *p = wifind(text, d); p; p = wifind(p + 1, d)) {
-            bool before_ok = p == text || boundary(p[-1]) || p[-1] == ' ' || p[-1] == '=' || p[-1] == '@';
-            if (before_ok && boundary(p[ld])) return true;
-        }
+// A pasta d aparece no texto como caminho inteiro (não como pedaço de outro nome)?
+static bool cites(const WCHAR *text, const WCHAR *d) {
+    size_t ld = wlen(d);
+    if (!ld) return false;
+    for (const WCHAR *p = wifind(text, d); p; p = wifind(p + 1, d)) {
+        bool before_ok = p == text || boundary(p[-1]) || p[-1] == ' ' || p[-1] == '=' || p[-1] == '@';
+        if (before_ok && boundary(p[ld])) return true;
     }
     return false;
 }
+
+size_t path_ref_len(const PtrVec *dirs, const WCHAR *text) {
+    size_t best = 0;
+    if (!text) return 0;
+    for (size_t i = 0; i < dirs->n; i++) {
+        size_t ld = wlen(dirs->items[i]);
+        if (ld > best && cites(text, dirs->items[i])) best = ld;
+    }
+    return best;
+}
+
+bool match_path_ref(const Identity *id, const WCHAR *text) { return path_ref_len(&id->dirs, text) > 0 || path_ref_len(&id->alt_dirs, text) > 0; }

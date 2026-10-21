@@ -21,5 +21,7 @@ bool protect_key_blocked(const WCHAR *key);    // chave no formato "HKLM\SOFTWAR
 // Valor de Registro: bloqueado se a chave estiver numa árvore proibida (valores soltos
 // dentro de chaves protegidas, como um item de Run, são permitidos).
 bool protect_value_blocked(const WCHAR *key);
+// Chave de rastros de uso do Windows (MuiCache, compatibilidade): valores podem sair.
+bool protect_usage_key(const WCHAR *key);
 
 #endif

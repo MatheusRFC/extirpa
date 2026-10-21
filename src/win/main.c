@@ -5,11 +5,18 @@
 #include "platform.h"
 #include "ui.h"
 
+#ifdef EXTIRPA_SELFTEST
+int selftest_run(void);  // selftest.c
+#endif
+
 static int run(void) {
     CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
     plat_init();
     i18n_init();
     ui_init();
+#ifdef EXTIRPA_SELFTEST
+    if (wifind(GetCommandLineW(), u"--selftest")) return selftest_run();
+#endif
 
     // Uma cópia só: duas desinstalações ao mesmo tempo se atrapalhariam.
     HANDLE mutex = CreateMutexW(NULL, TRUE, u"Local\\EXTIRPA-single-instance");

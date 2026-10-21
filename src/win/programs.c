@@ -131,36 +131,68 @@ static WCHAR *exe_from(const WCHAR *text) {
     return r;
 }
 
+// A pasta fica direto numa pasta de programas? Arquivos de Programas (64 e 32 bits) ou, nas
+// instalações por usuário, %LOCALAPPDATA%\Programs.
+static bool in_programs_root(const WCHAR *dir) {
+    WCHAR *parent = path_parent(dir), *user_programs = g_paths.local_appdata ? path_join(g_paths.local_appdata, u"Programs") : NULL;
+    bool r = parent && ((g_paths.program_files && path_eq(parent, g_paths.program_files)) ||
+                        (g_paths.program_files_x86 && path_eq(parent, g_paths.program_files_x86)) || (user_programs && path_eq(parent, user_programs)));
+    xfree(parent), xfree(user_programs);
+    return r;
+}
+
 // A pasta de um executável conta como pasta do programa se tiver o nome dele ou estiver
-// direto numa pasta de programas.
+// direto numa pasta de programas. Subpastas genéricas ("bin", "uninstall") sobem um nível:
+// C:\Program Files\Foo\uninstall\unins.exe é do C:\Program Files\Foo.
 static void add_exe_dir(Identity *id, const WCHAR *exe) {
     if (!exe) return;
     WCHAR *dir = path_parent(exe);
-    if (!dir) return;
-    // direto numa pasta de programas: Arquivos de Programas (64 e 32 bits) ou, nas
-    // instalações por usuário, %LOCALAPPDATA%\Programs
-    WCHAR *pf_parent = path_parent(dir), *user_programs = g_paths.local_appdata ? path_join(g_paths.local_appdata, u"Programs") : NULL;
-    bool in_pf = pf_parent && ((g_paths.program_files && path_eq(pf_parent, g_paths.program_files)) ||
-                               (g_paths.program_files_x86 && path_eq(pf_parent, g_paths.program_files_x86)) ||
-                               (user_programs && path_eq(pf_parent, user_programs)));
-    xfree(user_programs);
-    if (in_pf || match_name(id, path_leaf(dir)) >= CONF_MEDIUM) identity_add_dir(id, dir);
+    for (int up = 0; dir && up < 2; up++) {
+        WCHAR *leaf_norm = norm_alnum(path_leaf(dir));
+        bool generic = is_generic_word(leaf_norm);
+        xfree(leaf_norm);
+        if (!generic) break;
+        WCHAR *p = path_parent(dir);
+        xfree(dir);
+        dir = p;
+    }
+    if (dir && !protect_dir_blocked(dir)) {
+        bool root = in_programs_root(dir);
+        if (root || match_name(id, path_leaf(dir)) >= CONF_MEDIUM) identity_add_dir(id, dir, root);
+    }
     identity_add_exe(id, exe);
-    xfree(pf_parent), xfree(dir);
+    xfree(dir);
+}
+
+// Nome curto 8.3 de cada pasta (programas antigos gravam C:\PROGRA~1\... no Registro). Só dá
+// para descobrir enquanto a pasta existe: por isso a identidade é montada antes de desinstalar.
+void identity_add_short_names(Identity *id) {
+    size_t n = id->dirs.n;
+    for (size_t i = 0; i < n; i++) {
+        WCHAR buf[MAX_PATH + 1];
+        DWORD r = GetShortPathNameW(id->dirs.items[i], buf, MAX_PATH);
+        if (r && r < MAX_PATH) {
+            buf[r] = 0;
+            if (!wieq(buf, id->dirs.items[i])) identity_add_alt_dir(id, buf);
+        }
+    }
 }
 
 Identity *program_identity(const Program *p) {
     Identity *id = identity_new(p->name, p->publisher);
+    identity_set_version(id, p->version);
     if (p->install_location) {
-        WCHAR *loc = expand_env(p->install_location);
-        identity_add_dir(id, loc);
-        xfree(loc);
+        WCHAR *loc = expand_env(p->install_location), *n = path_norm(loc);
+        // pasta criada pelo instalador em Arquivos de Programas: o nome dela é o do programa
+        identity_add_dir(id, n, in_programs_root(n));
+        xfree(loc), xfree(n);
     }
     int idx;
     WCHAR *icon = program_icon_source(p, &idx), *unins = exe_from(p->uninstall);
     if (icon && wiends(icon, u".exe")) add_exe_dir(id, icon);
     if (unins) add_exe_dir(id, unins);
     xfree(icon), xfree(unins);
+    identity_add_short_names(id);
     return id;
 }
 

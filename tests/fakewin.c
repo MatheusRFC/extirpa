@@ -14,6 +14,7 @@
 #include "../src/core/pathx.h"
 
 static __thread DWORD g_last_error;
+static void fake_misc_reset(void);
 
 // ---------------------------------------------------------------- memória e básicos
 
@@ -507,6 +508,7 @@ void fake_fs_reset(void) {
     g_drive->dir = true;
     mem_set(&g_recycled, 0, sizeof(g_recycled));
     mem_set(&g_reboot, 0, sizeof(g_reboot));
+    fake_misc_reset();
 }
 
 static FNode *fchild(FNode *d, const WCHAR *name, size_t n) {
@@ -799,3 +801,115 @@ NOT_USED(BOOL, GetQueuedCompletionStatus, HANDLE a, LPDWORD b, PULONG_PTR c, LPO
 NOT_USED(HMODULE, LoadLibraryExW, LPCWSTR a, HANDLE b, DWORD c)
 NOT_USED(FARPROC, GetProcAddress, HMODULE a, LPCSTR b)
 VOID WINAPI Sleep(DWORD ms) { (void)ms; }
+
+// ---------------------------------------------------------------- processos, nomes curtos, programas externos
+
+HANDLE WINAPI OpenProcess(DWORD a, BOOL b, DWORD pid) {
+    (void)a, (void)b, (void)pid;
+    return NULL;
+}
+BOOL WINAPI QueryFullProcessImageNameW(HANDLE h, DWORD f, LPWSTR b, PDWORD n) {
+    (void)h, (void)f, (void)b, (void)n;
+    return FALSE;
+}
+BOOL WINAPI K32EnumProcesses(DWORD *p, DWORD cb, LPDWORD got) {
+    (void)p, (void)cb;
+    *got = 0;
+    return TRUE;
+}
+LRESULT WINAPI SendMessageTimeoutW(HWND h, UINT m, WPARAM w, LPARAM l, UINT f, UINT t, PDWORD_PTR r) {
+    (void)h, (void)m, (void)w, (void)l, (void)f, (void)t;
+    if (r) *r = 0;
+    return 1;
+}
+
+static PtrVec g_short_long, g_short_short;
+void fake_short_name(const WCHAR *long_path, const WCHAR *short_path) {
+    pv_push(&g_short_long, wdup(long_path));
+    pv_push(&g_short_short, wdup(short_path));
+}
+DWORD WINAPI GetShortPathNameW(LPCWSTR l, LPWSTR s, DWORD n) {
+    for (size_t i = 0; i < g_short_long.n; i++)
+        if (wieq(g_short_long.items[i], l) && fwalk(l, false, false)) {
+            size_t len = wlen(g_short_short.items[i]);
+            if (len + 1 > n) return (DWORD)(len + 1);
+            memcpy(s, g_short_short.items[i], (len + 1) * sizeof(WCHAR));
+            return (DWORD)len;
+        }
+    return 0;
+}
+
+// Programas que o EXTIRPA chama (schtasks e PowerShell), com o efeito que teriam.
+static PtrVec g_commands;
+size_t fake_command_count(void) { return g_commands.n; }
+const WCHAR *fake_command(size_t i) { return g_commands.items[i]; }
+
+static int b64v(WCHAR c) {
+    if (c >= 'A' && c <= 'Z') return c - 'A';
+    if (c >= 'a' && c <= 'z') return c - 'a' + 26;
+    if (c >= '0' && c <= '9') return c - '0' + 52;
+    if (c == '+') return 62;
+    if (c == '/') return 63;
+    return -1;
+}
+
+int fake_run_capture(const WCHAR *cmdline, char **out, size_t *out_len) {
+    if (out) *out = NULL;
+    if (out_len) *out_len = 0;
+    pv_push(&g_commands, wdup(cmdline));
+    const WCHAR *tn = wifind(cmdline, u"/TN \"");
+    if (wifind(cmdline, u"schtasks.exe") && wifind(cmdline, u"/Delete") && tn) {
+        tn += 5;
+        const WCHAR *e = wfindc(tn, '"');
+        WCHAR *name = wdupn(tn, (size_t)(e - tn)), *file = wcat(u"C:\\Windows\\System32\\Tasks", name);
+        FNode *n = fwalk(file, false, false);
+        if (n) fdetach(n);
+        xfree(name), xfree(file);
+        return n ? 0 : 1;
+    }
+    const WCHAR *enc = wifind(cmdline, u"-EncodedCommand ");
+    if (wifind(cmdline, u"powershell.exe") && enc) {
+        // decodifica o script (UTF-16LE em base64) e aplica Remove-NetFirewallRule
+        enc += 16;
+        size_t n = wlen(enc), nb = 0;
+        uint8_t *bytes = xalloc(n);
+        uint32_t acc = 0;
+        int bits = 0;
+        for (size_t i = 0; i < n; i++) {
+            int v = b64v(enc[i]);
+            if (v < 0) continue;
+            acc = (acc << 6) | (uint32_t)v;
+            bits += 6;
+            if (bits >= 8) bits -= 8, bytes[nb++] = (uint8_t)(acc >> bits);
+        }
+        WCHAR *script = wdupn((const WCHAR *)bytes, nb / 2);
+        xfree(bytes);
+        if (wifind(script, u"Remove-NetFirewallRule")) {
+            const WCHAR *p = wifind(script, u"$ids=@(");
+            for (p = p ? wfindc(p, '\'') : NULL; p;) {
+                StrBuf id = {0};
+                const WCHAR *q = p + 1;
+                for (; *q; q++) {
+                    if (*q == '\'' && q[1] == '\'') sb_addc(&id, '\''), q++;
+                    else if (*q == '\'') break;
+                    else sb_addc(&id, *q);
+                }
+                HKEY k;
+                if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, u"SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\FirewallRules", 0, 0, &k) == 0)
+                    RegDeleteValueW(k, sb_str(&id));
+                sb_free(&id);
+                if (!*q || q[1] != ',') break;
+                p = q + 2;
+            }
+        }
+        xfree(script);
+        return 0;
+    }
+    return 1;
+}
+
+static void fake_misc_reset(void) {
+    mem_set(&g_commands, 0, sizeof(g_commands));
+    mem_set(&g_short_long, 0, sizeof(g_short_long));
+    mem_set(&g_short_short, 0, sizeof(g_short_short));
+}

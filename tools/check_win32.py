@@ -42,10 +42,11 @@ MINGW_INCLUDES = """
 #include <srrestoreptapi.h>
 #include <uxtheme.h>
 #include <knownfolders.h>
+#include <psapi.h>
 """
 
 # Constantes que são ponteiros (não dá para comparar como número num inicializador)
-PULA = {"WINAPI", "CALLBACK", "W32IMP", "EXTIRPA_WIN32_H", "W32_GUID", "INVALID_HANDLE_VALUE", "HWND_TOPMOST"}
+PULA = {"WINAPI", "CALLBACK", "W32IMP", "EXTIRPA_WIN32_H", "W32_GUID", "INVALID_HANDLE_VALUE", "HWND_TOPMOST", "HWND_BROADCAST", "EXTIRPA_FAKE_WIN"}
 
 
 def secao_tipos(texto):
@@ -143,7 +144,13 @@ def main():
                 for arq in os.listdir(os.path.join(a.mingw, base)):
                     if arq.endswith(".h"):
                         todos += open(os.path.join(a.mingw, base, arq), encoding="utf-8", errors="replace").read()
-            faltam = [n for n in nomes if not re.search(r"\b%s\s*\(" % n, todos)]
+            # declarada direto, ou por um apelido (#define EnumProcesses K32EnumProcesses)
+            def declarada(n):
+                if re.search(r"\b%s\s*\(" % n, todos):
+                    return True
+                m = re.search(r"#define\s+(\w+)\s+%s\b" % n, todos)
+                return bool(m and re.search(r"\b%s\s*\(" % m.group(1), todos))
+            faltam = [n for n in nomes if not declarada(n)]
             for n in faltam:
                 falhas += 1
                 print(f"FUNÇÃO SEM DECLARAÇÃO NO MINGW-W64 (não conferida): {n}")

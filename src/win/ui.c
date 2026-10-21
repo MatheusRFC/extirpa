@@ -218,11 +218,19 @@ void ui_end(ModalState *ms, int result) {
     ms->done = true;
 }
 
+#ifdef EXTIRPA_SELFTEST
+void (*g_modal_hook)(HWND w, ModalState *ms);
+#define SELFTEST_TIMER 0x7E57
+#endif
+
 int ui_modal(HWND w, HWND owner, ModalState *ms) {
     if (owner) EnableWindow(owner, FALSE);
     ShowWindow(w, SW_SHOW);
     UpdateWindow(w);
     SetForegroundWindow(w);
+#ifdef EXTIRPA_SELFTEST
+    if (g_modal_hook) SetTimer(w, SELFTEST_TIMER, 1200, NULL);
+#endif
     MSG m;
     bool quit = false;
     while (!ms->done) {
@@ -231,6 +239,13 @@ int ui_modal(HWND w, HWND owner, ModalState *ms) {
             quit = true;
             break;
         }
+#ifdef EXTIRPA_SELFTEST
+        if (g_modal_hook && m.message == WM_TIMER && m.hwnd == w && m.wParam == SELFTEST_TIMER) {
+            KillTimer(w, SELFTEST_TIMER);
+            g_modal_hook(w, ms);
+            continue;
+        }
+#endif
         if (!IsDialogMessageW(w, &m)) {
             TranslateMessage(&m);
             DispatchMessageW(&m);

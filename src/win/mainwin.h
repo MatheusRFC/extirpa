@@ -10,4 +10,9 @@ HWND mainwin_create(void);
 bool mainwin_pretranslate(MSG *m);
 HWND mainwin_handle(void);
 
+#ifdef EXTIRPA_SELFTEST
+void mainwin_selftest_tab(int tab);
+bool mainwin_selftest_apps_ready(void);
+#endif
+
 #endif

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 #include "monitor.h"
 
+#include "../core/leftover.h"
 #include "../core/pathx.h"
 #include "fsx.h"
 #include "i18n.h"
@@ -116,6 +117,26 @@ static void walk_dir(Walk *w, const WCHAR *dir, int depth) {
     fs_list_free(&v);
 }
 
+// Tarefas agendadas: só os arquivos (um por tarefa), sempre descendo nas pastas, para uma
+// pasta nova de tarefas não esconder as tarefas de dentro.
+static void walk_tasks(Walk *w, const WCHAR *dir, int depth) {
+    if (depth > 8) return;
+    PtrVec v = fs_list(dir);
+    for (size_t i = 0; i < v.n; i++) {
+        DirEntry *e = v.items[i];
+        WCHAR *path = path_join(dir, e->name);
+        if (e->is_dir) {
+            if (!e->is_link) walk_tasks(w, path, depth + 1);
+        } else if (w->second) {
+            snap_check(w->s, TR_FILE, path, NULL);
+        } else {
+            snap_record(w->s, TR_FILE, path, NULL);
+        }
+        xfree(path);
+    }
+    fs_list_free(&v);
+}
+
 static void add_skip(Walk *w, const WCHAR *base, const WCHAR *sub) {
     if (!base) return;
     pv_push(&w->skip_dirs, sub ? path_join(base, sub) : path_norm(base));
@@ -150,6 +171,22 @@ void monitor_snapshot(Snapshot *s, bool second, Ctl *ctl) {
         RegCloseKey(k);
     }
     walk_services(&w);
+    // regras do firewall (um valor por regra) e tarefas agendadas (um arquivo por tarefa)
+    HKEY fw = reg_open(FIREWALL_RULES_KEY, KEY_READ);
+    if (fw) {
+        PtrVec names = reg_value_names(fw);
+        for (size_t i = 0; i < names.n; i++) {
+            if (second) snap_check(s, TR_VALUE, FIREWALL_RULES_KEY, names.items[i]);
+            else snap_record(s, TR_VALUE, FIREWALL_RULES_KEY, names.items[i]);
+        }
+        strings_free(&names);
+        RegCloseKey(fw);
+    }
+    if (p->system32) {
+        WCHAR *tasks = path_join(p->system32, u"Tasks");
+        walk_tasks(&w, tasks, 0);
+        xfree(tasks);
+    }
 
     const WCHAR *dirs[] = {p->program_files, p->program_files_x86, p->program_data, p->appdata, p->local_appdata, p->locallow, p->desktop, p->public_desktop};
     for (size_t i = 0; i < COUNT(dirs) && !ctl_cancelled(ctl); i++) {

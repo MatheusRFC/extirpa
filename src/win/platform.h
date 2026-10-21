@@ -47,6 +47,14 @@ void log_fmt(const WCHAR *pattern, ...);
 // Roda um programa sem janela, espera terminar (ou o tempo esgotar) e devolve a saída
 // (stdout+stderr) em UTF-8. Devolve o código de saída, ou -1 se não conseguiu executar.
 int run_capture(const WCHAR *cmdline, char **out, size_t *out_len, DWORD timeout_ms);
+typedef struct {
+    DWORD pid;
+    WCHAR *exe;
+} ProcInfo;
+// Processos em execução cujo executável está dentro de alguma das pastas/arquivos dados.
+PtrVec processes_under(const PtrVec *paths);
+void processes_free(PtrVec *v);
+bool process_kill(DWORD pid);
 void shell_open(const WCHAR *target);          // abre pasta, arquivo ou endereço
 void shell_select(const WCHAR *path);          // abre o Explorer com o item selecionado
 WCHAR *system_exe(const WCHAR *name);          // "C:\Windows\System32\<name>"

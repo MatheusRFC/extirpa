@@ -348,7 +348,15 @@ static DWORD WINAPI watchdog_thread(LPVOID arg) {
     return 0;
 }
 
+#ifdef EXTIRPA_FAKE_WIN
+int fake_run_capture(const WCHAR *cmdline, char **out, size_t *out_len);  // tests/fakewin.c
+#endif
+
 int run_capture(const WCHAR *cmdline, char **out, size_t *out_len, DWORD timeout_ms) {
+#ifdef EXTIRPA_FAKE_WIN
+    (void)timeout_ms;
+    return fake_run_capture(cmdline, out, out_len);
+#endif
     if (out) *out = NULL;
     if (out_len) *out_len = 0;
     SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
@@ -402,6 +410,60 @@ int run_capture(const WCHAR *cmdline, char **out, size_t *out_len, DWORD timeout
     else xfree(buf);
     if (out_len) *out_len = len;
     return (int)code;
+}
+
+PtrVec processes_under(const PtrVec *paths) {
+    PtrVec r = {0};
+    DWORD cap = 1024, got = 0;
+    DWORD *pids = NULL;
+    for (;;) {
+        pids = xrealloc(pids, cap * sizeof(DWORD));
+        if (!K32EnumProcesses(pids, cap * sizeof(DWORD), &got)) {
+            xfree(pids);
+            return r;
+        }
+        if (got < cap * sizeof(DWORD)) break;
+        cap *= 2;
+    }
+    DWORD self = GetCurrentProcessId();
+    for (DWORD i = 0; i < got / sizeof(DWORD); i++) {
+        if (!pids[i] || pids[i] == self) continue;
+        HANDLE h = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pids[i]);
+        if (!h) continue;
+        WCHAR buf[1024];
+        DWORD n = COUNT(buf);
+        if (QueryFullProcessImageNameW(h, 0, buf, &n)) {
+            buf[n] = 0;
+            for (size_t k = 0; k < paths->n; k++)
+                if (path_is_under_or_eq(buf, paths->items[k])) {
+                    ProcInfo *p = xalloc(sizeof(ProcInfo));
+                    p->pid = pids[i];
+                    p->exe = wdup(buf);
+                    pv_push(&r, p);
+                    break;
+                }
+        }
+        CloseHandle(h);
+    }
+    xfree(pids);
+    return r;
+}
+
+void processes_free(PtrVec *v) {
+    for (size_t i = 0; i < v->n; i++) {
+        ProcInfo *p = v->items[i];
+        xfree(p->exe), xfree(p);
+    }
+    pv_free(v);
+}
+
+bool process_kill(DWORD pid) {
+    HANDLE h = OpenProcess(PROCESS_TERMINATE | SYNCHRONIZE, FALSE, pid);
+    if (!h) return false;
+    bool ok = TerminateProcess(h, 1) != 0;
+    if (ok) WaitForSingleObject(h, 5000);
+    CloseHandle(h);
+    return ok;
 }
 
 void shell_open(const WCHAR *target) { ShellExecuteW(NULL, u"open", target, NULL, NULL, SW_SHOWNORMAL); }

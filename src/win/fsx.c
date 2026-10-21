@@ -108,3 +108,33 @@ static bool reboot_rec(const WCHAR *path, int depth) {
 }
 
 bool fs_delete_on_reboot(const WCHAR *path) { return reboot_rec(path, 0); }
+
+static DWORD delete_rec(const WCHAR *path, int depth) {
+    WCHAR *ap = api_path(path);
+    DWORD a = GetFileAttributesW(ap);
+    DWORD err = ERROR_SUCCESS;
+    if (a == INVALID_FILE_ATTRIBUTES) {
+        xfree(ap);
+        return ERROR_SUCCESS;
+    }
+    if (a & FILE_ATTRIBUTE_READONLY) SetFileAttributesW(ap, a & ~(DWORD)FILE_ATTRIBUTE_READONLY);
+    if (a & FILE_ATTRIBUTE_DIRECTORY) {
+        if (!(a & FILE_ATTRIBUTE_REPARSE_POINT) && depth < 128) {
+            PtrVec v = fs_list(path);
+            for (size_t i = 0; i < v.n; i++) {
+                WCHAR *sub = path_join(path, ((DirEntry *)v.items[i])->name);
+                DWORD e = delete_rec(sub, depth + 1);
+                if (e && !err) err = e;
+                xfree(sub);
+            }
+            fs_list_free(&v);
+        }
+        if (!RemoveDirectoryW(ap) && !err) err = GetLastError();
+    } else if (!DeleteFileW(ap)) {
+        err = GetLastError();
+    }
+    xfree(ap);
+    return err;
+}
+
+DWORD fs_delete_tree(const WCHAR *path) { return delete_rec(path, 0); }

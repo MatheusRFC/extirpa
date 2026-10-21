@@ -126,7 +126,7 @@ static void on_target(Hunter *hu, POINT pt) {
     case M_FORCED: {
         const WCHAR *folder = (p && p->install_location) ? p->install_location : (dir && !protect_dir_blocked(dir) ? dir : NULL);
         WCHAR *name = p ? wdup(p->name) : path_strip_ext(path_leaf(exe));
-        hu->changed = op_forced(hu->wnd, name, folder) || hu->changed;
+        hu->changed = op_forced(hu->wnd, p, name, folder) || hu->changed;
         xfree(name);
         reload(hu);
         break;

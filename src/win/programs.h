@@ -27,6 +27,8 @@ void programs_free(PtrVec *v);
 
 // Identidade para a busca de sobras: nome, editor e as pastas do programa.
 Identity *program_identity(const Program *p);
+// Acrescenta o nome curto 8.3 de cada pasta da identidade (precisa que a pasta exista).
+void identity_add_short_names(Identity *id);
 // O programa a que pertence um executável (pela pasta de instalação), ou NULL.
 Program *programs_find_by_exe(const PtrVec *v, const WCHAR *exe_path);
 // A entrada do programa ainda existe no Registro?

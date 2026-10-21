@@ -9,6 +9,7 @@
 
 #include "../src/core/pathx.h"
 #include "../src/core/regtext.h"
+#include "../src/win/fsx.h"
 #include "../src/win/i18n.h"
 #include "../src/win/monitor.h"
 #include "../src/win/platform.h"
@@ -333,7 +334,8 @@ static void test_scan_moderate_and_delete(void) {
     CHECK(!any_path_contains(&l, u"Thunderbird"));
     CHECK(!any_path_contains(&l, u"OneDrive"));
     CHECK(!any_path_contains(&l, u"MozillaMaintenance"));
-    CHECK(!any_path_contains(&l, u"FirefoxHTML"));  // tipos de arquivo: só no avançado
+    Leftover *html = find_item(&l, LK_KEY, u"HKLM\\SOFTWARE\\Classes\\FirefoxHTML-308046B0AF4A39CB", NULL);
+    CHECK(html && html->conf == CONF_HIGH && html->checked);  // tipo de arquivo que abre o firefox.exe
     if (g_fail) dump(&l);
 
     DelResult r;
@@ -393,7 +395,7 @@ static void test_scan_advanced(void) {
     Identity *id;
     scan_firefox(SCAN_ADVANCED, &l, &id);
     Leftover *progid = find_item(&l, LK_KEY, u"HKLM\\SOFTWARE\\Classes\\FirefoxHTML-308046B0AF4A39CB", NULL);
-    CHECK(progid && progid->conf == CONF_MEDIUM && !progid->checked);
+    CHECK(progid && progid->conf == CONF_HIGH && progid->checked);
     CHECK(find_item(&l, LK_KEY, u"HKLM\\SOFTWARE\\Classes\\CLSID\\{0D68D6D0-D93D-4D08-A30D-F00DD1F45B24}", NULL) != NULL);
     CHECK(!any_path_contains(&l, u"Thunderbird"));
     CHECK(!any_path_contains(&l, u".txt"));
@@ -420,8 +422,19 @@ static void test_shared_install_dir(void) {
     LeftList l = {0};
     scan_leftovers(&l, id, key, SCAN_MODERATE, NULL);
     left_finalize(&l);
-    Leftover *d = find_item(&l, LK_DIR, u"C:\\Program Files\\Acme", NULL);
-    CHECK(d && d->conf == CONF_LOW && !d->checked);  // apagar levaria o outro programa junto
+    // a pasta não sai inteira (levaria o outro programa junto): sai item por item, menos o outro
+    CHECK(find_item(&l, LK_DIR, u"C:\\Program Files\\Acme", NULL) == NULL);
+    Leftover *d = find_item(&l, LK_DIR_IF_EMPTY, u"C:\\Program Files\\Acme", NULL);
+    CHECK(d && d->checked);
+    Leftover *tool = find_item(&l, LK_FILE, u"C:\\Program Files\\Acme\\tool.exe", NULL);
+    CHECK(tool && tool->conf == CONF_HIGH && tool->checked);
+    CHECK(!any_path_contains(&l, u"Other Suite"));
+    DelResult r;
+    delete_leftovers(&l, u"Vendor Tool", NULL, &r);
+    CHECK(r.failed == 0 && r.kept == 1);
+    CHECK(fake_exists(u"C:\\Program Files\\Acme\\Other Suite\\other.exe"));
+    CHECK(!fake_exists(u"C:\\Program Files\\Acme\\tool.exe"));
+    del_result_free(&r);
     if (g_fail) dump(&l);
     left_free(&l);
     identity_free(id);
@@ -438,9 +451,11 @@ static void test_microsoft_program(void) {
     PtrVec v = programs_load();
     Program *p = find_program(&v, u"Microsoft Teams");
     Identity *id = program_identity(p);
+    WCHAR *key = wdup(p->key_path);
     programs_free(&v);
     LeftList l = {0};
-    scan_leftovers(&l, id, NULL, SCAN_ADVANCED, NULL);
+    scan_leftovers(&l, id, key, SCAN_ADVANCED, NULL);
+    xfree(key);
     left_finalize(&l);
     CHECK(find_item(&l, LK_DIR, u"C:\\Users\\ana\\AppData\\Local\\Microsoft\\Teams", NULL) != NULL);
     CHECK(find_item(&l, LK_KEY, u"HKCU\\Software\\Microsoft\\Teams", NULL) != NULL);
@@ -609,6 +624,318 @@ static void test_monitor(void) {
     trace_free(t);
 }
 
+
+// ---------------------------------------------------------------- limpeza completa (todas as fontes)
+
+#define SE_DIR u"C:\\Program Files\\Nimbus\\Super Editor"
+#define SE_KEY UNINST u"SuperEditor_is1"
+#define UP_DIR u"C:\\Program Files\\Nimbus\\Updater"
+#define FW_KEY u"HKLM\\SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\FirewallRules"
+#define MUI u"HKCU\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\MuiCache"
+
+static void task_file(const WCHAR *name, const WCHAR *command) {
+    StrBuf b = {0};
+    sb_addc(&b, 0xFEFF);
+    sb_add(&b, u"<?xml version=\"1.0\" encoding=\"UTF-16\"?>\r\n<Task><RegistrationInfo><URI>");
+    sb_add(&b, name);
+    sb_add(&b, u"</URI></RegistrationInfo><Actions Context=\"Author\"><Exec><Command>");
+    sb_add(&b, command);
+    sb_add(&b, u"</Command><Arguments>/silent &amp; /x</Arguments></Exec></Actions></Task>");
+    WCHAR *path = wcat(u"C:\\Windows\\System32\\Tasks", name);
+    fake_file(path, sb_str(&b), b.len * sizeof(WCHAR));
+    xfree(path);
+    sb_free(&b);
+}
+
+static void super_editor_installed(void) {
+    fake_str(SE_KEY, u"DisplayName", u"Super Editor 4.2.1");
+    fake_str(SE_KEY, u"DisplayVersion", u"4.2.1");
+    fake_str(SE_KEY, u"Publisher", u"Nimbus Software Ltd.");
+    fake_str(SE_KEY, u"UninstallString", u"\"" SE_DIR u"\\uninstall\\unins000.exe\"");  // sem InstallLocation
+    fake_str(UNINST u"NimbusUpdater", u"DisplayName", u"Nimbus Updater");
+    fake_str(UNINST u"NimbusUpdater", u"Publisher", u"Nimbus Software Ltd.");
+    fake_str(UNINST u"NimbusUpdater", u"InstallLocation", UP_DIR);
+    // arquivos
+    fake_file(SE_DIR u"\\se.exe", "MZ", 2);
+    fake_file(SE_DIR u"\\shellext.dll", "MZ", 2);
+    fake_file(SE_DIR u"\\bin\\se-cli.exe", "MZ", 2);
+    fake_file(SE_DIR u"\\uninstall\\unins000.exe", "MZ", 2);
+    fake_short_name(SE_DIR, u"C:\\PROGRA~1\\Nimbus\\SUPERE~1");
+    fake_file(UP_DIR u"\\nu.exe", "MZ", 2);
+    fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\Nimbus\\Super Editor\\settings.json", "{}", 2);
+    fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\Nimbus\\Updater\\state.json", "{}", 2);
+    fake_file(u"C:\\Users\\ana\\AppData\\Local\\SuperEditor\\cache\\a.bin", "x", 1);
+    make_lnk(u"C:\\Users\\ana\\Desktop\\Super Editor.lnk", SE_DIR u"\\se.exe");
+    make_lnk(START_MENU u"\\Nimbus\\Super Editor.lnk", SE_DIR u"\\se.exe");
+    make_lnk(START_MENU u"\\Nimbus\\Nimbus Updater.lnk", UP_DIR u"\\nu.exe");
+    make_lnk(u"C:\\Users\\ana\\AppData\\Roaming\\Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar\\Super Editor.lnk", SE_DIR u"\\se.exe");
+    // Registro: configurações
+    fake_str(u"HKCU\\Software\\Nimbus\\Super Editor\\Prefs", u"Theme", u"dark");
+    fake_str(u"HKCU\\Software\\Nimbus\\Updater", u"Channel", u"stable");
+    fake_str(u"HKLM\\SOFTWARE\\Nimbus\\Super Editor\\Capabilities", u"ApplicationName", u"Super Editor");
+    fake_str(u"HKLM\\SOFTWARE\\RegisteredApplications", u"Super Editor", u"Software\\Nimbus\\Super Editor\\Capabilities");
+    fake_str(u"HKLM\\SOFTWARE\\RegisteredApplications", u"Firefox", u"Software\\Clients\\StartMenuInternet\\Firefox\\Capabilities");
+    // tipos de arquivo, COM, menus do Explorer
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\SuperEditor.Document\\shell\\open\\command", u"", u"\"" SE_DIR u"\\se.exe\" \"%1\"");
+    fake_str(u"HKCU\\Software\\Classes\\.sed", u"", u"SuperEditor.Document");
+    fake_str(u"HKCU\\Software\\Classes\\.txt\\OpenWithProgids", u"SuperEditor.Document", u"");
+    fake_str(u"HKCU\\Software\\Classes\\.txt\\OpenWithProgids", u"txtfile", u"");
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\CLSID\\{11111111-2222-3333-4444-555555555555}\\InprocServer32", u"", u"C:\\PROGRA~1\\Nimbus\\SUPERE~1\\shellext.dll");
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\*\\shellex\\ContextMenuHandlers\\SuperEditor", u"", u"{11111111-2222-3333-4444-555555555555}");
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\*\\shellex\\ContextMenuHandlers\\Outro", u"", u"{99999999-2222-3333-4444-555555555555}");
+    fake_str(u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved", u"{11111111-2222-3333-4444-555555555555}", u"Super Editor Shell");
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\Directory\\shell\\SuperEditor\\command", u"", u"\"" SE_DIR u"\\se.exe\" \"%V\"");
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\Directory\\shell\\cmd\\command", u"", u"cmd.exe /s /k pushd \"%V\"");
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\TypeLib\\{22222222-2222-3333-4444-555555555555}\\1.0\\0\\win64", u"", SE_DIR u"\\shellext.dll");
+    // inicialização, tarefas, firewall, PATH, rastros de uso, serviço
+    fake_str(u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", u"SuperEditorTray", u"\"" SE_DIR u"\\se.exe\" --tray");
+    task_file(u"\\Nimbus\\SuperEditorUpdate", u"%ProgramFiles%\\Nimbus\\Super Editor\\se.exe");
+    task_file(u"\\NimbusUpdater", UP_DIR u"\\nu.exe");
+    task_file(u"\\Microsoft\\Windows\\Fake\\Task", SE_DIR u"\\se.exe");  // do Windows: nunca
+    fake_str(FW_KEY, u"{AAAA-SE}", u"v2.30|Action=Allow|Active=TRUE|Dir=In|App=%ProgramFiles%\\Nimbus\\Super Editor\\se.exe|Name=Super Editor|");
+    fake_str(FW_KEY, u"TCP Query User{B}C:\\program files\\nimbus\\super editor\\se.exe", u"v2.30|Action=Block|Dir=In|App=C:\\program files\\nimbus\\super editor\\se.exe|");
+    fake_str(FW_KEY, u"{BBBB-UP}", u"v2.30|Action=Allow|Dir=Out|App=" UP_DIR u"\\nu.exe|Name=Updater|");
+    const WCHAR path_val[] = u"C:\\Users\\ana\\bin;%ProgramFiles%\\Nimbus\\Super Editor\\bin;" UP_DIR u";";
+    fake_val(u"HKCU\\Environment", u"Path", REG_EXPAND_SZ, path_val, sizeof(path_val));
+    fake_str(MUI, SE_DIR u"\\se.exe.FriendlyAppName", u"Super Editor");
+    fake_str(MUI, UP_DIR u"\\nu.exe.FriendlyAppName", u"Updater");
+    fake_str(u"HKLM\\SYSTEM\\CurrentControlSet\\Services\\SuperEditorSvc", u"ImagePath", u"\"" SE_DIR u"\\se.exe\" --service");
+    // um programa qualquer que lembra um arquivo aberto dentro da pasta (só o modo avançado acha)
+    fake_str(u"HKCU\\Software\\OutroApp\\Recent", u"File1", SE_DIR u"\\readme.txt");
+}
+
+static void test_full_cleanup(void) {
+    base_system();
+    super_editor_installed();
+    PtrVec v = programs_load();
+    Program *p = find_program(&v, u"Super Editor 4.2.1");
+    CHECK(p != NULL);
+    if (!p) return;
+    Identity *id = program_identity(p);  // antes de desinstalar
+    CHECK(id->dirs.n == 1 && weq(id->dirs.items[0], SE_DIR));  // a pasta saiu do desinstalador em \uninstall
+    CHECK(id->alt_dirs.n == 1);
+    WCHAR *key = wdup(p->key_path);
+    programs_free(&v);
+    // o desinstalador do programa tira a entrada e alguns arquivos, e deixa o resto
+    HKEY u;
+    RegOpenKeyExW(HKEY_LOCAL_MACHINE, u"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall", 0, 0, &u);
+    RegDeleteTreeW(u, u"SuperEditor_is1");
+    DeleteFileW(SE_DIR u"\\uninstall\\unins000.exe");
+
+    LeftList l = {0};
+    scan_leftovers(&l, id, key, SCAN_MODERATE, NULL);
+    left_finalize(&l);
+    struct {
+        LeftKind kind;
+        const WCHAR *path, *value;
+    } expect[] = {
+        {LK_DIR, SE_DIR, NULL},
+        {LK_DIR, u"C:\\Users\\ana\\AppData\\Roaming\\Nimbus\\Super Editor", NULL},
+        {LK_DIR, u"C:\\Users\\ana\\AppData\\Local\\SuperEditor", NULL},
+        {LK_FILE, u"C:\\Users\\ana\\Desktop\\Super Editor.lnk", NULL},
+        {LK_FILE, START_MENU u"\\Nimbus\\Super Editor.lnk", NULL},
+        {LK_FILE, u"C:\\Users\\ana\\AppData\\Roaming\\Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar\\Super Editor.lnk", NULL},
+        {LK_KEY, u"HKCU\\Software\\Nimbus\\Super Editor", NULL},
+        {LK_KEY, u"HKLM\\SOFTWARE\\Nimbus\\Super Editor", NULL},
+        {LK_VALUE, u"HKLM\\SOFTWARE\\RegisteredApplications", u"Super Editor"},
+        {LK_KEY, u"HKLM\\SOFTWARE\\Classes\\SuperEditor.Document", NULL},
+        {LK_VALUE, u"HKCU\\Software\\Classes\\.txt\\OpenWithProgids", u"SuperEditor.Document"},
+        {LK_KEY, u"HKLM\\SOFTWARE\\Classes\\CLSID\\{11111111-2222-3333-4444-555555555555}", NULL},
+        {LK_KEY, u"HKLM\\SOFTWARE\\Classes\\*\\shellex\\ContextMenuHandlers\\SuperEditor", NULL},
+        {LK_VALUE, u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved", u"{11111111-2222-3333-4444-555555555555}"},
+        {LK_KEY, u"HKLM\\SOFTWARE\\Classes\\Directory\\shell\\SuperEditor", NULL},
+        {LK_KEY, u"HKLM\\SOFTWARE\\Classes\\TypeLib\\{22222222-2222-3333-4444-555555555555}", NULL},
+        {LK_VALUE, u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", u"SuperEditorTray"},
+        {LK_TASK, u"\\Nimbus\\SuperEditorUpdate", NULL},
+        {LK_FWRULE, u"{AAAA-SE}", NULL},
+        {LK_FWRULE, u"TCP Query User{B}C:\\program files\\nimbus\\super editor\\se.exe", NULL},
+        {LK_PATHENTRY, u"HKCU\\Environment", u"%ProgramFiles%\\Nimbus\\Super Editor\\bin"},
+        {LK_VALUE, MUI, SE_DIR u"\\se.exe.FriendlyAppName"},
+        {LK_SERVICE, u"SuperEditorSvc", NULL},
+    };
+    for (size_t i = 0; i < COUNT(expect); i++) {
+        Leftover *it = find_item(&l, expect[i].kind, expect[i].path, expect[i].value);
+        if (!it || it->conf != CONF_HIGH || !it->checked) {
+            char *a = u8(expect[i].path), *b = u8(expect[i].value ? expect[i].value : u"");
+            fprintf(stderr, "  esperado e marcado: %s %s\n", a, b);
+            xfree(a), xfree(b);
+        }
+        CHECK(it && it->conf == CONF_HIGH && it->checked);
+    }
+    Leftover *ext = find_item(&l, LK_VALUE, u"HKCU\\Software\\Classes\\.sed", u"");
+    CHECK(ext && !ext->checked);  // associação padrão: entra, mas desmarcada
+    // nada do Nimbus Updater, do Windows nem de outros
+    CHECK(!any_path_contains(&l, u"Updater"));
+    CHECK(!any_path_contains(&l, u"{BBBB-UP}"));
+    CHECK(!any_path_contains(&l, u"\\Microsoft\\Windows\\Fake"));
+    CHECK(!any_path_contains(&l, u"Outro"));
+    CHECK(!any_path_contains(&l, u"txtfile"));
+    CHECK(!any_path_contains(&l, u"Firefox"));
+    CHECK(!any_path_contains(&l, u"Directory\\shell\\cmd"));
+    CHECK(!find_item(&l, LK_DIR, u"C:\\Program Files\\Nimbus", NULL));  // a pasta do editor não sai inteira
+    if (g_fail) dump(&l);
+
+    DelResult r;
+    delete_leftovers(&l, u"Super Editor", NULL, &r);
+    CHECK(r.failed == 0);
+    // tudo do programa saiu
+    CHECK(!fake_exists(SE_DIR));
+    CHECK(!fake_exists(u"C:\\Users\\ana\\AppData\\Roaming\\Nimbus\\Super Editor"));
+    CHECK(!fake_exists(u"C:\\Users\\ana\\AppData\\Local\\SuperEditor"));
+    CHECK(!fake_exists(u"C:\\Users\\ana\\Desktop\\Super Editor.lnk"));
+    CHECK(!fake_key_exists(u"HKCU\\Software\\Nimbus\\Super Editor"));
+    CHECK(!fake_key_exists(u"HKLM\\SOFTWARE\\Nimbus"));  // ficou vazia: saiu
+    CHECK(!fake_val_exists(u"HKLM\\SOFTWARE\\RegisteredApplications", u"Super Editor"));
+    CHECK(!fake_key_exists(u"HKLM\\SOFTWARE\\Classes\\SuperEditor.Document"));
+    CHECK(!fake_val_exists(u"HKCU\\Software\\Classes\\.txt\\OpenWithProgids", u"SuperEditor.Document"));
+    CHECK(!fake_key_exists(u"HKLM\\SOFTWARE\\Classes\\CLSID\\{11111111-2222-3333-4444-555555555555}"));
+    CHECK(!fake_key_exists(u"HKLM\\SOFTWARE\\Classes\\*\\shellex\\ContextMenuHandlers\\SuperEditor"));
+    CHECK(!fake_key_exists(u"HKLM\\SOFTWARE\\Classes\\Directory\\shell\\SuperEditor"));
+    CHECK(!fake_key_exists(u"HKLM\\SOFTWARE\\Classes\\TypeLib\\{22222222-2222-3333-4444-555555555555}"));
+    CHECK(!fake_val_exists(u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", u"SuperEditorTray"));
+    CHECK(!fake_exists(u"C:\\Windows\\System32\\Tasks\\Nimbus\\SuperEditorUpdate"));
+    CHECK(!fake_val_exists(FW_KEY, u"{AAAA-SE}"));
+    CHECK(!fake_val_exists(FW_KEY, u"TCP Query User{B}C:\\program files\\nimbus\\super editor\\se.exe"));
+    CHECK(!fake_val_exists(MUI, SE_DIR u"\\se.exe.FriendlyAppName"));
+    CHECK(!fake_key_exists(u"HKLM\\SYSTEM\\CurrentControlSet\\Services\\SuperEditorSvc"));
+    // o PATH perdeu só a entrada do programa (e manteve o tipo REG_EXPAND_SZ)
+    uint8_t *data;
+    DWORD type, size;
+    data = reg_get_raw(u"HKCU\\Environment", u"Path", &type, &size);
+    CHECK(data && type == REG_EXPAND_SZ);
+    if (data) CHECK_WEQ((const WCHAR *)data, u"C:\\Users\\ana\\bin;" UP_DIR);
+    xfree(data);
+    // o resto continua lá
+    CHECK(fake_exists(UP_DIR u"\\nu.exe"));
+    CHECK(fake_exists(u"C:\\Users\\ana\\AppData\\Roaming\\Nimbus\\Updater\\state.json"));
+    CHECK(fake_exists(START_MENU u"\\Nimbus\\Nimbus Updater.lnk"));
+    CHECK(fake_key_exists(u"HKCU\\Software\\Nimbus\\Updater"));
+    CHECK(fake_exists(u"C:\\Windows\\System32\\Tasks\\NimbusUpdater"));
+    CHECK(fake_exists(u"C:\\Windows\\System32\\Tasks\\Microsoft\\Windows\\Fake\\Task"));
+    CHECK(fake_val_exists(FW_KEY, u"{BBBB-UP}"));
+    CHECK(fake_val_exists(MUI, UP_DIR u"\\nu.exe.FriendlyAppName"));
+    CHECK(fake_val_exists(u"HKLM\\SOFTWARE\\RegisteredApplications", u"Firefox"));
+    CHECK(fake_key_exists(u"HKLM\\SOFTWARE\\Classes\\*\\shellex\\ContextMenuHandlers\\Outro"));
+    CHECK(fake_key_exists(u"HKLM\\SOFTWARE\\Classes\\Directory\\shell\\cmd"));
+    CHECK(fake_val_exists(u"HKCU\\Software\\Classes\\.txt\\OpenWithProgids", u"txtfile"));
+    CHECK(fake_val_exists(u"HKCU\\Software\\Classes\\.sed", u""));  // desmarcado: ficou
+    CHECK(fake_key_exists(u"HKCU\\Software\\OutroApp\\Recent"));
+    // o backup da tarefa foi gravado, e o .reg tem o PATH antigo e as regras do firewall
+    bool task_backup = false;
+    PtrVec bk = fs_list(u"C:\\Users\\ana\\AppData\\Local\\EXTIRPA\\Backups");
+    for (size_t i = 0; i < bk.n; i++) task_backup = task_backup || wiends(((DirEntry *)bk.items[i])->name, u"task - Nimbus_SuperEditorUpdate.xml");
+    fs_list_free(&bk);
+    CHECK(task_backup);
+    size_t len;
+    CHECK(fake_read(r.backup_path, &data, &len));
+    WCHAR *text = wdupn((const WCHAR *)(data + 2), (len - 2) / 2);
+    CHECK(wifind(text, u"[HKEY_CURRENT_USER\\Environment]") && wifind(text, u"\"Path\"=hex(2):"));
+    CHECK(wifind(text, u"\"{AAAA-SE}\"=\"v2.30|Action=Allow"));
+    CHECK(!wifind(text, u"{BBBB-UP}"));
+    xfree(text);
+    // o schtasks foi chamado só para a tarefa do programa
+    size_t schtasks = 0;
+    for (size_t i = 0; i < fake_command_count(); i++)
+        if (wifind(fake_command(i), u"schtasks.exe")) {
+            schtasks++;
+            CHECK(wifind(fake_command(i), u"/TN \"\\Nimbus\\SuperEditorUpdate\""));
+        }
+    CHECK(schtasks == 1);
+    del_result_free(&r);
+    left_free(&l);
+
+    // modo avançado: a referência solta no Registro de outro programa aparece, desmarcada
+    base_system();
+    super_editor_installed();
+    v = programs_load();
+    p = find_program(&v, u"Super Editor 4.2.1");
+    Identity *id2 = program_identity(p);
+    programs_free(&v);
+    LeftList a = {0};
+    scan_leftovers(&a, id2, key, SCAN_ADVANCED, NULL);
+    left_finalize(&a);
+    Leftover *recent = find_item(&a, LK_VALUE, u"HKCU\\Software\\OutroApp\\Recent", u"File1");
+    CHECK(recent && recent->conf == CONF_LOW && !recent->checked);
+    left_free(&a);
+    identity_free(id2);
+    identity_free(id);
+    xfree(key);
+}
+
+// ---------------------------------------------------------------- duas versões do mesmo programa
+
+#define PY_ROOT u"C:\\Users\\ana\\AppData\\Local\\Programs\\Python"
+
+static void python_install(const WCHAR *ver, const WCHAR *tag, const WCHAR *core_ver) {
+    WCHAR *key = wfmt(u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{PY-%s}", tag);
+    WCHAR *name = wfmt(u"Python %s (64-bit)", ver), *dir = wfmt(PY_ROOT u"\\Python%s", tag), *exe = wfmt(u"%s\\python.exe", dir);
+    fake_str(key, u"DisplayName", name);
+    fake_str(key, u"DisplayVersion", ver);
+    fake_str(key, u"Publisher", u"Python Software Foundation");
+    fake_str(key, u"DisplayIcon", exe);
+    fake_str(key, u"UninstallString", u"\"C:\\Users\\ana\\AppData\\Local\\Package Cache\\{x}\\python-setup.exe\" /uninstall");
+    fake_file(exe, "MZ", 2);
+    WCHAR *lib = wfmt(u"%s\\Lib\\os.py", dir);
+    fake_file(lib, "x", 1);
+    WCHAR *core = wfmt(u"HKCU\\Software\\Python\\PythonCore\\%s\\InstallPath", core_ver);
+    fake_str(core, u"", dir);
+    fake_str(core, u"ExecutablePath", exe);
+    WCHAR *site = wfmt(u"C:\\Users\\ana\\AppData\\Roaming\\Python\\Python%s\\site-packages\\x.py", tag);
+    fake_file(site, "x", 1);
+    xfree(key), xfree(name), xfree(dir), xfree(exe), xfree(lib), xfree(core), xfree(site);
+}
+
+static void test_two_versions(void) {
+    base_system();
+    python_install(u"3.11.5", u"311", u"3.11");
+    python_install(u"3.12.0", u"312", u"3.12");
+    fake_file(PY_ROOT u"\\Launcher\\py.exe", "MZ", 2);  // de nenhum dos dois, sem registro
+    PtrVec v = programs_load();
+    Program *p = find_program(&v, u"Python 3.12.0 (64-bit)");
+    CHECK(p != NULL);
+    if (!p) return;
+    Identity *id = program_identity(p);
+    WCHAR *key = wdup(p->key_path);
+    programs_free(&v);
+    CHECK(id->dirs.n == 1 && weq(id->dirs.items[0], PY_ROOT u"\\Python312"));
+    // o desinstalador do 3.12 tira a entrada e o python.exe; sobra a Lib
+    reg_delete_key(key);
+    DeleteFileW(PY_ROOT u"\\Python312\\python.exe");
+
+    LeftList l = {0};
+    scan_leftovers(&l, id, key, SCAN_MODERATE, NULL);
+    left_finalize(&l);
+    Leftover *shared = find_item(&l, LK_KEY, u"HKCU\\Software\\Python", NULL);
+    CHECK(shared && shared->conf == CONF_LOW && !shared->checked);
+    Leftover *core = find_item(&l, LK_KEY, u"HKCU\\Software\\Python\\PythonCore\\3.12", NULL);
+    CHECK(core && core->conf == CONF_HIGH && core->checked);
+    CHECK(!any_path_contains(&l, u"3.11"));
+    CHECK(!any_path_contains(&l, u"Python311"));
+    Leftover *inst = find_item(&l, LK_DIR, PY_ROOT u"\\Python312", NULL);
+    CHECK(inst && inst->checked);
+    Leftover *launcher = find_item(&l, LK_DIR, PY_ROOT u"\\Launcher", NULL);
+    CHECK(!launcher || !launcher->checked);
+    Leftover *site = find_item(&l, LK_DIR, u"C:\\Users\\ana\\AppData\\Roaming\\Python\\Python312", NULL);
+    CHECK(site != NULL);
+    if (g_fail) dump(&l);
+
+    DelResult r;
+    delete_leftovers(&l, u"Python 3.12", NULL, &r);
+    CHECK(r.failed == 0);
+    CHECK(!fake_exists(PY_ROOT u"\\Python312"));
+    CHECK(!fake_key_exists(u"HKCU\\Software\\Python\\PythonCore\\3.12"));
+    // o 3.11 inteiro continua lá
+    CHECK(fake_exists(PY_ROOT u"\\Python311\\python.exe"));
+    CHECK(fake_exists(PY_ROOT u"\\Python311\\Lib\\os.py"));
+    CHECK(fake_exists(PY_ROOT u"\\Launcher\\py.exe"));
+    CHECK(fake_key_exists(u"HKCU\\Software\\Python\\PythonCore\\3.11\\InstallPath"));
+    CHECK(fake_exists(u"C:\\Users\\ana\\AppData\\Roaming\\Python\\Python311\\site-packages\\x.py"));
+    del_result_free(&r);
+    left_free(&l);
+    identity_free(id);
+    xfree(key);
+}
+
 int main(void) {
     test_programs_load();
     test_scan_safe();
@@ -620,6 +947,8 @@ int main(void) {
     test_registry_helpers();
     test_startup();
     test_monitor();
+    test_full_cleanup();
+    test_two_versions();
     printf("%d verificações (Windows simulado), %d falhas\n", g_checks, g_fail);
     return g_fail ? 1 : 0;
 }
