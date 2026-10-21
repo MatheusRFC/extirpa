@@ -30,14 +30,27 @@ jobs:
         shell: pwsh
         continue-on-error: true
         run: |
-          try { $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--selftest' -Wait -PassThru; "selftest exit: $($p.ExitCode)" }
-          catch { "selftest start error: $_" } *>&1 | Tee-Object -FilePath results\steps.txt -Append
+          & {
+            try {
+              $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--selftest' -PassThru
+              if (-not $p.WaitForExit(600000)) {
+                "SELFTEST TRAVADO depois de 10 min: captura da tela e encerramento"
+                Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+                $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+                $bmp = New-Object System.Drawing.Bitmap $b.Width, $b.Height
+                [System.Drawing.Graphics]::FromImage($bmp).CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
+                $bmp.Save("$PWD\results\hang.png")
+                Get-Process | Where-Object { $_.MainWindowTitle } | Select-Object Name, Id, MainWindowTitle | Out-String
+                $p | Stop-Process -Force
+              } else { "selftest exit: $($p.ExitCode)" }
+            } catch { "selftest start error: $_" }
+          } *>&1 | Tee-Object -FilePath results\steps.txt -Append
       - name: Snapshot before installing
         shell: pwsh
         continue-on-error: true
         run: |
-          try { $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--snapshot-save','C:\snap.bin' -Wait -PassThru; "snapshot exit: $($p.ExitCode)" }
-          catch { "snapshot error: $_" } *>&1 | Tee-Object -FilePath results\steps.txt -Append
+          & { try { $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--snapshot-save','C:\snap.bin' -Wait -PassThru; "snapshot exit: $($p.ExitCode)" }
+              catch { "snapshot error: $_" } } *>&1 | Tee-Object -FilePath results\steps.txt -Append
       - name: Install real programs
         shell: pwsh
         continue-on-error: true
@@ -64,8 +77,9 @@ jobs:
         shell: pwsh
         continue-on-error: true
         run: |
-          try { $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--realtest','C:\snap.bin','Notepad++','VLC media player','PuTTY','KeePass','FileZilla','WinSCP' -Wait -PassThru; "realtest exit: $($p.ExitCode)" }
-          catch { "realtest error: $_" } *>&1 | Tee-Object -FilePath results\steps.txt -Append
+          & { try { $p = Start-Process -FilePath bin\extirpa-selftest.exe -ArgumentList '--realtest','C:\snap.bin','Notepad++','VLC media player','PuTTY','KeePass','FileZilla','WinSCP' -PassThru
+                    if (-not $p.WaitForExit(2400000)) { "REALTEST TRAVADO"; $p | Stop-Process -Force } else { "realtest exit: $($p.ExitCode)" } }
+              catch { "realtest error: $_" } } *>&1 | Tee-Object -FilePath results\steps.txt -Append
       - name: Collect results
         if: always()
         shell: pwsh
