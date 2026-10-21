@@ -10,6 +10,7 @@ Desinstalador completo para Windows (equivalente ao Revo Uninstaller, escrito do
 - Declarações do Windows: `src/win/win32.h` é escrito à mão. Depois de mexer nele, `python3 tools/check_win32.py --mingw <pasta mingw-w64-headers>` (a do código-fonte do mingw-w64, com `include/` e `crt/`) confere assinaturas, constantes, campos e GUIDs contra os cabeçalhos do mingw-w64. As `.lib` de importação são geradas pelo `build.py` a partir das funções declaradas no `win32.h`.
 - Ícones: `python3 tools/gerar_icones.py` (Pillow). Desenho-mestre: `assets/extirpa.svg`.
 - Release: `python3 scripts/package.py` → `dist/` (`extirpa.exe`, zip e `SHA256SUMS`).
+- Release do GitHub: workflow `.github/workflows/release.yml`. Commitar o texto em `docs/releases/vX.Y.Z.md` (sem ele, vale a seção `[X.Y.Z]` do `CHANGELOG.md`) e disparar com `gh api -X POST repos/MatheusRFC/extirpa/actions/workflows/release.yml/dispatches -f ref=main -f "inputs[publicar]=true"` (ou enviar a tag `vX.Y.Z`); sem `publicar` é ensaio, com os arquivos como artefato. A sessão do Claude não cria tag nem release direto (a API de releases e o push de tag dão 403); usa o disparo do workflow.
 
 ## Regras do projeto
 - Sem dependências externas e sem biblioteca C: só APIs do Windows, declaradas em `win32.h`. `src/win/rt.c` fornece `memset`/`memcpy`/`memmove`/`memcmp`.

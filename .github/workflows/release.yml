@@ -1,0 +1,79 @@
+# SPDX-License-Identifier: MIT
+#
+# Release do GitHub. Dispara com a tag vX.Y.Z ou à mão (Actions → Release → Run workflow; a sessão do
+# Claude usa a API de workflow_dispatch). Roda os testes e compila com tools/build.py all (via
+# scripts/package.py, que também confere a versão do platform.h contra o app.rc) e, com "publicar" (ou
+# pela tag), cria a tag e a release com extirpa.exe, o zip, o SHA256SUMS e o texto de
+# docs/releases/vX.Y.Z.md (ou da seção do CHANGELOG.md). Sem "publicar", é só um ensaio: os arquivos
+# ficam como artefato.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      publicar:
+        description: "Publicar a release (desmarcado: só ensaio, arquivos como artefato)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Versão e texto da release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLICAR: ${{ github.event_name == 'push' || inputs.publicar }}
+        run: |
+          set -euo pipefail
+          V=$(sed -n 's/.*EXTIRPA_VERSION u"\(.*\)"/\1/p' src/win/platform.h)
+          TAG="v$V"
+          echo "V=$V" >> "$GITHUB_ENV"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          echo "versão $V, publicar: $PUBLICAR"
+          if [ "$GITHUB_EVENT_NAME" = push ] && [ "$GITHUB_REF_NAME" != "$TAG" ]; then
+            echo "::error::a tag $GITHUB_REF_NAME não bate com a versão do projeto ($V)"; exit 1
+          fi
+          if [ "$PUBLICAR" = true ] && gh release view "$TAG" >/dev/null 2>&1; then
+            echo "::error::a release $TAG já existe"; exit 1
+          fi
+          grep -q "^## \[$V\]" CHANGELOG.md || { echo "::error::falta a seção [$V] no CHANGELOG.md"; exit 1; }
+          $(command -v python || command -v python3) tools/release_notes.py "$V"
+
+      - name: LLVM
+        run: sudo apt-get update -q && sudo apt-get install -y -q clang lld llvm
+
+      - name: Testes, compilação e pacotes
+        run: |
+          python3 scripts/package.py
+          ls -l dist
+          cat dist/SHA256SUMS
+
+      - name: Arquivos como artefato (ensaio)
+        if: github.event_name != 'push' && !inputs.publicar
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publicar a release
+        if: github.event_name == 'push' || inputs.publicar
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          $(command -v python || command -v python3) tools/release_notes.py "$V" --out "$RUNNER_TEMP/notes.md"
+          files=()
+          for f in dist/*; do [ -f "$f" ] && files+=("$f"); done
+          printf '%s\n' "${files[@]}"
+          gh release create "$TAG" "${files[@]}" --target "$GITHUB_SHA" --title "EXTIRPA $V" --notes-file "$RUNNER_TEMP/notes.md"
+          echo "::notice title=release::$(gh release view "$TAG" --json url --jq .url)"
