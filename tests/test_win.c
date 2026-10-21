@@ -961,6 +961,20 @@ static void test_two_versions(void) {
     xfree(key);
 }
 
+static WCHAR *rot13w(const WCHAR *s) {
+    WCHAR *r = wdup(s);
+    for (WCHAR *p = r; *p; p++) {
+        if (*p >= 'a' && *p <= 'z') *p = (WCHAR)('a' + (*p - 'a' + 13) % 26);
+        else if (*p >= 'A' && *p <= 'Z') *p = (WCHAR)('A' + (*p - 'A' + 13) % 26);
+    }
+    return r;
+}
+
+#define AUTOPLAY u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers"
+#define USERASSIST u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count"
+#define JUMPLIST u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Search\\JumplistData"
+#define FILEEXTS u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts"
+
 // Casos vistos com programas reais (teste no Windows do GitHub Actions)
 static void test_real_cases(void) {
     // FileZilla: a chave do programa tem o nome da chave de desinstalação ("FileZilla Client")
@@ -1026,6 +1040,87 @@ static void test_real_cases(void) {
     }
     programs_free(&v);
 
+    // VLC: a pasta de configuração tem o nome do executável, de 3 letras ("vlc")
+    base_system();
+    const WCHAR VL[] = u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\VLC media player";
+    fake_str(VL, u"DisplayName", u"VLC media player");
+    fake_str(VL, u"DisplayVersion", u"3.0.24");
+    fake_str(VL, u"Publisher", u"VideoLAN");
+    fake_str(VL, u"UninstallString", u"\"C:\\Program Files\\VideoLAN\\VLC\\uninstall.exe\"");
+    fake_str(VL, u"DisplayIcon", u"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe");
+    fake_file(u"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe", "MZ", 2);
+    fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\vlc\\vlc-qt-interface.ini", "x", 1);
+    fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\vlcsnap\\x.png", "x", 1);  // outro nome: não
+    // reprodução automática: um handler com ícone do VLC, outro que o desinstalador já apagou
+    // (sobrou só o nome no evento) e um da Microsoft no mesmo evento
+    fake_str(AUTOPLAY u"\\Handlers\\VLCPlayDVDMovieOnArrival", u"DefaultIcon", u"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe,0");
+    fake_str(AUTOPLAY u"\\Handlers\\MSPlayDVD", u"DefaultIcon", u"%SystemRoot%\\system32\\wmploc.dll,-25");
+    fake_str(AUTOPLAY u"\\EventHandlers\\PlayDVDMovieOnArrival", u"VLCPlayDVDMovieOnArrival", u"");
+    fake_str(AUTOPLAY u"\\EventHandlers\\PlayDVDMovieOnArrival", u"MSPlayDVD", u"");
+    fake_str(AUTOPLAY u"\\EventHandlers\\PlayBluRayOnArrival", u"VLCPlayBlurayOnArrival", u"");
+    // "Abrir com" do Explorer, rastros de uso (UserAssist em ROT13, Jump Lists)
+    fake_str(FILEEXTS u"\\.mp3\\OpenWithProgids", u"VLC.mp3", u"");
+    fake_str(FILEEXTS u"\\.mp3\\OpenWithProgids", u"WMP11.AssocFile.MP3", u"");
+    WCHAR *ua_vlc = rot13w(u"{6D809377-6AF0-444B-8957-A3773F02200E}\\VideoLAN\\VLC\\vlc.exe");
+    WCHAR *ua_np = rot13w(u"{F38BF404-1D43-42F2-9305-67DE0B28FC23}\\notepad.exe");
+    fake_dword(USERASSIST, ua_vlc, 1);
+    fake_dword(USERASSIST, ua_np, 1);
+    fake_str(JUMPLIST, u"{6D809377-6AF0-444B-8957-A3773F02200E}\\VideoLAN\\VLC\\vlc.exe", u"x");
+    fake_str(JUMPLIST, u"Microsoft.Windows.Explorer", u"x");
+    v = programs_load();
+    p = find_program(&v, u"VLC media player");
+    CHECK(p != NULL);
+    if (p) {
+        Identity *id = program_identity(p);
+        WCHAR *key = wdup(p->key_path);
+        // o desinstalador tira a entrada e a pasta; a do editor (VideoLAN) fica vazia
+        reg_delete_key(key);
+        DeleteFileW(u"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe");
+        RemoveDirectoryW(u"C:\\Program Files\\VideoLAN\\VLC");
+        LeftList l = {0};
+        scan_leftovers(&l, id, key, SCAN_MODERATE, NULL);
+        left_finalize(&l);
+        Leftover *d = find_item(&l, LK_DIR, u"C:\\Users\\ana\\AppData\\Roaming\\vlc", NULL);
+        CHECK(d && d->conf == CONF_HIGH && d->checked);
+        Leftover *o = find_item(&l, LK_DIR, u"C:\\Users\\ana\\AppData\\Roaming\\vlcsnap", NULL);
+        CHECK(!o || !o->checked);
+        Leftover *it = find_item(&l, LK_DIR_IF_EMPTY, u"C:\\Program Files\\VideoLAN", NULL);
+        CHECK(it && it->checked);
+        it = find_item(&l, LK_KEY, AUTOPLAY u"\\Handlers\\VLCPlayDVDMovieOnArrival", NULL);
+        CHECK(it && it->checked);
+        it = find_item(&l, LK_VALUE, AUTOPLAY u"\\EventHandlers\\PlayDVDMovieOnArrival", u"VLCPlayDVDMovieOnArrival");
+        CHECK(it && it->checked);
+        it = find_item(&l, LK_VALUE, AUTOPLAY u"\\EventHandlers\\PlayBluRayOnArrival", u"VLCPlayBlurayOnArrival");
+        CHECK(it && !it->checked);  // só pelo nome: desmarcado
+        if (it) it->checked = true;  // o usuário marca
+        it = find_item(&l, LK_VALUE, FILEEXTS u"\\.mp3\\OpenWithProgids", u"VLC.mp3");
+        CHECK(it && it->checked);
+        it = find_item(&l, LK_VALUE, USERASSIST, ua_vlc);
+        CHECK(it && it->checked);
+        it = find_item(&l, LK_VALUE, JUMPLIST, u"{6D809377-6AF0-444B-8957-A3773F02200E}\\VideoLAN\\VLC\\vlc.exe");
+        CHECK(it && it->checked);
+        CHECK(!any_path_contains(&l, u"MSPlayDVD") && !find_item(&l, LK_VALUE, FILEEXTS u"\\.mp3\\OpenWithProgids", u"WMP11.AssocFile.MP3"));
+        CHECK(!find_item(&l, LK_VALUE, USERASSIST, ua_np) && !find_item(&l, LK_VALUE, JUMPLIST, u"Microsoft.Windows.Explorer"));
+        if (g_fail) dump(&l);
+        DelResult r;
+        delete_leftovers(&l, u"VLC", NULL, &r);
+        CHECK(r.failed == 0);
+        CHECK(!fake_exists(u"C:\\Program Files\\VideoLAN") && !fake_exists(u"C:\\Users\\ana\\AppData\\Roaming\\vlc"));
+        CHECK(!fake_key_exists(AUTOPLAY u"\\Handlers\\VLCPlayDVDMovieOnArrival") && fake_key_exists(AUTOPLAY u"\\Handlers\\MSPlayDVD"));
+        CHECK(!fake_val_exists(AUTOPLAY u"\\EventHandlers\\PlayDVDMovieOnArrival", u"VLCPlayDVDMovieOnArrival"));
+        CHECK(fake_val_exists(AUTOPLAY u"\\EventHandlers\\PlayDVDMovieOnArrival", u"MSPlayDVD"));
+        CHECK(fake_key_exists(AUTOPLAY u"\\EventHandlers\\PlayBluRayOnArrival"));  // a chave do evento fica, mesmo vazia
+        CHECK(!fake_val_exists(FILEEXTS u"\\.mp3\\OpenWithProgids", u"VLC.mp3") && fake_val_exists(FILEEXTS u"\\.mp3\\OpenWithProgids", u"WMP11.AssocFile.MP3"));
+        CHECK(!fake_val_exists(USERASSIST, ua_vlc) && fake_val_exists(USERASSIST, ua_np));
+        CHECK(fake_val_exists(JUMPLIST, u"Microsoft.Windows.Explorer"));
+        del_result_free(&r);
+        left_free(&l);
+        identity_free(id);
+        xfree(key);
+    }
+    programs_free(&v);
+    xfree(ua_vlc), xfree(ua_np);
+
     // Notepad++: o atalho do Bloco de Notas do Windows ("Notepad.lnk", sem destino) não é dele
     base_system();
     const WCHAR NP[] = u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Notepad++";
@@ -1044,6 +1139,10 @@ static void test_real_cases(void) {
         fake_file(u"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Notepad.lnk", hdr, sizeof(hdr));
     }
     fake_file(u"C:\\Users\\ana\\AppData\\Roaming\\Notepad++\\config.xml", "x", 1);
+    // pacote esparso do menu de contexto do Windows 11, que o desinstalador do Notepad++ deixou
+    fake_str(APPX_PACKAGES_KEY u"\\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww", u"Path", u"C:\\Program Files\\Notepad++\\contextMenu");
+    fake_str(APPX_PACKAGES_KEY u"\\Microsoft.WindowsNotepad_11.2507.26.0_x64__8wekyb3d8bbwe", u"Path",
+             u"C:\\Program Files\\WindowsApps\\Microsoft.WindowsNotepad_11.2507.26.0_x64__8wekyb3d8bbwe");
     v = programs_load();
     p = find_program(&v, u"Notepad++ (64-bit x64)");
     CHECK(p != NULL);
@@ -1055,6 +1154,18 @@ static void test_real_cases(void) {
         scan_leftovers(&l, id, key, SCAN_MODERATE, NULL);
         left_finalize(&l);
         CHECK(!any_path_contains(&l, u"Notepad.lnk"));
+        CHECK(!any_path_contains(&l, u"WindowsNotepad"));
+        Leftover *pk = find_item(&l, LK_APPX, u"NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww", NULL);
+        CHECK(pk && pk->checked);
+        DelResult r;
+        delete_leftovers(&l, u"Notepad++", NULL, &r);
+        CHECK(r.failed == 0);
+        CHECK(!fake_key_exists(APPX_PACKAGES_KEY u"\\NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww"));
+        CHECK(fake_key_exists(APPX_PACKAGES_KEY u"\\Microsoft.WindowsNotepad_11.2507.26.0_x64__8wekyb3d8bbwe"));
+        bool ps_all = false;
+        for (size_t c = 0; c < fake_command_count(); c++) ps_all = ps_all || wifind(fake_command(c), u"powershell.exe");
+        CHECK(ps_all);
+        del_result_free(&r);
         Leftover *k = find_item(&l, LK_KEY, u"HKLM\\SOFTWARE\\WOW6432Node\\Notepad++", NULL);
         CHECK(k && k->checked);
         Leftover *d = find_item(&l, LK_DIR, u"C:\\Users\\ana\\AppData\\Roaming\\Notepad++", NULL);

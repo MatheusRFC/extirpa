@@ -31,6 +31,7 @@ static const WCHAR *kind_text(LeftKind k) {
     case LK_TASK: return T(S_KIND_TASK);
     case LK_FWRULE: return T(S_KIND_FWRULE);
     case LK_PATHENTRY: return T(S_KIND_PATHENTRY);
+    case LK_APPX: return T(S_KIND_APPX);
     }
     return u"";
 }
@@ -41,8 +42,9 @@ static const WCHAR *reason_text(LeftReason r) {
     static const StrId ids[] = {S_REASON_UNINSTALL_KEY, S_REASON_INSTALL_DIR, S_REASON_NAME,   S_REASON_PUBLISHER, S_REASON_PATH_REF,
                                 S_REASON_RUN,           S_REASON_APP_PATHS,   S_REASON_SHARED, S_REASON_SERVICE,   S_REASON_SHORTCUT,
                                 S_REASON_COM,           S_REASON_FILE_ASSOC,  S_REASON_TRACE,  S_REASON_USER,      S_REASON_TASK,
-                                S_REASON_FIREWALL,      S_REASON_PATH_VAR,    S_REASON_USAGE,  S_REASON_SHELL_EXT, S_REASON_REFERENCE};
-    _Static_assert(COUNT(ids) == LR_REFERENCE + 1, "um texto para cada LeftReason");
+                                S_REASON_FIREWALL,      S_REASON_PATH_VAR,    S_REASON_USAGE,  S_REASON_SHELL_EXT, S_REASON_REFERENCE,
+                                S_REASON_PACKAGE};
+    _Static_assert(COUNT(ids) == LR_PACKAGE + 1, "um texto para cada LeftReason");
     return (unsigned)r < COUNT(ids) ? T(ids[r]) : u"";
 }
 

@@ -886,6 +886,19 @@ int fake_run_capture(const WCHAR *cmdline, char **out, size_t *out_len) {
         }
         WCHAR *script = wdupn((const WCHAR *)bytes, nb / 2);
         xfree(bytes);
+        const WCHAR *ra = wifind(script, u"Remove-AppxPackage -Package '");
+        if (ra) {
+            // o pacote some do repositório de pacotes (e só ele: as chaves vizinhas ficam)
+            ra += wlen(u"Remove-AppxPackage -Package '");
+            const WCHAR *e = wfindc(ra, '\'');
+            WCHAR *name = e ? wdupn(ra, (size_t)(e - ra)) : NULL;
+            if (name) {
+                HKEY k;
+                if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, u"SOFTWARE\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\CurrentVersion\\AppModel\\PackageRepository\\Packages", 0, 0, &k) == 0)
+                    RegDeleteTreeW(k, name);
+                xfree(name);
+            }
+        }
         if (wifind(script, u"Remove-NetFirewallRule")) {
             const WCHAR *p = wifind(script, u"$ids=@(");
             for (p = p ? wfindc(p, '\'') : NULL; p;) {

@@ -14,6 +14,13 @@ static bool task_name_ok(const WCHAR *name) {
     return !wistarts(name, u"\\Microsoft\\") && !wieq(name, u"\\Microsoft");
 }
 
+bool left_appx_name_ok(const WCHAR *n) {
+    if (!n || wlen(n) < 3 || wlen(n) > 255) return false;
+    for (const WCHAR *p = n; *p; p++)
+        if (!((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p >= '0' && *p <= '9') || *p == '.' || *p == '_' || *p == '-' || *p == '~')) return false;
+    return !wistarts(n, u"Microsoft") && !wistarts(n, u"Windows.") && !wistarts(n, u"MicrosoftWindows");
+}
+
 static bool blocked(LeftKind kind, const WCHAR *path) {
     switch (kind) {
     case LK_KEY:
@@ -26,13 +33,14 @@ static bool blocked(LeftKind kind, const WCHAR *path) {
     case LK_TASK: return !task_name_ok(path);
     case LK_FWRULE: return !path[0];
     case LK_PATHENTRY: return !(path_eq(path, ENV_KEY_MACHINE) || path_eq(path, ENV_KEY_USER));
+    case LK_APPX: return !left_appx_name_ok(path);
     }
     return true;
 }
 
 Leftover *left_add(LeftList *l, LeftKind kind, const WCHAR *path, const WCHAR *value, int conf, LeftReason reason, const WCHAR *detail) {
     // nomes de serviço, tarefa e regra de firewall ficam como vieram; caminhos são normalizados
-    WCHAR *p = (kind == LK_SERVICE || kind == LK_TASK || kind == LK_FWRULE) ? wtrim_dup(path) : path_norm(path);
+    WCHAR *p = (kind == LK_SERVICE || kind == LK_TASK || kind == LK_FWRULE || kind == LK_APPX) ? wtrim_dup(path) : path_norm(path);
     if (blocked(kind, p) || (kind == LK_PATHENTRY && (!value || !value[0]))) {
         xfree(p);
         return NULL;
@@ -74,6 +82,7 @@ static int order_kind(LeftKind k) {
     case LK_FWRULE: return 0;
     case LK_PATHENTRY: return 0;
     case LK_SERVICE: return 0;
+    case LK_APPX: return 0;
     case LK_KEY: return 1;
     case LK_VALUE: return 1;
     case LK_KEY_IF_EMPTY: return 2;
@@ -157,6 +166,12 @@ void left_add_trace(LeftList *l, const Trace *t) {
         case TR_KEY:
             if (wistarts(it->path, SERVICES) && !wfindc(it->path + wlen(SERVICES), '\\')) {
                 left_add(l, LK_SERVICE, it->path + wlen(SERVICES), NULL, CONF_HIGH, LR_SERVICE, NULL);
+                continue;
+            }
+            // pacote do Windows registrado durante a instalação: sai pelo Remove-AppxPackage
+            if (wlen(it->path) > wlen(APPX_PACKAGES_KEY) + 1 && wistarts(it->path, APPX_PACKAGES_KEY) && it->path[wlen(APPX_PACKAGES_KEY)] == '\\' &&
+                !wfindc(it->path + wlen(APPX_PACKAGES_KEY) + 1, '\\')) {
+                left_add(l, LK_APPX, it->path + wlen(APPX_PACKAGES_KEY) + 1, NULL, CONF_HIGH, LR_PACKAGE, NULL);
                 continue;
             }
             if (reg_sensitive(it->path)) conf = CONF_LOW;

@@ -128,7 +128,7 @@ def build_exe(selftest=False):
 
 
 # Módulos da parte Windows testados contra o Registro e o disco simulados (tests/fakewin.c)
-WIN_TESTADOS = ["platform", "reg", "fsx", "programs", "scan", "startup", "monitor", "uninst", "i18n"]
+WIN_TESTADOS = ["platform", "reg", "fsx", "programs", "scan", "startup", "monitor", "uninst", "i18n", "appx"]
 
 
 def compilar_e_rodar(cc, nome, fontes, extra, env=None):

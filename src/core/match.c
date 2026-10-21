@@ -281,7 +281,9 @@ void identity_add_exe(Identity *id, const WCHAR *exe_path) {
     WCHAR *parent = path_parent(p);
     if (parent && !protect_dir_blocked(parent)) {
         WCHAR *base = path_strip_ext(path_leaf(p)), *nb = norm_alnum(base);
-        if (wlen(nb) >= 4 && !wistarts(nb, u"unins") && !wistarts(nb, u"setup")) identity_add_exact(id, base);
+        // nomes de 3 letras só quando o nome do programa começa com eles ("vlc" do VLC media player)
+        bool longo = wlen(nb) >= 4 || (wlen(nb) == 3 && wistarts(id->name_norm, nb));
+        if (longo && !wistarts(nb, u"unins") && !wistarts(nb, u"setup")) identity_add_exact(id, base);
         xfree(base), xfree(nb);
     }
     xfree(parent), xfree(p);

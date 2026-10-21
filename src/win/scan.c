@@ -14,6 +14,8 @@
 //    há dentro dela (menos o outro programa) entra item por item.
 #include "scan.h"
 
+#include "appx.h"
+
 #include "../core/lnk.h"
 #include "../core/pathx.h"
 #include "../core/protect.h"
@@ -41,6 +43,8 @@ typedef struct {
     PtrVec progids;     // WCHAR*: nomes de tipos de arquivo (ProgIDs) do programa
     PtrVec clsids;      // WCHAR*: componentes COM do programa ("{GUID}")
 } Scan;
+
+static bool name_is_ours(const Scan *sc, const WCHAR *name);
 
 static int threshold(ScanMode m) { return m == SCAN_SAFE ? CONF_HIGH : m == SCAN_MODERATE ? CONF_MEDIUM : CONF_LOW; }
 
@@ -403,6 +407,203 @@ static void scan_usage(Scan *sc) {
         strings_free(&names);
         RegCloseKey(k);
     }
+}
+
+// Caminho gravado com uma pasta conhecida na frente ("{7C5A40EF-...}\WinSCP\WinSCP.exe", como
+// fazem o UserAssist e as Jump Lists) com a pasta de verdade. Sem pasta conhecida, uma cópia.
+static WCHAR *expand_known_folder(const WCHAR *s) {
+    static const struct {
+        const WCHAR *guid;
+        int which;
+    } KF[] = {
+        {u"{6D809377-6AF0-444B-8957-A3773F02200E}", 0},  // FOLDERID_ProgramFilesX64
+        {u"{905E63B6-C1BF-494E-B29C-65B732D3D21A}", 0},  // FOLDERID_ProgramFiles
+        {u"{7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}", 1},  // FOLDERID_ProgramFilesX86
+        {u"{6365D5A7-0F0D-45E5-87F6-0DA56B6A4F7D}", 2},  // FOLDERID_ProgramFilesCommonX64
+        {u"{DE974D24-D9C6-4D3E-BF91-F4455120B917}", 3},  // FOLDERID_ProgramFilesCommonX86
+        {u"{F1B32785-6FBA-4FCF-9D55-7B8E7F157091}", 4},  // FOLDERID_LocalAppData
+        {u"{3EB685DB-65F9-4CF6-A03A-E3EF65729F3D}", 5},  // FOLDERID_RoamingAppData
+        {u"{62AB5D82-FDC1-4DC3-A9DD-070D1D495D97}", 6},  // FOLDERID_ProgramData
+        {u"{5CD7AEE2-2219-4A67-B85D-6C9CE15660CB}", 7},  // FOLDERID_UserProgramFiles
+    };
+    const Paths *p = &g_paths;
+    for (size_t i = 0; i < COUNT(KF); i++) {
+        size_t lg = wlen(KF[i].guid);
+        if (!wistarts(s, KF[i].guid) || (s[lg] != '\\' && s[lg] != 0)) continue;
+        WCHAR *base = NULL;
+        switch (KF[i].which) {
+        case 0: base = wdup(p->program_files); break;
+        case 1: base = wdup(p->program_files_x86); break;
+        case 2: base = wdup(p->common_files); break;
+        case 3: base = wdup(p->common_files_x86); break;
+        case 4: base = wdup(p->local_appdata); break;
+        case 5: base = wdup(p->appdata); break;
+        case 6: base = wdup(p->program_data); break;
+        case 7: base = p->local_appdata ? path_join(p->local_appdata, u"Programs") : NULL; break;
+        }
+        if (!base) return wdup(s);
+        WCHAR *r = s[lg] ? path_join(base, s + lg + 1) : wdup(base);
+        xfree(base);
+        return r;
+    }
+    return wdup(s);
+}
+
+static WCHAR *rot13(const WCHAR *s) {
+    WCHAR *r = wdup(s);
+    for (WCHAR *p = r; *p; p++) {
+        if (*p >= 'a' && *p <= 'z') *p = (WCHAR)('a' + (*p - 'a' + 13) % 26);
+        else if (*p >= 'A' && *p <= 'Z') *p = (WCHAR)('A' + (*p - 'A' + 13) % 26);
+    }
+    return r;
+}
+
+// Jump Lists da busca e UserAssist (contagem de programas abertos, nomes em ROT13): um valor
+// por programa, com o caminho do executável no nome.
+static void scan_usage_named(Scan *sc) {
+    static const WCHAR JUMP[] = u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Search\\JumplistData";
+    HKEY k = reg_open(JUMP, KEY_READ);
+    if (k) {
+        PtrVec names = reg_value_names(k);
+        for (size_t i = 0; i < names.n; i++) {
+            WCHAR *x = expand_known_folder(names.items[i]);
+            if (owns(sc, x)) left_add(sc->out, LK_VALUE, JUMP, names.items[i], CONF_HIGH, LR_USAGE, x);
+            xfree(x);
+        }
+        strings_free(&names);
+        RegCloseKey(k);
+    }
+    static const WCHAR UA[] = u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist";
+    HKEY ua = reg_open(UA, KEY_READ);
+    if (!ua) return;
+    PtrVec guids = reg_subkeys(ua);
+    for (size_t g = 0; g < guids.n; g++) {
+        WCHAR *sub = path_join(guids.items[g], u"Count"), *key = path_join(UA, sub);
+        HKEY c = reg_open_sub(ua, sub);
+        if (c) {
+            PtrVec names = reg_value_names(c);
+            for (size_t i = 0; i < names.n; i++) {
+                WCHAR *plain = rot13(names.items[i]), *x = expand_known_folder(plain);
+                if (owns(sc, x)) left_add(sc->out, LK_VALUE, key, names.items[i], CONF_HIGH, LR_USAGE, x);
+                xfree(plain), xfree(x);
+            }
+            strings_free(&names);
+            RegCloseKey(c);
+        }
+        xfree(sub), xfree(key);
+    }
+    strings_free(&guids);
+    RegCloseKey(ua);
+}
+
+// Reprodução automática (AutoPlay): Handlers\<nome> com ícone ou comando do programa, e as
+// entradas com esse nome nos eventos (EventHandlers\<evento>, um valor por handler).
+static void scan_autoplay(Scan *sc) {
+    static const WCHAR *const ROOTS[] = {u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers",
+                                         u"HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers",
+                                         u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers"};
+    PtrVec mine = {0};
+    for (size_t r = 0; r < COUNT(ROOTS); r++) {
+        WCHAR *hk = path_join(ROOTS[r], u"Handlers");
+        HKEY h = reg_open(hk, KEY_READ);
+        if (h) {
+            PtrVec subs = reg_subkeys(h);
+            for (size_t i = 0; i < subs.n; i++) {
+                HKEY k = reg_open_sub(h, subs.items[i]);
+                if (!k) continue;
+                PtrVec vals = reg_values(k);
+                const WCHAR *hit = NULL;
+                WCHAR *hit_text = NULL;
+                for (size_t j = 0; j < vals.n && !hit; j++) {
+                    RegValue *v = vals.items[j];
+                    WCHAR *t = regvalue_text(v);
+                    if (owns(sc, t)) hit = v->name, hit_text = t;
+                    else if (t && (wieq(v->name, u"InvokeProgID") || wieq(v->name, u"ProgID")) && vec_has_i(&sc->progids, t)) hit = v->name, hit_text = t;
+                    else xfree(t);
+                }
+                if (hit) {
+                    WCHAR *p = path_join(hk, subs.items[i]);
+                    left_add(sc->out, LK_KEY, p, NULL, CONF_HIGH, LR_SHELL_EXT, hit_text);
+                    remember(&mine, subs.items[i]);
+                    xfree(p);
+                }
+                xfree(hit_text);
+                reg_values_free(&vals);
+                RegCloseKey(k);
+            }
+            strings_free(&subs);
+            RegCloseKey(h);
+        }
+        xfree(hk);
+    }
+    // o nome do handler também pode ter ficado só nos eventos (o desinstalador apagou o handler)
+    for (size_t r = 0; r < COUNT(ROOTS); r++) {
+        WCHAR *ek = path_join(ROOTS[r], u"EventHandlers");
+        HKEY e = reg_open(ek, KEY_READ);
+        if (e) {
+            PtrVec events = reg_subkeys(e);
+            for (size_t i = 0; i < events.n; i++) {
+                HKEY k = reg_open_sub(e, events.items[i]);
+                if (!k) continue;
+                PtrVec names = reg_value_names(k);
+                WCHAR *key = path_join(ek, events.items[i]);
+                for (size_t j = 0; j < names.n; j++) {
+                    const WCHAR *n = names.items[j];
+                    if (vec_has_i(&mine, n)) {
+                        left_add(sc->out, LK_VALUE, key, n, CONF_HIGH, LR_REFERENCE, NULL);
+                    } else {
+                        // handler que não existe mais, com o nome começando pelo do programa
+                        // ("VLCPlayBlurayOnArrival" do VLC): desmarcado
+                        WCHAR *hp = path_join(ROOTS[r], u"Handlers"), *hpath = path_join(hp, n);
+                        WCHAR *nn = norm_alnum(n);
+                        bool prefix = false;
+                        for (size_t x = 0; x < sc->id->exact.n && !prefix; x++) {
+                            const WCHAR *ex = sc->id->exact.items[x];
+                            prefix = wlen(ex) >= 3 && wistarts(nn, ex) && wlen(nn) > wlen(ex);
+                        }
+                        if (prefix && !reg_exists(hpath)) left_add(sc->out, LK_VALUE, key, n, CONF_MEDIUM, LR_NAME, NULL);
+                        xfree(hp), xfree(hpath), xfree(nn);
+                    }
+                }
+                xfree(key);
+                strings_free(&names);
+                RegCloseKey(k);
+            }
+            strings_free(&events);
+            RegCloseKey(e);
+        }
+        xfree(ek);
+    }
+    strings_free(&mine);
+}
+
+// Pacotes do Windows registrados pelo programa. O caso típico é o pacote "esparso" que um
+// programa comum registra para aparecer no menu de contexto do Windows 11 (o Notepad++ faz
+// isso): o desinstalador às vezes não o remove, e as chaves dele ficam espalhadas por áreas do
+// Registro que só o próprio Windows deve mexer. Sai pelo Remove-AppxPackage.
+static void scan_appx(Scan *sc) {
+    HKEY root = reg_open(APPX_PACKAGES_KEY, KEY_READ);
+    if (!root) return;
+    PtrVec subs = reg_subkeys(root);
+    for (size_t i = 0; i < subs.n; i++) {
+        const WCHAR *full = subs.items[i];
+        if (!left_appx_name_ok(full)) continue;
+        const WCHAR *us = wfindc(full, '_');
+        WCHAR *name = us ? wdupn(full, (size_t)(us - full)) : wdup(full);
+        HKEY k = reg_open_sub(root, full);
+        WCHAR *path = k ? value_text(k, u"Path") : NULL;
+        if (k) RegCloseKey(k);
+        int conf = CONF_NONE;
+        if (owns(sc, path)) conf = CONF_HIGH;
+        else if (name_is_ours(sc, name) && !foreign(sc, path)) {
+            // só pelo nome: marcado se a pasta do pacote já não existe (registro órfão)
+            conf = (!path || !path[0] || !dir_exists(path)) ? CONF_HIGH : CONF_MEDIUM;
+        }
+        if (conf) left_add(sc->out, LK_APPX, full, NULL, conf, LR_PACKAGE, path);
+        xfree(name), xfree(path);
+    }
+    strings_free(&subs);
+    RegCloseKey(root);
 }
 
 // Pastas do programa na variável PATH (do sistema e do usuário).
@@ -778,6 +979,52 @@ static void scan_progid_refs(Scan *sc) {
     }
 }
 
+// Nome exato deste programa e de nenhum outro instalado (regra 2 aplicada na hora).
+static bool name_is_ours(const Scan *sc, const WCHAR *name) {
+    if (match_name(sc->id, name) != CONF_HIGH) return false;
+    for (size_t j = 0; j < sc->others.n; j++)
+        if (match_name(sc->others.items[j], name) == CONF_HIGH) return false;
+    return true;
+}
+
+// ProgID do programa pelo nome: "VLC.mp3" é do VLC (o começo, antes do ponto, é um nome exato).
+static bool progid_named(const Scan *sc, const WCHAR *progid) {
+    const WCHAR *dot = wfindc(progid, '.');
+    if (!dot || dot == progid) return false;
+    WCHAR *head = wdupn(progid, (size_t)(dot - progid));
+    bool r = name_is_ours(sc, head);
+    xfree(head);
+    return r;
+}
+
+// "Abrir com" do Explorer (FileExts\.ext\OpenWithProgids): os tipos de arquivo do programa,
+// que ficam oferecidos mesmo depois que o ProgID sumiu.
+static void scan_fileexts(Scan *sc) {
+    static const WCHAR FE[] = u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts";
+    HKEY root = reg_open(FE, KEY_READ);
+    if (!root) return;
+    PtrVec exts = reg_subkeys(root);
+    for (size_t i = 0; i < exts.n && !ctl_cancelled(sc->ctl); i++) {
+        WCHAR *sub = path_join(exts.items[i], u"OpenWithProgids");
+        HKEY k = reg_open_sub(root, sub);
+        if (k) {
+            PtrVec names = reg_value_names(k);
+            WCHAR *key = path_join(FE, sub);
+            for (size_t j = 0; j < names.n; j++) {
+                const WCHAR *n = names.items[j];
+                if (vec_has_i(&sc->progids, n)) left_add(sc->out, LK_VALUE, key, n, CONF_HIGH, LR_REFERENCE, NULL);
+                else if (progid_named(sc, n)) left_add(sc->out, LK_VALUE, key, n, CONF_HIGH, LR_FILE_ASSOC, NULL);
+            }
+            xfree(key);
+            strings_free(&names);
+            RegCloseKey(k);
+        }
+        xfree(sub);
+    }
+    strings_free(&exts);
+    RegCloseKey(root);
+}
+
 // Software\Clients\<tipo>\<nome> (navegadores, clientes de e-mail, players registrados).
 static void scan_clients(Scan *sc) {
     static const WCHAR *const ROOTS[] = {u"HKLM\\SOFTWARE\\Clients", u"HKLM\\SOFTWARE\\WOW6432Node\\Clients", u"HKCU\\Software\\Clients"};
@@ -1048,6 +1295,14 @@ static void scan_files(Scan *sc) {
         if (dir_exists(id->dirs.items[i])) left_add(sc->out, LK_DIR, id->dirs.items[i], NULL, CONF_HIGH, LR_INSTALL_DIR, NULL);
 
     WCHAR *local_programs = p->local_appdata ? path_join(p->local_appdata, u"Programs") : NULL;
+    // pasta do editor que continha a de instalação ("C:\Program Files\VideoLAN\VLC"): sai se ficar vazia
+    const WCHAR *proots[] = {p->program_files, p->program_files_x86, local_programs};
+    for (size_t i = 0; i < id->dirs.n; i++) {
+        WCHAR *parent = path_parent(id->dirs.items[i]), *gp = parent ? path_parent(parent) : NULL;
+        for (size_t r = 0; gp && r < COUNT(proots); r++)
+            if (proots[r] && path_eq(gp, proots[r]) && dir_exists(parent)) left_add(sc->out, LK_DIR_IF_EMPTY, parent, NULL, CONF_HIGH, LR_PUBLISHER, NULL);
+        xfree(parent), xfree(gp);
+    }
     const WCHAR *roots[] = {p->program_files, p->program_files_x86, p->common_files, p->common_files_x86, p->program_data,
                             p->appdata,       p->local_appdata,     p->locallow,     local_programs};
     for (size_t i = 0; i < COUNT(roots); i++) scan_dir_names(sc, roots[i], false);
@@ -1293,6 +1548,7 @@ void scan_leftovers(LeftList *out, const Identity *id, const WCHAR *uninstall_ke
         scan_shared_dlls(&sc);
         scan_services(&sc);
         scan_usage(&sc);
+        scan_usage_named(&sc);
         scan_path_var(&sc);
         scan_firewall(&sc);
         scan_shortcuts(&sc);
@@ -1301,7 +1557,10 @@ void scan_leftovers(LeftList *out, const Identity *id, const WCHAR *uninstall_ke
         scan_shell_verbs(&sc);
         scan_clsid_refs(&sc);
         scan_progid_refs(&sc);
+        scan_fileexts(&sc);
+        scan_autoplay(&sc);
         scan_clients(&sc);
+        scan_appx(&sc);
         ctl_progress(ctl, T(S_SCAN_TASKS));
         scan_tasks(&sc);
     }
@@ -1551,14 +1810,35 @@ static bool still_blocked(const Leftover *it) {
     case LK_TASK: return it->path[0] != '\\' || wistarts(it->path, u"\\Microsoft\\") || wfindc(it->path, '"');
     case LK_FWRULE: return !it->path[0];
     case LK_PATHENTRY: return !(path_eq(it->path, ENV_KEY_MACHINE) || path_eq(it->path, ENV_KEY_USER));
+    case LK_APPX: return !left_appx_name_ok(it->path);
     }
     return true;
+}
+
+static bool appx_registered(const WCHAR *full_name) {
+    WCHAR *k = path_join(APPX_PACKAGES_KEY, full_name);
+    bool r = reg_exists(k);
+    xfree(k);
+    return r;
+}
+
+// Remove-AppxPackage para todos os usuários; se o Windows recusar, só para o usuário atual.
+static DWORD delete_appx(const WCHAR *full_name) {
+    WCHAR *err = appx_remove(full_name, true);
+    if (err && appx_registered(full_name)) {
+        log_fmt(u"  Remove-AppxPackage -AllUsers: %s", err);
+        xfree(err);
+        err = appx_remove(full_name, false);
+    }
+    if (err) log_fmt(u"  Remove-AppxPackage: %s", err);
+    xfree(err);
+    return appx_registered(full_name) ? ERROR_ACCESS_DENIED : ERROR_SUCCESS;
 }
 
 void delete_leftovers(LeftList *l, const WCHAR *label, Ctl *ctl, DelResult *res) {
     mem_set(res, 0, sizeof(*res));
     log_fmt(u"Exclusão de sobras: \"%s\"", label);
-    PtrVec services = {0}, values = {0}, keys = {0}, keys_if_empty = {0}, files = {0}, dirs_if_empty = {0}, tasks = {0}, fw = {0}, pathent = {0};
+    PtrVec services = {0}, values = {0}, keys = {0}, keys_if_empty = {0}, files = {0}, dirs_if_empty = {0}, tasks = {0}, fw = {0}, pathent = {0}, appx = {0};
     for (size_t i = 0; i < l->items.n; i++) {
         Leftover *it = l->items.items[i];
         if (!it->checked || it->status == LS_DELETED) continue;
@@ -1577,6 +1857,7 @@ void delete_leftovers(LeftList *l, const WCHAR *label, Ctl *ctl, DelResult *res)
         case LK_TASK: pv_push(&tasks, it); break;
         case LK_FWRULE: pv_push(&fw, it); break;
         case LK_PATHENTRY: pv_push(&pathent, it); break;
+        case LK_APPX: pv_push(&appx, it); break;
         }
     }
     WCHAR *stampf = now_text(true);
@@ -1624,8 +1905,10 @@ void delete_leftovers(LeftList *l, const WCHAR *label, Ctl *ctl, DelResult *res)
         sb_free(&b);
     }
 
-    // 2. tarefas agendadas e serviços (pelo Windows: para e remove)
-    if (tasks.n + services.n) ctl_progress(ctl, T(S_DEL_SERVICES));
+    // 2. pacotes do Windows, tarefas agendadas e serviços (pelo próprio Windows). Pacote não tem
+    // backup: o Windows só o registra de novo pelo instalador do programa.
+    if (appx.n + tasks.n + services.n) ctl_progress(ctl, T(S_DEL_SERVICES));
+    for (size_t i = 0; i < appx.n; i++) finish(appx.items[i], delete_appx(((Leftover *)appx.items[i])->path), res, u"pacote do Windows");
     for (size_t i = 0; i < tasks.n; i++) finish(tasks.items[i], delete_task(((Leftover *)tasks.items[i])->path, stampf), res, u"tarefa");
     for (size_t i = 0; i < services.n; i++) finish(services.items[i], delete_service(((Leftover *)services.items[i])->path), res, u"serviço");
 
@@ -1705,7 +1988,7 @@ void delete_leftovers(LeftList *l, const WCHAR *label, Ctl *ctl, DelResult *res)
     log_fmt(u"Exclusão de sobras: %d apagados, %d falharam, %d mantidos", res->deleted, res->failed, res->kept);
     xfree(stampf);
     pv_free(&services), pv_free(&values), pv_free(&keys), pv_free(&keys_if_empty), pv_free(&files), pv_free(&dirs_if_empty);
-    pv_free(&tasks), pv_free(&fw), pv_free(&pathent);
+    pv_free(&tasks), pv_free(&fw), pv_free(&pathent), pv_free(&appx);
 }
 
 void del_result_free(DelResult *r) {

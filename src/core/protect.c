@@ -32,6 +32,11 @@ static const char *const KEYS[] = {
     "%S\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run",
     "%S\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run32",
     "%S\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\StartupFolder",
+    "%S\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers",
+    "%S\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers\\Handlers",
+    "%S\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers\\EventHandlers",
+    "%S\\Microsoft\\Windows\\CurrentVersion\\Search",
+    "%S\\Microsoft\\Windows\\CurrentVersion\\Search\\JumplistData",
     "%S\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions",
     "%S\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
     "%S\\Microsoft\\Active Setup",
@@ -103,6 +108,7 @@ static const char *const KEY_TREES[] = {
     "%S\\Microsoft\\Windows\\CurrentVersion\\SideBySide",
     "%S\\Microsoft\\Windows\\CurrentVersion\\Appx",
     "%S\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts",
+    "%S\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist",
     "%S\\Microsoft\\Installer",
     "%C\\Installer",
     "%C\\Local Settings",
@@ -177,6 +183,12 @@ bool protect_key_blocked(const WCHAR *key) {
     bool blocked = !wfindc(k, '\\');  // uma raiz sozinha
     for (size_t i = 0; !blocked && i < COUNT(KEYS); i++) blocked = each_expansion(KEYS[i], eq_or_ancestor, k);
     for (size_t i = 0; !blocked && i < COUNT(KEY_TREES); i++) blocked = each_expansion(KEY_TREES[i], in_tree, k);
+    // eventos do AutoPlay (EventHandlers\\<evento>): são do Windows; só os valores saem
+    for (size_t i = 0; !blocked && i < COUNT(SOFTWARE_ROOTS); i++) {
+        WCHAR *a = w_from_ascii(SOFTWARE_ROOTS[i]), *ev = wcat(a, u"\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers\\EventHandlers");
+        blocked = path_is_under(k, ev);
+        xfree(a), xfree(ev);
+    }
     // extensões de arquivo diretamente sob uma raiz de classes (".txt", ".pdf"...)
     if (!blocked && path_leaf(k)[0] == '.') {
         WCHAR *parent = path_parent(k);
@@ -191,6 +203,20 @@ bool protect_key_blocked(const WCHAR *key) {
     return blocked;
 }
 
+// k está exatamente um nível abaixo de base e a folha dele é leaf (leaf NULL: qualquer)?
+static bool child_of(const WCHAR *k, const char *base_ascii, const WCHAR *leaf, size_t levels) {
+    WCHAR *base = w_from_ascii(base_ascii);
+    bool r = false;
+    size_t lb = wlen(base);
+    if (wlen(k) > lb + 1 && wistarts(k, base) && k[lb] == '\\') {
+        size_t seps = 0;
+        for (const WCHAR *p = k + lb + 1; *p; p++) seps += *p == '\\';
+        r = seps + 1 == levels && (!leaf || wieq(path_leaf(k), leaf));
+    }
+    xfree(base);
+    return r;
+}
+
 bool protect_usage_key(const WCHAR *key) {
     for (size_t i = 0; i < COUNT(USAGE_VALUE_KEYS); i++) {
         WCHAR *u = w_from_ascii(USAGE_VALUE_KEYS[i]);
@@ -198,7 +224,10 @@ bool protect_usage_key(const WCHAR *key) {
         xfree(u);
         if (eq) return true;
     }
-    return false;
+    // UserAssist\{GUID}\Count (programas abertos, com o nome em ROT13) e
+    // FileExts\.ext\OpenWithProgids (tipos de arquivo oferecidos em "Abrir com")
+    return child_of(key, "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist", u"Count", 2) ||
+           child_of(key, "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts", u"OpenWithProgids", 2);
 }
 
 bool protect_value_blocked(const WCHAR *key) {

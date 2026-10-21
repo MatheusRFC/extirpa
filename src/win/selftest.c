@@ -137,7 +137,9 @@ static void pump_for(DWORD ms) {
 static void dump_left(LeftList *l, size_t limit) {
     for (size_t i = 0; i < l->items.n && i < limit; i++) {
         Leftover *it = l->items.items[i];
-        static const WCHAR *const kinds[] = {u"chave", u"valor", u"chave-se-vazia", u"pasta", u"arquivo", u"pasta-se-vazia", u"serviço"};
+        static const WCHAR *const kinds[] = {u"chave", u"valor", u"chave-se-vazia", u"pasta", u"arquivo", u"pasta-se-vazia",
+                                             u"serviço", u"tarefa", u"firewall", u"PATH", u"pacote"};
+        _Static_assert(COUNT(kinds) == LK_APPX + 1, "um nome para cada LeftKind");
         linef(wfmt(u"    [%s conf=%d %s] %s%s%s", kinds[it->kind], it->conf, it->checked ? u"x" : u" ", it->path, it->value ? u" -> " : u"",
                    it->value ? it->value : u""));
     }
@@ -674,6 +676,24 @@ static int realtest(int argc, WCHAR **argv) {
                 linef(wfmt(u"    falhou: %s %s: %s", it->path, it->value ? it->value : u"", e));
                 xfree(e);
                 problems++;
+                if (it->kind == LK_DIR && dir_exists(it->path)) {
+                    // o que ficou na pasta e quem está usando
+                    PtrVec one = {0};
+                    pv_push(&one, it->path);
+                    PtrVec procs = processes_under(&one);
+                    for (size_t j = 0; j < procs.n; j++)
+                        linef(wfmt(u"      processo: %s (PID %u)", ((ProcInfo *)procs.items[j])->exe, (unsigned)((ProcInfo *)procs.items[j])->pid));
+                    processes_free(&procs);
+                    pv_free(&one);
+                    PtrVec files = fs_list(it->path);
+                    for (size_t j = 0; j < files.n && j < 20; j++) {
+                        DirEntry *f = files.items[j];
+                        DWORD attr = GetFileAttributesW(it->path);
+                        (void)attr;
+                        linef(wfmt(u"      contém: %s%s", f->name, f->is_dir ? u"\\" : u""));
+                    }
+                    fs_list_free(&files);
+                }
             }
         }
         del_result_free(&r);
@@ -683,12 +703,17 @@ static int realtest(int argc, WCHAR **argv) {
     }
 
     section(u"O que a instalação criou e ainda existe (segunda foto)");
+    size_t choco = 0;
     s.out = trace_new();
     monitor_snapshot(&s, true, NULL);
     size_t mine = 0, other = 0;
     for (size_t i = 0; i < s.out->items.n; i++) {
         TraceItem *it = s.out->items.items[i];
         const Tested *owner = NULL;
+        if (wifind(it->path, u"chocolatey")) {  // do gerenciador de pacotes que instalou os programas do teste
+            choco++;
+            continue;
+        }
         WCHAR *full = it->value ? wcat3(it->path, u" -> ", it->value) : wdup(it->path);
         for (size_t k = 0; k < tested.n && !owner; k++)
             if (belongs(tested.items[k], full)) owner = tested.items[k];
@@ -699,13 +724,38 @@ static int realtest(int argc, WCHAR **argv) {
             linef(wfmt(u"  outro  %c %s", (WCHAR)it->kind, full));
             other++;
         }
+        // tipos de arquivo e protocolos que ficaram: mostra o conteúdo, para saber de quem são
+        if (it->kind == TR_KEY && wifind(it->path, u"\\Classes\\") && !wifind(it->path, u"Local Settings") && !wifind(it->path, u"PackagedCom")) {
+            HKEY k = reg_open(it->path, KEY_READ);
+            if (k) {
+                PtrVec vals = reg_values(k);
+                for (size_t j = 0; j < vals.n && j < 8; j++) {
+                    RegValue *v = vals.items[j];
+                    WCHAR *t = (v->type == REG_SZ || v->type == REG_EXPAND_SZ) ? wdupn((const WCHAR *)v->data, v->size / 2) : wdup(u"(binário)");
+                    linef(wfmt(u"         %s = %s", v->name[0] ? v->name : u"(padrão)", t));
+                    xfree(t);
+                }
+                reg_values_free(&vals);
+                PtrVec subs = reg_subkeys(k);
+                for (size_t j = 0; j < subs.n && j < 8; j++) linef(wfmt(u"         [%s]", subs.items[j]));
+                strings_free(&subs);
+                HKEY c = reg_open_sub(k, u"shell\\open\\command");
+                if (c) {
+                    WCHAR *cmd = reg_get_str(c, u"");
+                    linef(wfmt(u"         shell\\open\\command = %s", cmd ? cmd : u"-"));
+                    xfree(cmd);
+                    RegCloseKey(c);
+                }
+                RegCloseKey(k);
+            }
+        }
         xfree(full);
     }
     WCHAR *pm = env_path(u"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment"), *pu = env_path(u"HKCU\\Environment");
     path_diff(pm_before, pm, u"sistema");
     path_diff(pu_before, pu, u"usuário");
-    linef(wfmt(u"\r\nresultado: %u itens dos programas testados ficaram, %u itens novos de outros (ruído do Windows, Chocolatey...), %d problemas",
-               (unsigned)mine, (unsigned)s.out->items.n - (unsigned)mine, problems));
+    linef(wfmt(u"\r\nresultado: %u itens dos programas testados ficaram, %u itens novos de outros (ruído do Windows), %u do Chocolatey, %d problemas",
+               (unsigned)mine, (unsigned)(s.out->items.n - mine - choco), (unsigned)choco, problems));
     flush();
     xfree(pm), xfree(pu), xfree(pm_before), xfree(pu_before);
     hs_free(&s.before);
