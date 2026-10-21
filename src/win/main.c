@@ -15,7 +15,8 @@ static int run(void) {
     i18n_init();
     ui_init();
 #ifdef EXTIRPA_SELFTEST
-    if (wifind(GetCommandLineW(), u"--selftest")) return selftest_run();
+    if (wifind(GetCommandLineW(), u"--selftest") || wifind(GetCommandLineW(), u"--snapshot-save") || wifind(GetCommandLineW(), u"--realtest"))
+        return selftest_run();
 #endif
 
     // Uma cópia só: duas desinstalações ao mesmo tempo se atrapalhariam.

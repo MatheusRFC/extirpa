@@ -26,6 +26,28 @@ static WCHAR *fix_exe(const WCHAR *cmdline) {
     return r;
 }
 
+static bool has_bytes(const uint8_t *d, size_t n, const char *needle) {
+    size_t m = 0;
+    while (needle[m]) m++;
+    for (size_t i = 0; m && i + m <= n; i++)
+        if (d[i] == (uint8_t)needle[0] && mem_cmp(d + i, needle, m) == 0) return true;
+    return false;
+}
+
+// Parâmetros silenciosos pelo tipo do desinstalador, olhando o próprio executável: o NSIS
+// grava "Nullsoft.NSIS" no manifesto; o Inno Setup, "Inno Setup". NULL se não reconhecer.
+static const WCHAR *silent_args_for(const WCHAR *exe) {
+    if (file_size(exe) > 64u * 1024 * 1024) return NULL;
+    uint8_t *d;
+    size_t n;
+    if (!file_read_all(exe, &d, &n)) return NULL;
+    const WCHAR *r = NULL;
+    if (has_bytes(d, n, "Nullsoft.NSIS") || has_bytes(d, n, "Nullsoft Install System")) r = u"/S";
+    else if (has_bytes(d, n, "Inno Setup")) r = u"/VERYSILENT /SUPPRESSMSGBOXES /NORESTART";
+    xfree(d);
+    return r;
+}
+
 WCHAR *uninstall_command(const Program *p, bool quiet, bool *is_quiet) {
     if (is_quiet) *is_quiet = false;
     WCHAR *un = p->uninstall ? expand_env(p->uninstall) : NULL;
@@ -37,6 +59,18 @@ WCHAR *uninstall_command(const Program *p, bool quiet, bool *is_quiet) {
             r = fix_exe(q);
             xfree(q);
             if (is_quiet) *is_quiet = true;
+        } else {
+            Cmd c;
+            if (cmd_split(un, &c)) {
+                const WCHAR *args = silent_args_for(c.exe);
+                if (args && !wifind(c.args, args)) {
+                    WCHAR *a = c.args[0] ? wcat3(c.args, u" ", args) : wdup(args);
+                    r = cmd_join(c.exe, a);
+                    xfree(a);
+                    if (is_quiet) *is_quiet = true;
+                }
+            }
+            cmd_free(&c);
         }
     }
     if (!r && un) {

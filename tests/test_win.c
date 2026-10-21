@@ -256,9 +256,18 @@ static void test_programs_load(void) {
     c = uninstall_command(code, true, &q);
     CHECK_WEQ(c, u"\"C:\\Users\\ana\\AppData\\Local\\Programs\\Microsoft VS Code\\unins000.exe\" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART");
     xfree(c);
-    c = uninstall_command(ff, true, &q);  // sem variante silenciosa conhecida: o normal
+    c = uninstall_command(ff, true, &q);  // desinstalador desconhecido: o normal
     CHECK_WEQ(c, u"\"C:\\Program Files\\Mozilla Firefox\\uninstall\\helper.exe\"");
     CHECK(!q);
+    xfree(c);
+    // NSIS reconhecido pelo próprio executável: /S
+    fake_file(u"C:\\Program Files\\Mozilla Firefox\\uninstall\\helper.exe", "MZ....<assemblyIdentity name=\"Nullsoft.NSIS.exehead\"", 44);
+    c = uninstall_command(ff, true, &q);
+    CHECK_WEQ(c, u"\"C:\\Program Files\\Mozilla Firefox\\uninstall\\helper.exe\" /S");
+    CHECK(q);
+    xfree(c);
+    c = uninstall_command(ff, false, &q);  // desinstalação normal: nunca silenciosa
+    CHECK_WEQ(c, u"\"C:\\Program Files\\Mozilla Firefox\\uninstall\\helper.exe\"");
     xfree(c);
 
     // identidade: pasta de instalação e o executável do ícone

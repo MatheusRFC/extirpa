@@ -1,0 +1,40 @@
+# SPDX-License-Identifier: MIT
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: LLVM
+        run: sudo apt-get update && sudo apt-get install -y clang lld llvm
+      - name: Tests and build
+        run: python3 tools/build.py all
+      - uses: actions/upload-artifact@v4
+        with:
+          name: extirpa-windows
+          path: |
+            build/extirpa.exe
+            build/extirpa-selftest.exe
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tests and build
+        run: python tools/build.py all
+      - name: Self-test on Windows
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath build\extirpa-selftest.exe -ArgumentList '--selftest' -Wait -PassThru
+          Get-Content "$env:LOCALAPPDATA\EXTIRPA\selftest\report.txt"
+          exit $p.ExitCode
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: selftest-report
+          path: ~\AppData\Local\EXTIRPA\selftest

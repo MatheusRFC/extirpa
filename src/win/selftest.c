@@ -34,6 +34,7 @@
 #include "ui.h"
 #include "uninst.h"
 #include "appx.h"
+#include "../core/trace.h"
 
 static StrBuf g_rep;
 static WCHAR *g_dir;
@@ -496,9 +497,241 @@ static void test_ui(PtrVec *progs) {
     check(true, u"todas as janelas abriram e fecharam");
 }
 
+// ---------------------------------------------------------------- teste com programas reais
+//
+//   extirpa-selftest.exe --snapshot-save <arquivo>
+//       foto do sistema (antes de instalar os programas de teste)
+//   extirpa-selftest.exe --realtest <arquivo> <nome1> [<nome2> ...]
+//       para cada programa (parte do nome em "Aplicativos instalados"): desinstalação rápida
+//       pelo EXTIRPA, busca de sobras no modo moderado e exclusão dos itens marcados, como o
+//       usuário faria clicando em "Excluir marcados". Depois tira a segunda foto e lista tudo o
+//       que a instalação criou e ainda existe: o que o EXTIRPA deixou para trás.
+
+static WCHAR *env_path(const WCHAR *key) {
+    HKEY k = reg_open(key, KEY_READ);
+    if (!k) return wdup(u"");
+    WCHAR *p = reg_get_str(k, u"Path");
+    RegCloseKey(k);
+    return p ? p : wdup(u"");
+}
+
+static int snapshot_save(const WCHAR *file) {
+    Snapshot s;
+    mem_set(&s, 0, sizeof(s));
+    ULONGLONG t0 = GetTickCount64();
+    monitor_snapshot(&s, false, NULL);
+    StrBuf b = {0};
+    WCHAR *pm = env_path(u"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment"), *pu = env_path(u"HKCU\\Environment");
+    // arquivo: n (64 bits), os hashes, e os dois PATH em UTF-16 terminados em zero
+    size_t bytes = 8 + s.before.n * 8 + (wlen(pm) + 1 + wlen(pu) + 1) * 2;
+    uint8_t *d = xalloc(bytes), *o = d;
+    uint64_t n = s.before.n;
+    mem_copy(o, &n, 8), o += 8;
+    for (size_t i = 0; i < s.before.cap; i++)
+        if (s.before.slots[i]) mem_copy(o, &s.before.slots[i], 8), o += 8;
+    mem_copy(o, pm, (wlen(pm) + 1) * 2), o += (wlen(pm) + 1) * 2;
+    mem_copy(o, pu, (wlen(pu) + 1) * 2);
+    bool ok = file_write_all(file, d, bytes);
+    xfree(d), xfree(pm), xfree(pu);
+    hs_free(&s.before);
+    sb_free(&b);
+    WCHAR *rep = path_join(g_dir, u"snapshot.txt");
+    WCHAR *t = wfmt(u"foto: %U entradas, %U ms, gravada: %s\r\n", n, (uint64_t)(GetTickCount64() - t0), ok ? u"sim" : u"NÃO");
+    size_t len;
+    char *u8 = w_to_utf8(t, wlen(t), &len);
+    file_write_all(rep, u8, len);
+    xfree(u8), xfree(t), xfree(rep);
+    return ok ? 0 : 1;
+}
+
+typedef struct {
+    WCHAR *name;
+    Identity *id;
+} Tested;
+
+static bool belongs(const Tested *t, const WCHAR *path) {
+    if (match_path_ref(t->id, path)) return true;
+    // algum pedaço do caminho tem o nome do programa
+    for (const WCHAR *p = path; *p;) {
+        const WCHAR *e = p;
+        while (*e && *e != '\\') e++;
+        WCHAR *part = wdupn(p, (size_t)(e - p));
+        int c = match_name(t->id, part);
+        xfree(part);
+        if (c >= CONF_MEDIUM) return true;
+        p = *e ? e + 1 : e;
+    }
+    return false;
+}
+
+static void path_diff(const WCHAR *before, const WCHAR *after, const WCHAR *label) {
+    for (const WCHAR *p = after; *p;) {
+        const WCHAR *e = wfindc(p, ';');
+        if (!e) e = p + wlen(p);
+        WCHAR *entry = wdupn(p, (size_t)(e - p));
+        if (entry[0]) {
+            bool was = false;
+            for (const WCHAR *q = before; *q && !was;) {
+                const WCHAR *f = wfindc(q, ';');
+                if (!f) f = q + wlen(q);
+                was = (size_t)(f - q) == wlen(entry) && wieqn(q, entry, wlen(entry));
+                q = *f ? f + 1 : f;
+            }
+            if (!was) linef(wfmt(u"  PATH (%s) ganhou: %s", label, entry));
+        }
+        xfree(entry);
+        p = *e ? e + 1 : e;
+    }
+}
+
+static DWORD WINAPI watchdog(LPVOID ev) {
+    Sleep(8 * 60 * 1000);  // 8 min por desinstalador: depois disso segue sem esperar
+    SetEvent(ev);
+    return 0;
+}
+
+static int realtest(int argc, WCHAR **argv) {
+    const WCHAR *snapfile = argv[2];
+    uint8_t *d;
+    size_t len;
+    if (!file_read_all(snapfile, &d, &len) || len < 8) {
+        line(u"foto não encontrada");
+        flush();
+        return 100;
+    }
+    Snapshot s;
+    mem_set(&s, 0, sizeof(s));
+    uint64_t n;
+    mem_copy(&n, d, 8);
+    const uint8_t *o = d + 8;
+    for (uint64_t i = 0; i < n && o + 8 <= d + len; i++, o += 8) {
+        uint64_t h;
+        mem_copy(&h, o, 8);
+        hs_add(&s.before, h);
+    }
+    WCHAR *pm_before = wdup((const WCHAR *)o), *pu_before = wdup((const WCHAR *)o + wlen((const WCHAR *)o) + 1);
+    xfree(d);
+
+    PtrVec tested = {0};
+    int problems = 0;
+    for (int a = 3; a < argc; a++) {
+        section(argv[a]);
+        PtrVec progs = programs_load();
+        Program *p = NULL;
+        for (size_t i = 0; i < progs.n && !p; i++)
+            if (wifind(((Program *)progs.items[i])->name, argv[a])) p = progs.items[i];
+        if (!p) {
+            linef(wfmt(u"  NÃO ENCONTRADO na lista de programas: %s", argv[a]));
+            problems++;
+            programs_free(&progs);
+            continue;
+        }
+        Identity *id = program_identity(p);
+        Tested *t = xalloc(sizeof(Tested));
+        t->name = wdup(p->name);
+        t->id = id;
+        pv_push(&tested, t);
+        WCHAR *key = wdup(p->key_path);
+        linef(wfmt(u"  programa: %s %s (%s)", p->name, p->version ? p->version : u"", p->publisher ? p->publisher : u"-"));
+        linef(wfmt(u"  entrada: %s", key));
+        for (size_t i = 0; i < id->dirs.n; i++) linef(wfmt(u"  pasta: %s", id->dirs.items[i]));
+        for (size_t i = 0; i < id->alt_dirs.n; i++) linef(wfmt(u"  pasta (8.3): %s", id->alt_dirs.items[i]));
+        bool quiet;
+        WCHAR *cmd = uninstall_command(p, true, &quiet);
+        programs_free(&progs);
+        linef(wfmt(u"  desinstalador: %s%s", cmd ? cmd : u"(nenhum)", quiet ? u"  [silencioso]" : u"  [NÃO SILENCIOSO]"));
+        flush();
+        if (cmd && quiet) {
+            HANDLE ev = CreateEventW(NULL, TRUE, FALSE, NULL);
+            HANDLE th = CreateThread(NULL, 0, watchdog, ev, 0, NULL);
+            RunResult rr;
+            ULONGLONG t0 = GetTickCount64();
+            run_and_wait(cmd, ev, &rr);
+            linef(wfmt(u"  rodou: %s, código %u, %U ms%s", rr.started ? u"sim" : u"não", (unsigned)rr.exit_code, (uint64_t)(GetTickCount64() - t0),
+                       rr.skipped ? u" (TEMPO ESGOTADO)" : u""));
+            if (th) CloseHandle(th);
+            CloseHandle(ev);
+            Sleep(3000);
+        } else {
+            problems++;
+        }
+        xfree(cmd);
+        bool still = reg_exists(key);
+        linef(wfmt(u"  entrada ainda existe depois do desinstalador: %s", still ? u"SIM" : u"não"));
+        LeftList l = {0};
+        ULONGLONG t0 = GetTickCount64();
+        scan_leftovers(&l, id, key, SCAN_MODERATE, NULL);
+        left_finalize(&l);
+        linef(wfmt(u"  sobras: %u itens em %U ms", (unsigned)l.items.n, (uint64_t)(GetTickCount64() - t0)));
+        dump_left(&l, 200);
+        DelResult r;
+        delete_leftovers(&l, t->name, NULL, &r);
+        linef(wfmt(u"  exclusão: %d apagados, %d falharam, %d mantidos, %d sem Lixeira", r.deleted, r.failed, r.kept, r.permanent));
+        for (size_t i = 0; i < l.items.n; i++) {
+            Leftover *it = l.items.items[i];
+            if (it->status == LS_FAILED) {
+                WCHAR *e = win_error_text(it->error);
+                linef(wfmt(u"    falhou: %s %s: %s", it->path, it->value ? it->value : u"", e));
+                xfree(e);
+                problems++;
+            }
+        }
+        del_result_free(&r);
+        left_free(&l);
+        xfree(key);
+        flush();
+    }
+
+    section(u"O que a instalação criou e ainda existe (segunda foto)");
+    s.out = trace_new();
+    monitor_snapshot(&s, true, NULL);
+    size_t mine = 0, other = 0;
+    for (size_t i = 0; i < s.out->items.n; i++) {
+        TraceItem *it = s.out->items.items[i];
+        const Tested *owner = NULL;
+        WCHAR *full = it->value ? wcat3(it->path, u" -> ", it->value) : wdup(it->path);
+        for (size_t k = 0; k < tested.n && !owner; k++)
+            if (belongs(tested.items[k], full)) owner = tested.items[k];
+        if (owner) {
+            linef(wfmt(u"  FICOU [%s] %c %s", owner->name, (WCHAR)it->kind, full));
+            mine++;
+        } else if (other < 400) {
+            linef(wfmt(u"  outro  %c %s", (WCHAR)it->kind, full));
+            other++;
+        }
+        xfree(full);
+    }
+    WCHAR *pm = env_path(u"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment"), *pu = env_path(u"HKCU\\Environment");
+    path_diff(pm_before, pm, u"sistema");
+    path_diff(pu_before, pu, u"usuário");
+    linef(wfmt(u"\r\nresultado: %u itens dos programas testados ficaram, %u itens novos de outros (ruído do Windows, Chocolatey...), %d problemas",
+               (unsigned)mine, (unsigned)s.out->items.n - (unsigned)mine, problems));
+    flush();
+    xfree(pm), xfree(pu), xfree(pm_before), xfree(pu_before);
+    hs_free(&s.before);
+    trace_free(s.out);
+    for (size_t i = 0; i < tested.n; i++) {
+        Tested *t = tested.items[i];
+        xfree(t->name), identity_free(t->id), xfree(t);
+    }
+    pv_free(&tested);
+    return (int)mine + problems;
+}
+
 int selftest_run(void) {
     g_dir = path_join(g_paths.data_dir, u"selftest");
     dir_create_all(g_dir);
+    int argc = 0;
+    WCHAR **argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+    if (argv && argc >= 3 && wieq(argv[1], u"--snapshot-save")) return snapshot_save(argv[2]);
+    if (argv && argc >= 4 && wieq(argv[1], u"--realtest")) {
+        // relatório separado do autoteste geral
+        WCHAR *old = g_dir;
+        g_dir = path_join(old, u"real");
+        xfree(old);
+        dir_create_all(g_dir);
+        return realtest(argc, argv);
+    }
     PtrVec progs = {0};
     test_environment();
     test_programs(&progs);
