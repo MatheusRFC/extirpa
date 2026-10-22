@@ -1,0 +1,395 @@
+2026-10-22 02:22:28  EXTIRPA 1.1.0 iniciado (PID 7588, administrador: sim)
+2026-10-22 02:22:39  EXTIRPA encerrado
+2026-10-22 02:22:41  Busca de sobras: "7-Zip 26.04 (x64)" (modo 1, 1 pastas do programa)
+2026-10-22 02:22:46  Windows Installer: 176164 componentes lidos em 4968 ms (362 produtos com arquivos só deles)
+2026-10-22 02:22:49  Busca de sobras: 15 itens encontrados
+2026-10-22 02:22:49  Busca de sobras: "Azure Cosmos DB Emulator" (modo 1, 1 pastas do programa)
+2026-10-22 02:22:55  Busca de sobras: 4010 itens encontrados
+2026-10-22 02:22:57  Busca de sobras: "CMake" (modo 1, 1 pastas do programa)
+2026-10-22 02:23:09  Busca de sobras: 9002 itens encontrados
+2026-10-22 02:23:17  Busca de sobras: "Git" (modo 1, 1 pastas do programa)
+2026-10-22 02:23:18  Busca de sobras: 10 itens encontrados
+2026-10-22 02:23:18  Busca de sobras: "ImageMagick 7.1.2-25 Q16-HDRI (64-bit) (2026-06-04)" (modo 1, 1 pastas do programa)
+2026-10-22 02:23:19  Busca de sobras: 4 itens encontrados
+2026-10-22 02:23:19  Busca de sobras: "Inno Setup version 6.7.1" (modo 1, 1 pastas do programa)
+2026-10-22 02:23:19  Busca de sobras: 10 itens encontrados
+2026-10-22 02:23:19  Busca de sobras: "Microsoft Azure Service Fabric" (modo 1, 1 pastas do programa)
+2026-10-22 02:23:20    nome compartilhado com outro programa, desmarcado: HKLM\SOFTWARE\Microsoft\Service Fabric
+2026-10-22 02:23:20    nome compartilhado com outro programa, desmarcado: C:\ProgramData\Microsoft\Windows\Start Menu\Programs\ServiceFabricLocalClusterManager
+2026-10-22 02:23:20  Busca de sobras: 11 itens encontrados
+2026-10-22 02:23:20  Busca de sobras: "Microsoft Edge" (modo 1, 1 pastas do programa)
+2026-10-22 02:23:21  Busca de sobras: 56 itens encontrados
+2026-10-22 02:23:21  Busca de sobras: "Microsoft Edge WebView2 Runtime" (modo 1, 2 pastas do programa)
+2026-10-22 02:23:21  Busca de sobras: 5 itens encontrados
+2026-10-22 02:23:21  Busca de sobras: "Microsoft Visual Studio Installer" (modo 1, 2 pastas do programa)
+2026-10-22 02:23:22    nome compartilhado com outro programa, desmarcado: C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio
+2026-10-22 02:23:22    pasta com outro programa dentro, vai item por item: C:\Program Files (x86)\Microsoft Visual Studio (C:\Program Files (x86)\Microsoft Visual Studio)
+2026-10-22 02:23:22    pasta com outro programa dentro, vai item por item: C:\Program Files\Microsoft Visual Studio (C:\Program Files\Microsoft Visual Studio\18\Enterprise)
+2026-10-22 02:23:22    nome compartilhado com outro programa, desmarcado: C:\Program Files (x86)\Visual Studio
+2026-10-22 02:23:22  Busca de sobras: 12 itens encontrados
+2026-10-22 02:23:22  Busca de sobras: "MongoDB Shell" (modo 1, 1 pastas do programa)
+2026-10-22 02:23:26  Busca de sobras: 40 itens encontrados
+2026-10-22 02:23:26  Busca de sobras: "Mozilla Firefox (x64 en-US)" (modo 1, 1 pastas do programa)
+2026-10-22 02:23:27  Busca de sobras: 39 itens encontrados
+2026-10-22 02:23:27  Executando: "C:\Windows\system32\cmd.exe" /c rd /s /q "C:\Users\runneradmin\AppData\Local\Programs\Extirpa Selftest Widget\bin"
+2026-10-22 02:23:27    terminou: código 0
+2026-10-22 02:23:27  Busca de sobras: "Extirpa Selftest Widget" (modo 1, 1 pastas do programa)
+2026-10-22 02:23:28  Busca de sobras: 8 itens encontrados
+2026-10-22 02:23:28  Exclusão de sobras: "Extirpa Selftest Widget"
+2026-10-22 02:23:28    backup do Registro: C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261022-022328 - Extirpa Selftest Widget.reg
+2026-10-22 02:23:28    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run -> Extirpa Selftest Widget
+2026-10-22 02:23:28    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Run -> Extirpa Selftest Widget
+2026-10-22 02:23:28    apagado: chave HKCU\Software\Extirpa Selftest Corp\Extirpa Selftest Widget
+2026-10-22 02:23:28    apagado: pasta C:\Users\runneradmin\AppData\Local\Programs\Extirpa Selftest Widget
+2026-10-22 02:23:28    apagado: pasta C:\Users\runneradmin\AppData\Roaming\Extirpa Selftest Corp\Extirpa Selftest Widget
+2026-10-22 02:23:28    apagado: arquivo C:\Users\runneradmin\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Extirpa Selftest Widget.lnk
+2026-10-22 02:23:28  Exclusão de sobras: 6 apagados, 0 falharam, 2 mantidos
+2026-10-22 02:23:28  Restaurar backup: C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261022-022328 - Extirpa Selftest Widget.reg -> código 0
+2026-10-22 02:23:28  Executando: "C:\Windows\system32\cmd.exe" /c start "" /b "C:\Windows\system32\PING.EXE" -n 3 127.0.0.1
+2026-10-22 02:23:30    terminou: código 0
+2026-10-22 02:23:30  Executando: "C:\nao\existe\uninstall.exe" /S
+2026-10-22 02:23:30    não iniciou (erro 2)
+2026-10-22 02:23:34    foto: HKLM\SOFTWARE\Classes levou 3750 ms (187056 entradas)
+2026-10-22 02:23:36    foto: 262144 entradas, 5656 ms, em HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\SideBySide\Winners\wow64_microsoft-windows-security-netlogon_31bf3856ad364e35_none_36869ae252b4b6fc
+2026-10-22 02:23:37    foto: HKLM\SOFTWARE\Microsoft levou 2656 ms (93462 entradas)
+2026-10-22 02:23:39    foto: HKLM\SOFTWARE\Wow6432Node levou 2219 ms (101396 entradas)
+2026-10-22 02:23:39    foto: HKLM\SOFTWARE pronto, 382240 entradas, 8640 ms
+2026-10-22 02:23:39    foto: HKCU\Software pronto, 383960 entradas, 8687 ms
+2026-10-22 02:23:42    foto: C:\Program Files\Amazon\AWSCLIV2 levou 2984 ms (7128 entradas)
+2026-10-22 02:23:43    foto: C:\Program Files\Amazon levou 4109 ms (9483 entradas)
+2026-10-22 02:23:50    foto: C:\Program Files\dotnet\packs levou 3640 ms (9358 entradas)
+2026-10-22 02:24:02    foto: C:\Program Files\dotnet\sdk levou 11844 ms (23927 entradas)
+2026-10-22 02:24:04    foto: C:\Program Files\dotnet levou 17469 ms (38828 entradas)
+2026-10-22 02:24:06    foto: C:\Program Files\Git levou 2000 ms (8866 entradas)
+2026-10-22 02:24:14    foto: C:\Program Files pronto, 482679 entradas, 43296 ms
+2026-10-22 02:24:18    foto: 524288 entradas, 47531 ms, em C:\Program Files (x86)\Android\android-sdk\platforms\android-37.1\data\res\values-it-feminine
+2026-10-22 02:24:19    foto: C:\Program Files (x86)\Android\android-sdk levou 5219 ms (56569 entradas)
+2026-10-22 02:24:19    foto: C:\Program Files (x86)\Android levou 5641 ms (57469 entradas)
+2026-10-22 02:24:30    foto: C:\Program Files (x86)\Microsoft SDKs\NuGetPackages levou 8781 ms (12142 entradas)
+2026-10-22 02:24:35    foto: C:\Program Files (x86)\Microsoft SDKs\UWPNuGetPackages levou 4828 ms (8744 entradas)
+2026-10-22 02:24:35    foto: C:\Program Files (x86)\Microsoft SDKs levou 13907 ms (21832 entradas)
+2026-10-22 02:24:40    foto: C:\Program Files (x86)\Windows Kits\10 levou 2390 ms (9813 entradas)
+2026-10-22 02:24:40    foto: C:\Program Files (x86)\Windows Kits levou 2453 ms (9953 entradas)
+2026-10-22 02:24:40    foto: C:\Program Files (x86) pronto, 585989 entradas, 69468 ms
+2026-10-22 02:24:47    foto: C:\ProgramData\Microsoft\VisualStudio levou 5672 ms (3453 entradas)
+2026-10-22 02:24:47    foto: C:\ProgramData\Microsoft levou 5922 ms (5099 entradas)
+2026-10-22 02:24:47    foto: C:\ProgramData pronto, 593205 entradas, 76375 ms
+2026-10-22 02:24:47    foto: C:\Users\runneradmin\AppData\Roaming pronto, 593357 entradas, 76390 ms
+2026-10-22 02:24:48    foto: C:\Users\runneradmin\AppData\Local pronto, 596964 entradas, 77390 ms
+2026-10-22 02:24:48    foto: C:\Users\runneradmin\AppData\LocalLow pronto, 596994 entradas, 77390 ms
+2026-10-22 02:24:48    foto: C:\Users\runneradmin\Desktop pronto, 596995 entradas, 77390 ms
+2026-10-22 02:24:48    foto: C:\Users\Public\Desktop pronto, 597001 entradas, 77390 ms
+2026-10-22 02:24:48  Foto do sistema (antes): 597001 entradas lidas em 77390 ms
+2026-10-22 02:24:51    foto: HKLM\SOFTWARE\Classes levou 3500 ms (187056 entradas)
+2026-10-22 02:24:53    foto: 262144 entradas, 5219 ms, em HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\SideBySide\Winners\wow64_microsoft-windows-security-ngc-cryptngc_31bf3856ad364e35_none_d87bdad13bd1d4ff
+2026-10-22 02:24:54    foto: HKLM\SOFTWARE\Microsoft levou 2266 ms (93458 entradas)
+2026-10-22 02:24:56    foto: HKLM\SOFTWARE\Wow6432Node levou 2094 ms (101396 entradas)
+2026-10-22 02:24:56    foto: HKLM\SOFTWARE pronto, 382236 entradas, 7860 ms
+2026-10-22 02:24:56    foto: HKCU\Software pronto, 384017 entradas, 7906 ms
+2026-10-22 02:24:56    foto: C:\Program Files pronto, 482736 entradas, 8469 ms
+2026-10-22 02:24:56    foto: 524288 entradas, 8563 ms, em C:\Program Files (x86)\Android\android-sdk\platforms\android-37.1\data\res\values-eu-television
+2026-10-22 02:24:57    foto: C:\Program Files (x86) pronto, 586046 entradas, 9141 ms
+2026-10-22 02:24:57    foto: C:\ProgramData pronto, 593262 entradas, 9281 ms
+2026-10-22 02:24:57    foto: C:\Users\runneradmin\AppData\Roaming pronto, 593414 entradas, 9297 ms
+2026-10-22 02:24:57    foto: C:\Users\runneradmin\AppData\Local pronto, 597022 entradas, 9313 ms
+2026-10-22 02:24:57    foto: C:\Users\runneradmin\AppData\LocalLow pronto, 597052 entradas, 9313 ms
+2026-10-22 02:24:57    foto: C:\Users\runneradmin\Desktop pronto, 597053 entradas, 9313 ms
+2026-10-22 02:24:57    foto: C:\Users\Public\Desktop pronto, 597059 entradas, 9313 ms
+2026-10-22 02:24:57  Foto do sistema (depois): 597059 entradas lidas em 9313 ms
+2026-10-22 02:25:22    foto: HKLM\SOFTWARE\Classes levou 3500 ms (187056 entradas)
+2026-10-22 02:25:24    foto: 262144 entradas, 5203 ms, em HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\SideBySide\Winners\wow64_microsoft-windows-security-ngc-cryptngc_31bf3856ad364e35_none_d87bdad13bd1d4ff
+2026-10-22 02:25:25    foto: HKLM\SOFTWARE\Microsoft levou 2422 ms (93458 entradas)
+2026-10-22 02:25:27    foto: HKLM\SOFTWARE\Wow6432Node levou 2157 ms (101396 entradas)
+2026-10-22 02:25:27    foto: HKLM\SOFTWARE pronto, 382236 entradas, 8094 ms
+2026-10-22 02:25:27    foto: HKCU\Software pronto, 384073 entradas, 8125 ms
+2026-10-22 02:25:28    foto: C:\Program Files pronto, 482792 entradas, 8703 ms
+2026-10-22 02:25:28    foto: 524288 entradas, 8797 ms, em C:\Program Files (x86)\Android\android-sdk\platforms\android-37.1\data\res\values-de-rDE
+2026-10-22 02:25:28    foto: C:\Program Files (x86) pronto, 586102 entradas, 9375 ms
+2026-10-22 02:25:28    foto: C:\ProgramData pronto, 593318 entradas, 9531 ms
+2026-10-22 02:25:28    foto: C:\Users\runneradmin\AppData\Roaming pronto, 593470 entradas, 9531 ms
+2026-10-22 02:25:28    foto: C:\Users\runneradmin\AppData\Local pronto, 597077 entradas, 9562 ms
+2026-10-22 02:25:28    foto: C:\Users\runneradmin\AppData\LocalLow pronto, 597107 entradas, 9562 ms
+2026-10-22 02:25:28    foto: C:\Users\runneradmin\Desktop pronto, 597108 entradas, 9562 ms
+2026-10-22 02:25:28    foto: C:\Users\Public\Desktop pronto, 597114 entradas, 9562 ms
+2026-10-22 02:25:28  Foto do sistema (antes): 597114 entradas lidas em 9562 ms
+2026-10-22 02:28:42  Windows Installer: 176177 componentes lidos em 4422 ms (363 produtos com arquivos só deles)
+2026-10-22 02:28:42  Busca de sobras: "Notepad++ (64-bit x64)" (modo 1, 1 pastas do programa)
+2026-10-22 02:28:43  Busca de sobras: 12 itens encontrados
+2026-10-22 02:28:43  Executando: "C:\Program Files\Notepad++\uninstall.exe" /S
+2026-10-22 02:28:43    terminou: código 0
+2026-10-22 02:28:46  Busca de sobras: "Notepad++ (64-bit x64)" (modo 1, 1 pastas do programa)
+2026-10-22 02:28:47  Busca de sobras: 4 itens encontrados
+2026-10-22 02:28:47  Exclusão de sobras: "Notepad++ (64-bit x64)"
+2026-10-22 02:28:47    backup do Registro: C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261022-022847 - Notepad++ (64-bit x64).reg
+2026-10-22 02:28:47  Removendo aplicativo do Windows: NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww (todos os usuários)
+2026-10-22 02:28:49    removido
+2026-10-22 02:28:49    apagado: pacote do Windows NotepadPlusPlus_1.0.0.0_neutral__2247w0b46hfww
+2026-10-22 02:28:49    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\Abgrcnq++\abgrcnq++.rkr
+2026-10-22 02:28:49    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 63
+2026-10-22 02:28:49    apagado: chave HKLM\SOFTWARE\WOW6432Node\Notepad++
+2026-10-22 02:28:49  Exclusão de sobras: 4 apagados, 0 falharam, 0 mantidos
+2026-10-22 02:28:49  Busca de sobras: "VLC media player" (modo 1, 1 pastas do programa)
+2026-10-22 02:28:50  Busca de sobras: 312 itens encontrados
+2026-10-22 02:28:50  Executando: "C:\Program Files\VideoLAN\VLC\uninstall.exe" /S
+2026-10-22 02:28:51    terminou: código 0
+2026-10-22 02:28:54  Busca de sobras: "VLC media player" (modo 1, 1 pastas do programa)
+2026-10-22 02:28:55  Busca de sobras: 9 itens encontrados
+2026-10-22 02:28:55  Exclusão de sobras: "VLC media player"
+2026-10-22 02:28:55    backup do Registro: C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261022-022855 - VLC media player.reg
+2026-10-22 02:28:55    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\IvqrbYNA\IYP\iyp.rkr
+2026-10-22 02:28:55    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 64
+2026-10-22 02:28:55    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 65
+2026-10-22 02:28:55    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 66
+2026-10-22 02:28:55    apagado: valor HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayBluRayOnArrival -> VLCPlayBlurayOnArrival
+2026-10-22 02:28:55    apagado: valor HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayBluRayOnArrival -> VLCPlayBlurayOnArrival
+2026-10-22 02:28:55    apagado: chave HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayBlurayOnArrival
+2026-10-22 02:28:55    apagado: chave HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayBlurayOnArrival
+2026-10-22 02:28:55    apagado: pasta vazia C:\Program Files\VideoLAN
+2026-10-22 02:28:55  Exclusão de sobras: 9 apagados, 0 falharam, 0 mantidos
+2026-10-22 02:28:55  Busca de sobras: "KeePass Password Safe 2.61.1" (modo 1, 1 pastas do programa)
+2026-10-22 02:28:56  Busca de sobras: 8 itens encontrados
+2026-10-22 02:28:56  Executando: "C:\Program Files\KeePass Password Safe 2\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+2026-10-22 02:28:59    terminou: código 0
+2026-10-22 02:29:02  Busca de sobras: "KeePass Password Safe 2.61.1" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:02  Busca de sobras: 2 itens encontrados
+2026-10-22 02:29:02  Exclusão de sobras: "KeePass Password Safe 2.61.1"
+2026-10-22 02:29:02    backup do Registro: C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261022-022902 - KeePass Password Safe 2.61.1.reg
+2026-10-22 02:29:02    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\RunNotification -> StartupTNotiKeePass 2 PreLoad
+2026-10-22 02:29:02    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Search\JumplistData -> C:\Program Files\KeePass Password Safe 2\KeePass.exe
+2026-10-22 02:29:02    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 67
+2026-10-22 02:29:02  Exclusão de sobras: 3 apagados, 0 falharam, 0 mantidos
+2026-10-22 02:29:02  Busca de sobras: "FileZilla 3.71.1" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:03  Busca de sobras: 12 itens encontrados
+2026-10-22 02:29:03  Executando: "C:\Program Files\FileZilla FTP Client\uninstall.exe" /S
+2026-10-22 02:29:03    terminou: código 0
+2026-10-22 02:29:06  Busca de sobras: "FileZilla 3.71.1" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:07  Busca de sobras: 4 itens encontrados
+2026-10-22 02:29:07  Exclusão de sobras: "FileZilla 3.71.1"
+2026-10-22 02:29:07    backup do Registro: C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261022-022907 - FileZilla 3.71.1.reg
+2026-10-22 02:29:07    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> SvyrMvyyn.Pyvrag.NccVQ
+2026-10-22 02:29:07    apagado: chave HKLM\SOFTWARE\WOW6432Node\FileZilla Client
+2026-10-22 02:29:07    apagado: pasta C:\Users\runneradmin\AppData\Local\FileZilla
+2026-10-22 02:29:07    apagado: pasta C:\Users\runneradmin\AppData\Roaming\FileZilla
+2026-10-22 02:29:07  Exclusão de sobras: 4 apagados, 0 falharam, 0 mantidos
+2026-10-22 02:29:07  Busca de sobras: "WinSCP 6.7" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:08  Busca de sobras: 40 itens encontrados
+2026-10-22 02:29:08  Executando: "C:\Program Files (x86)\WinSCP\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+2026-10-22 02:29:10    terminou: código 0
+2026-10-22 02:29:13  Busca de sobras: "WinSCP 6.7" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:14  Busca de sobras: 13 itens encontrados
+2026-10-22 02:29:14  Exclusão de sobras: "WinSCP 6.7"
+2026-10-22 02:29:14    backup do Registro: C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261022-022914 - WinSCP 6.7.reg
+2026-10-22 02:29:14    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {7P5N40RS-N0SO-4OSP-874N-P0S2R0O9SN8R}\JvaFPC\JvaFPC.rkr
+2026-10-22 02:29:14    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Search\JumplistData -> {7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}\WinSCP\WinSCP.exe
+2026-10-22 02:29:14    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Cached -> {E15E1D68-0D1C-49F7-BEB8-812B1E00FA60} {000214FC-0000-0000-C000-000000000046} 0xFFFF
+2026-10-22 02:29:14    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 69
+2026-10-22 02:29:14    apagado: chave HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\winscp.exe
+2026-10-22 02:29:14    apagado: chave HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\winscp.exe
+2026-10-22 02:29:14    apagado: chave HKLM\SOFTWARE\WOW6432Node\Martin Prikryl\WinSCP 2
+2026-10-22 02:29:14    apagado: chave HKCU\Software\Martin Prikryl\WinSCP 2
+2026-10-22 02:29:14    apagado: chave HKLM\SOFTWARE\Martin Prikryl\WinSCP 2
+2026-10-22 02:29:14    apagado: chave vazia HKLM\SOFTWARE\WOW6432Node\Martin Prikryl
+2026-10-22 02:29:14    apagado: chave vazia HKCU\Software\Martin Prikryl
+2026-10-22 02:29:14    apagado: chave vazia HKLM\SOFTWARE\Martin Prikryl
+2026-10-22 02:29:14    FALHOU: pasta C:\Program Files (x86)\WinSCP: Access is denied (5)
+2026-10-22 02:29:14    apagado: arquivo C:\Users\runneradmin\AppData\Roaming\winscp.rnd
+2026-10-22 02:29:14  Exclusão de sobras: 13 apagados, 1 falharam, 0 mantidos
+2026-10-22 02:29:14  Busca de sobras: "7-Zip 26.05 (x64)" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:15  Busca de sobras: 18 itens encontrados
+2026-10-22 02:29:15  Executando: "C:\Program Files\7-Zip\Uninstall.exe" /S
+2026-10-22 02:29:15    terminou: código 0
+2026-10-22 02:29:18  Busca de sobras: "7-Zip 26.05 (x64)" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:20  Busca de sobras: 5 itens encontrados
+2026-10-22 02:29:20  Exclusão de sobras: "7-Zip 26.05 (x64)"
+2026-10-22 02:29:20    backup do Registro: C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261022-022920 - 7-Zip 26.05 (x64).reg
+2026-10-22 02:29:20    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\7-Mvc\7mSZ.rkr
+2026-10-22 02:29:20    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 4
+2026-10-22 02:29:20    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 70
+2026-10-22 02:29:20    apagado: chave HKCU\Software\7-Zip
+2026-10-22 02:29:20    apagado: chave HKLM\SOFTWARE\7-Zip
+2026-10-22 02:29:20  Exclusão de sobras: 5 apagados, 0 falharam, 0 mantidos
+2026-10-22 02:29:20  Busca de sobras: "Audacity 3.7.9" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:21  Busca de sobras: 13 itens encontrados
+2026-10-22 02:29:21  Executando: "C:\Program Files\Audacity\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+2026-10-22 02:29:22    terminou: código 0
+2026-10-22 02:29:25  Busca de sobras: "Audacity 3.7.9" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:27  Busca de sobras: 7 itens encontrados
+2026-10-22 02:29:27  Exclusão de sobras: "Audacity 3.7.9"
+2026-10-22 02:29:27    backup do Registro: C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261022-022927 - Audacity 3.7.9.reg
+2026-10-22 02:29:27    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\Nhqnpvgl\Nhqnpvgl.rkr
+2026-10-22 02:29:27    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Search\JumplistData -> C:\Program Files\Audacity\Audacity.exe
+2026-10-22 02:29:27    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 71
+2026-10-22 02:29:27    apagado: chave HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\audacity.exe
+2026-10-22 02:29:27    apagado: chave HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\audacity.exe
+2026-10-22 02:29:27    apagado: pasta C:\Users\runneradmin\AppData\Local\audacity
+2026-10-22 02:29:27    apagado: pasta C:\Users\runneradmin\AppData\Roaming\audacity
+2026-10-22 02:29:27  Exclusão de sobras: 7 apagados, 0 falharam, 0 mantidos
+2026-10-22 02:29:27  Busca de sobras: "PuTTY release 0.85 (64-bit)" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:28  Busca de sobras: 23 itens encontrados
+2026-10-22 02:29:28  Executando: "C:\Windows\system32\msiexec.exe" /X{3B0346D3-155D-43E5-9561-B9BE51CF2EB6} /passive /norestart
+2026-10-22 02:29:30    terminou: código 0
+2026-10-22 02:29:33  Busca de sobras: "PuTTY release 0.85 (64-bit)" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:40  Windows Installer: 176164 componentes lidos em 7188 ms (362 produtos com arquivos só deles)
+2026-10-22 02:29:42  Busca de sobras: 5 itens encontrados
+2026-10-22 02:29:42  Exclusão de sobras: "PuTTY release 0.85 (64-bit)"
+2026-10-22 02:29:42    backup do Registro: C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261022-022942 - PuTTY release 0.85 (64-bit).reg
+2026-10-22 02:29:42    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\ChGGL\chggltra.rkr
+2026-10-22 02:29:42    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 72
+2026-10-22 02:29:42    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 73
+2026-10-22 02:29:42    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 74
+2026-10-22 02:29:42    apagado: arquivo C:\Users\runneradmin\AppData\Local\PUTTY.RND
+2026-10-22 02:29:42  Exclusão de sobras: 5 apagados, 0 falharam, 0 mantidos
+2026-10-22 02:29:42  Busca de sobras: "Everything 1.4.1.1032 (x64)" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:43  Busca de sobras: 17 itens encontrados
+2026-10-22 02:29:43  Executando: "C:\Program Files\Everything\Uninstall.exe" /S
+2026-10-22 02:29:44    terminou: código 0
+2026-10-22 02:29:47  Busca de sobras: "Everything 1.4.1.1032 (x64)" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:48  Busca de sobras: 6 itens encontrados
+2026-10-22 02:29:48  Exclusão de sobras: "Everything 1.4.1.1032 (x64)"
+2026-10-22 02:29:48    backup do Registro: C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261022-022948 - Everything 1.4.1.1032 (x64).reg
+2026-10-22 02:29:48    apagado: valor HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store -> C:\Program Files\Everything\Everything.exe
+2026-10-22 02:29:48    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\Rirelguvat\Rirelguvat.rkr
+2026-10-22 02:29:48    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\RunNotification -> StartupTNotiEverything
+2026-10-22 02:29:48    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 76
+2026-10-22 02:29:48    apagado: chave HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\Everything.exe
+2026-10-22 02:29:48    apagado: chave HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Everything.exe
+2026-10-22 02:29:48  Exclusão de sobras: 6 apagados, 0 falharam, 0 mantidos
+2026-10-22 02:29:48  Busca de sobras: "SumatraPDF" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:49  Busca de sobras: 69 itens encontrados
+2026-10-22 02:29:49  Executando: "C:\Program Files\SumatraPDF\SumatraPDF.exe" -uninstall -all-users -silent
+2026-10-22 02:29:49    terminou: código 0
+2026-10-22 02:29:52  Busca de sobras: "SumatraPDF" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:53  Busca de sobras: 3 itens encontrados
+2026-10-22 02:29:53  Exclusão de sobras: "SumatraPDF"
+2026-10-22 02:29:53    backup do Registro: C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261022-022953 - SumatraPDF.reg
+2026-10-22 02:29:53    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\FhzngenCQS\FhzngenCQS.rkr
+2026-10-22 02:29:53    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 75
+2026-10-22 02:29:53    apagado: pasta C:\Users\runneradmin\AppData\Local\SumatraPDF
+2026-10-22 02:29:53  Exclusão de sobras: 3 apagados, 0 falharam, 0 mantidos
+2026-10-22 02:29:53  Busca de sobras: "Greenshot 1.3.328" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:54  Busca de sobras: 15 itens encontrados
+2026-10-22 02:29:54  Executando: "C:\Users\runneradmin\AppData\Local\Programs\Greenshot\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+2026-10-22 02:29:55    terminou: código 0
+2026-10-22 02:29:58  Busca de sobras: "Greenshot 1.3.328" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:58  Busca de sobras: 5 itens encontrados
+2026-10-22 02:29:58  Exclusão de sobras: "Greenshot 1.3.328"
+2026-10-22 02:29:58    backup do Registro: C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261022-022958 - Greenshot 1.3.328.reg
+2026-10-22 02:29:58    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\RunNotification -> StartupTNotiGreenshot
+2026-10-22 02:29:58    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 77
+2026-10-22 02:29:58    apagado: chave HKCU\Software\Classes\CLSID\{47726565-6e73-686f-7400-000000000000}
+2026-10-22 02:29:58    apagado: chave HKLM\SOFTWARE\Classes\CLSID\{47726565-6e73-686f-7400-000000000000}
+2026-10-22 02:29:58    apagado: chave HKLM\SOFTWARE\Microsoft\Tracing\Greenshot_RASAPI32
+2026-10-22 02:29:58    apagado: chave HKLM\SOFTWARE\Microsoft\Tracing\Greenshot_RASMANCS
+2026-10-22 02:29:58  Exclusão de sobras: 6 apagados, 0 falharam, 0 mantidos
+2026-10-22 02:29:59  Busca de sobras: "IrfanView 4.76 (64-bit)" (modo 1, 1 pastas do programa)
+2026-10-22 02:29:59  Busca de sobras: 164 itens encontrados
+2026-10-22 02:29:59  Busca de sobras: "IrfanView 4.76 (64-bit)" (modo 1, 1 pastas do programa)
+2026-10-22 02:30:00  Busca de sobras: 164 itens encontrados
+2026-10-22 02:30:00  Exclusão de sobras: "IrfanView 4.76 (64-bit)"
+2026-10-22 02:30:00    backup do Registro: C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261022-023000 - IrfanView 4.76 (64-bit).reg
+2026-10-22 02:30:00    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\VesnaIvrj\v_ivrj64.rkr
+2026-10-22 02:30:00    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 78
+2026-10-22 02:30:00    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 79
+2026-10-22 02:30:00    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 80
+2026-10-22 02:30:00    apagado: valor HKLM\SOFTWARE\RegisteredApplications -> IrfanView
+2026-10-22 02:30:00    apagado: valor HKLM\SOFTWARE\WOW6432Node\RegisteredApplications -> IrfanView
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\IrfanView64
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\Applications\i_view64.exe
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.aif
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.ani
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.arw
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.asf
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.au
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.avi
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.avif
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.b3d
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.bmp
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.clp
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.cr2
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.cr3
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.crw
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.cur
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.dcm
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.dcx
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.dds
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.djvu
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.dng
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.dxf
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.ecw
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.emf
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.eps
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.erf
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.exr
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.flv
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.g3
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.gif
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.hdp
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.heic
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.ico
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.iff
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.jls
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.jng
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.jp2
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.jpg
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.jpm
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.jxl
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.mid
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.mng
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.mov
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.mp3
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.mpe
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.mpg
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.nef
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.nrw
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.ogg
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.pbm
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.pcd
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.pcx
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.pgm
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.png
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.ppm
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.psd
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.psp
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.qoi
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.ras
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.raw
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.rle
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.rmi
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.rwl
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.sff
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.sgi
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.sid
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.swf
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.tga
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.tif
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.ttf
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.wav
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.wbmp
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.webp
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.wma
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.wmf
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.wmv
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.xbm
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\Classes\IrfanView.xpm
+2026-10-22 02:30:00    apagado: chave HKLM\SOFTWARE\IrfanView
+2026-10-22 02:30:00    apagado: pasta C:\Program Files\IrfanView
+2026-10-22 02:30:00    apagado: pasta C:\ProgramData\Microsoft\Windows\Start Menu\Programs\IrfanView
+2026-10-22 02:30:00    apagado: pasta C:\Users\runneradmin\AppData\Roaming\IrfanView
+2026-10-22 02:30:00  Exclusão de sobras: 89 apagados, 0 falharam, 0 mantidos
+2026-10-22 02:30:04    foto: HKLM\SOFTWARE\Classes levou 3547 ms (187064 entradas)
+2026-10-22 02:30:05    foto: 262144 entradas, 5234 ms, em HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\SideBySide\Winners\wow64_microsoft-windows-sechost_31bf3856ad364e35_none_2cfd8e72ecd191d4\10.0
+2026-10-22 02:30:06    foto: HKLM\SOFTWARE\Microsoft levou 2422 ms (93483 entradas)
+2026-10-22 02:30:08    foto: HKLM\SOFTWARE\Wow6432Node levou 2078 ms (101397 entradas)
+2026-10-22 02:30:08    foto: HKLM\SOFTWARE pronto, 382269 entradas, 8047 ms
+2026-10-22 02:30:08    foto: HKCU\Software pronto, 384203 entradas, 8094 ms
+2026-10-22 02:30:09    foto: C:\Program Files pronto, 482813 entradas, 8703 ms
+2026-10-22 02:30:09    foto: 524288 entradas, 8797 ms, em C:\Program Files (x86)\Android\android-sdk\platforms\android-37.1\data\res\values-bs
+2026-10-22 02:30:09    foto: C:\Program Files (x86) pronto, 586110 entradas, 9469 ms
+2026-10-22 02:30:10    foto: C:\ProgramData pronto, 593392 entradas, 9625 ms
+2026-10-22 02:30:10    foto: C:\Users\runneradmin\AppData\Roaming pronto, 593555 entradas, 9625 ms
+2026-10-22 02:30:10    foto: C:\Users\runneradmin\AppData\Local pronto, 597169 entradas, 9656 ms
+2026-10-22 02:30:10    foto: C:\Users\runneradmin\AppData\LocalLow pronto, 597221 entradas, 9656 ms
+2026-10-22 02:30:10    foto: C:\Users\runneradmin\Desktop pronto, 597222 entradas, 9656 ms
+2026-10-22 02:30:10    foto: C:\Users\Public\Desktop pronto, 597228 entradas, 9656 ms
+2026-10-22 02:30:10  Foto do sistema (depois): 597228 entradas lidas em 9656 ms
