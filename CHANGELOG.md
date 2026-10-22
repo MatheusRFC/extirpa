@@ -4,6 +4,25 @@ All notable changes to EXTIRPA. Dates are in the author's time zone.
 
 ## [Unreleased]
 
+## [1.1.0] — 2026-10-22
+
+The leftover search now covers what Windows itself keeps about a program, and the results come in two steps: registry, then files and folders.
+
+### Added
+- **Two-step leftover window:** first the registry and system items (keys, values, services, scheduled tasks, firewall rules, PATH, packages), with counts of keys and values; then the files and folders, with counts and total size. Each step has its own **Delete checked**; after the registry is cleaned without failures, the window moves on to the files.
+- **Analysis before uninstalling:** right before the program's uninstaller runs, EXTIRPA searches with the program still installed. Whatever that search found and still exists after the uninstaller is added to the leftovers.
+- **Windows Installer leftovers** of MSI programs, by product code: the product's registration (`Installer\Products`, `Features`, `UpgradeCodes`, `UserData\<user>\Products`, the components only it used, and only its value in shared ones), the `Installer\Folders` entries for its folders and for its cache folder, the cached package (`C:\Windows\Installer\<name>.msi`, only the one registered as its `LocalPackage`), `C:\Windows\Installer\{code}` and `SourceHash{code}`. After a normal `msiexec /x` only the cache folder and its `Folders` entry usually remain; in a forced uninstall the whole registration is offered, so Windows no longer thinks the program is installed.
+- **Traces kept under the executable's name:** Prefetch files (`C:\Windows\Prefetch\NAME.EXE-XXXXXXXX.pf`), crash dumps (`%LOCALAPPDATA%\CrashDumps`), Windows Error Reporting folders (`AppCrash_name.exe_...`), network tracing keys (`Microsoft\Tracing\name_RASAPI32`/`_RASMANCS`), heap-leak diagnosis and DirectInput keys. High confidence when the executable has the program's exact name; medium for other executables that were in the program's folder; low for generic names (`unins000`, `setup`, `update`...) or names another installed program also uses. The executables in the program's folders are listed before uninstalling.
+- Explorer's FeatureUsage (taskbar usage per program), the "new app for this file type" notices (`ApplicationAssociationToasts`), `Compatibility Assistant\Persisted`, `Applications\<program>.exe` keys with no command left, and dot folders in the user profile (`%USERPROFILE%\.<program>`).
+
+### Fixed
+- A file type class that belongs to Windows or to another program (`AudioCD`, `DVD`...) where the program only added a verb (VLC's "Play with VLC") is no longer offered as a whole key: only the program's own verb (`shell\<verb>`) is. Found while testing this version: VLC adds a verb to `AudioCD` and `DVD`, and a first build offered (and on the test machine deleted) the whole keys. Versions 1.0.x had the same flaw in forced uninstalls of a program still installed.
+- The analysis before uninstalling only brings back items that are still the program's: items found by name or path, and values whose content is still the same. A file type association that the uninstaller handed back to another program (`.mp3` pointing to another player again) is not offered.
+
+### Changed
+- **Protection list:** narrow exceptions for the items above. Only keys named by the program's exact packed product code under the Windows Installer areas, values of `Installer\Folders`, and, inside the Windows folder, only direct children of `C:\Windows\Installer` named `{code}`, `SourceHash{code}` or `<name>.msi`/`.msp`, and `Prefetch\NAME.EXE-XXXXXXXX.pf` files. The keys that group all products and the rest of the Windows folder stay protected. New keys protected as a whole: `FeatureUsage` and its subkeys, `ApplicationAssociationToasts`, `Microsoft\Tracing`, `RADAR\HeapLeakDetection\DiagnosedApplications`, `DirectInput`.
+
+
 ## [1.0.1] — 2026-10-21
 
 Leftover search for Windows Installer (MSI) programs that don't record their install folder, found testing GridCraft 0.9.0: its uninstall entry has no `InstallLocation`, no icon and `MsiExec.exe` as the uninstaller, so EXTIRPA didn't know where the program lived and only found its AppData folder.

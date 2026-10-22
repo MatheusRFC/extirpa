@@ -113,6 +113,7 @@ X(S_STEP_UNINSTALLING_ONE, u"Desinstalando %s…", u"Uninstalling %s…")
 X(S_STEP_UNINSTALLING_MANY, u"Desinstalando %s (%u de %u)…", u"Uninstalling %s (%u of %u)…")
 X(S_DETAIL_WAITING_UNINSTALLER, u"Siga as instruções do desinstalador do programa. O EXTIRPA espera ele terminar.",
   u"Follow the program's own uninstaller. EXTIRPA waits for it to finish.")
+X(S_STEP_ANALYZING, u"Analisando o que é de %s antes de desinstalar…", u"Analyzing what belongs to %s before uninstalling…")
 X(S_STEP_SCANNING, u"Procurando sobras…", u"Searching for leftovers…")
 X(S_SCAN_REGISTRY, u"Procurando sobras no Registro…", u"Searching the registry…")
 X(S_SCAN_STARTUP, u"Conferindo inicialização, serviços e atalhos…", u"Checking startup entries, services and shortcuts…")
@@ -138,6 +139,17 @@ X(S_NOTE_STILL_INSTALLED, u"%s ainda aparece como instalado (a desinstalação p
 X(S_LEFT_TITLE, u"Sobras encontradas", u"Leftovers found")
 X(S_LEFT_HEADER, u"%u sobras de %s", u"%u leftovers of %s")
 X(S_LEFT_NONE, u"Nenhuma sobra pendente de %s", u"No pending leftovers of %s")
+X(S_LEFT_TITLE_STEP, u"%s — etapa %u de 2", u"%s — step %u of 2")
+X(S_LEFT_STEP_REG, u"Registro e sistema: %u sobras de %s", u"Registry and system: %u leftovers of %s")
+X(S_LEFT_STEP_REG_NONE, u"Registro e sistema: nenhuma sobra pendente de %s", u"Registry and system: no pending leftovers of %s")
+X(S_LEFT_STEP_FILES, u"Arquivos e pastas: %u sobras de %s", u"Files and folders: %u leftovers of %s")
+X(S_LEFT_STEP_FILES_NONE, u"Arquivos e pastas: nenhuma sobra pendente de %s", u"Files and folders: no pending leftovers of %s")
+X(S_LEFT_REG_COUNTS, u"Chaves: %u · valores: %u · outros itens do sistema (serviços, tarefas agendadas, firewall, PATH, pacotes): %u",
+  u"Keys: %u · values: %u · other system items (services, scheduled tasks, firewall, PATH, packages): %u")
+X(S_LEFT_FILE_COUNTS, u"Pastas: %u · arquivos: %u · tamanho total: %s", u"Folders: %u · files: %u · total size: %s")
+X(S_LEFT_BACK, u"< Voltar", u"< Back")
+X(S_LEFT_NEXT, u"Próximo >", u"Next >")
+X(S_LEFT_FINISH, u"Concluir", u"Finish")
 X(S_LEFT_HINT,
   u"Só os itens marcados são apagados. Os de confiança alta já vêm marcados; os de média e baixa, não. Clique com o botão direito para abrir o local de um "
   u"item.",
@@ -217,6 +229,8 @@ X(S_REASON_SHELL_EXT, u"Menu de contexto ou extensão do Explorer", u"Context me
 X(S_REASON_REFERENCE, u"Aponta para outro item do programa", u"Points to another item of the program")
 X(S_REASON_PACKAGE, u"Pacote do Windows registrado pelo programa (ex.: menu de contexto do Windows 11)",
   u"Windows package registered by the program (e.g. Windows 11 context menu)")
+X(S_REASON_MSI, u"Registro ou cache do Windows Installer deste programa", u"This program's Windows Installer registration or cache")
+X(S_REASON_EXE_TRACE, u"Guardado pelo Windows com o nome do executável do programa", u"Kept by Windows under the program's executable name")
 
 // desinstalação forçada
 X(S_FORCED_TITLE, u"Desinstalação forçada", u"Forced uninstall")

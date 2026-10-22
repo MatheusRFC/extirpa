@@ -551,6 +551,34 @@ static void hint_app_paths(Identity *id) {
     }
 }
 
+static void collect_exes_in(Identity *id, const WCHAR *dir, int depth, size_t *budget) {
+    if (depth > 3 || !*budget) return;
+    WCHAR *pat = path_join(dir, u"*");
+    WIN32_FIND_DATAW fd;
+    HANDLE h = FindFirstFileExW(pat, FindExInfoBasic, &fd, FindExSearchNameMatch, NULL, 0);
+    xfree(pat);
+    if (h == INVALID_HANDLE_VALUE) return;
+    PtrVec subdirs = {0};
+    do {
+        if (fd.cFileName[0] == '.') continue;
+        if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)) pv_push(&subdirs, path_join(dir, fd.cFileName));
+        } else if (wiends(fd.cFileName, u".exe") && *budget) {
+            identity_add_exe_name(id, fd.cFileName);
+            (*budget)--;
+        }
+    } while (FindNextFileW(h, &fd));
+    FindClose(h);
+    for (size_t i = 0; i < subdirs.n; i++) collect_exes_in(id, subdirs.items[i], depth + 1, budget);
+    strings_free(&subdirs);
+}
+
+void identity_collect_exes(Identity *id) {
+    size_t budget = 256;
+    size_t n = id->dirs.n;
+    for (size_t i = 0; i < n; i++) collect_exes_in(id, id->dirs.items[i], 0, &budget);
+}
+
 Identity *program_identity_target(Program *p) {
     PtrVec one = {0};
     pv_push(&one, p);
@@ -566,6 +594,7 @@ Identity *program_identity_target(Program *p) {
         identity_add_short_names(id);
         for (size_t i = 0; i < id->dirs.n; i++) log_fmt(u"  pasta deduzida pelo App Paths ou pelos atalhos: %s", id->dirs.items[i]);
     }
+    identity_collect_exes(id);
     return id;
 }
 

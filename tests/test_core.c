@@ -227,12 +227,73 @@ static void test_protect(void) {
 
     CHECK(!protect_value_blocked(u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"));
     CHECK(protect_value_blocked(u"HKLM\\SYSTEM\\CurrentControlSet\\Services\\Foo"));
-    CHECK(protect_value_blocked(u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\Folders"));
+    // Installer\Folders: valores (uma pasta cada) podem sair; a chave e o resto do Installer, não
+    CHECK(!protect_value_blocked(u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\Folders"));
+    CHECK(protect_key_blocked(u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\Folders"));
+    CHECK(protect_value_blocked(u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UserData\\S-1-5-18\\Products"));
     CHECK(protect_value_blocked(u"HKLM"));
     CHECK(!protect_value_blocked(u"HKCU\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\MuiCache"));
     CHECK(!protect_value_blocked(u"HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Compatibility Assistant\\Store"));
     CHECK(protect_value_blocked(u"HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags"));
     CHECK(protect_key_blocked(u"HKCU\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\MuiCache"));
+    CHECK(!protect_value_blocked(u"HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Compatibility Assistant\\Persisted"));
+    CHECK(protect_key_blocked(u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FeatureUsage\\AppSwitched"));
+    CHECK(protect_key_blocked(u"HKLM\\SOFTWARE\\Microsoft\\Tracing"));
+    CHECK(!protect_key_blocked(u"HKLM\\SOFTWARE\\Microsoft\\Tracing\\gridcraft_RASAPI32"));
+
+    // registro de um produto do Windows Installer: só a chave com o código compactado
+#define P32 u"5B99A329ED230724BAEC2006910B1CF2"
+    static const WCHAR *const MSI_OK[] = {
+        u"HKLM\\SOFTWARE\\Classes\\Installer\\Products\\" P32,
+        u"HKLM\\SOFTWARE\\Classes\\Installer\\Products\\" P32 u"\\SourceList",
+        u"HKLM\\SOFTWARE\\Classes\\Installer\\Features\\" P32,
+        u"HKLM\\SOFTWARE\\Classes\\Installer\\UpgradeCodes\\B7231155503FEB14290DBE4849E4C7D4",
+        u"HKCU\\Software\\Microsoft\\Installer\\Products\\" P32,
+        u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UpgradeCodes\\B7231155503FEB14290DBE4849E4C7D4",
+        u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UserData\\S-1-5-18\\Products\\" P32,
+        u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UserData\\S-1-5-18\\Products\\" P32 u"\\InstallProperties",
+        u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UserData\\S-1-5-18\\Components\\55136EFD4D4B08055AACA66AB2029FE9",
+    };
+    for (size_t i = 0; i < COUNT(MSI_OK); i++) {
+        CHECK(!protect_key_blocked(MSI_OK[i]));
+        CHECK(!protect_value_blocked(MSI_OK[i]));
+    }
+    static const WCHAR *const MSI_NO[] = {
+        u"HKLM\\SOFTWARE\\Classes\\Installer",
+        u"HKLM\\SOFTWARE\\Classes\\Installer\\Products",
+        u"HKLM\\SOFTWARE\\Classes\\Installer\\Products\\NAOHEXADECIMAL0000000000000000000",
+        u"HKLM\\SOFTWARE\\Classes\\Installer\\Products\\" P32 u"00",
+        u"HKLM\\SOFTWARE\\Classes\\Installer\\Patches\\" P32,
+        u"HKLM\\SOFTWARE\\Classes\\Installer\\Dependencies\\Foo",
+        u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UserData",
+        u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UserData\\S-1-5-18",
+        u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UserData\\S-1-5-18\\Products",
+        u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UserData\\S-1-5-18\\Components",
+        u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UserData\\S-1-5-18\\Components\\" P32 u"\\X",
+        u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UserData\\S-1-5-18\\Patches\\" P32,
+        u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\InProgress",
+    };
+    for (size_t i = 0; i < COUNT(MSI_NO); i++) CHECK(protect_key_blocked(MSI_NO[i]));
+#undef P32
+
+    // dentro da pasta do Windows: só o cache de um produto do Windows Installer e o Prefetch
+    protect_set_windows(u"C:\\Windows");
+    CHECK(!protect_dir_blocked(u"C:\\Windows\\Installer\\{923A99B5-32DE-4270-ABCE-026019B0C12F}"));
+    CHECK(!protect_dir_blocked(u"C:\\Windows\\Installer\\SourceHash{923A99B5-32DE-4270-ABCE-026019B0C12F}"));
+    CHECK(!protect_dir_blocked(u"C:\\WINDOWS\\Installer\\10d3e1d.msi"));
+    CHECK(!protect_dir_blocked(u"C:\\Windows\\Prefetch\\GRIDCRAFT.EXE-91B6E9E7.pf"));
+    CHECK(protect_dir_blocked(u"C:\\Windows\\Installer"));
+    CHECK(protect_dir_blocked(u"C:\\Windows\\Installer\\$PatchCache$"));
+    CHECK(protect_dir_blocked(u"C:\\Windows\\Installer\\{923A99B5-32DE-4270-ABCE-026019B0C12F}\\icone.ico"));  // só a pasta inteira
+    CHECK(protect_dir_blocked(u"C:\\Windows\\Installer\\x\\10d3e1d.msi"));
+    CHECK(protect_dir_blocked(u"C:\\Windows\\Installer\\..\\System32\\a.msi"));
+    CHECK(protect_dir_blocked(u"C:\\Windows\\Prefetch"));
+    CHECK(protect_dir_blocked(u"C:\\Windows\\Prefetch\\Layout.ini"));
+    CHECK(protect_dir_blocked(u"C:\\Windows\\Prefetch\\ReadyBoot"));
+    CHECK(protect_dir_blocked(u"C:\\Windows\\Prefetch\\GRIDCRAFT.EXE-91B6E9EZ.pf"));
+    CHECK(protect_dir_blocked(u"C:\\Windows\\System32\\GRIDCRAFT.EXE-91B6E9E7.pf"));
+    protect_set_windows(NULL);
+    CHECK(protect_dir_blocked(u"C:\\Windows\\Prefetch\\GRIDCRAFT.EXE-91B6E9E7.pf"));
 }
 
 // ---------------------------------------------------------------- identificação

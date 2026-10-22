@@ -44,6 +44,8 @@ typedef enum {
     LR_SHELL_EXT,      // extensão do Explorer (menu de contexto, ícones) do programa
     LR_REFERENCE,      // referência a um item do programa que também está sendo removido
     LR_PACKAGE,        // pacote do Windows registrado pelo programa
+    LR_MSI,            // registro ou cache do Windows Installer deste programa
+    LR_EXE_TRACE,      // guardado pelo Windows com o nome do executável (Prefetch, relatórios de erro...)
 } LeftReason;
 
 typedef struct {

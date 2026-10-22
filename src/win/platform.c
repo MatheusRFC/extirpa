@@ -110,6 +110,7 @@ void plat_init(void) {
     // Lista de proteção: as pastas do sistema e do usuário nunca são apagadas, nem
     // nada que as contenha. A pasta do Windows e algumas outras, nem por dentro.
     protect_reset();
+    protect_set_windows(p->windows);
     if (p->windows) protect_add_dir_tree(p->windows);
     protect_add_dir_tree(p->data_dir);
     protect_dir(p->exe);

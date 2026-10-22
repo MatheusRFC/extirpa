@@ -4,7 +4,7 @@
 
 # EXTIRPA
 
-O **EX**haustive **T**race & **I**nstalled-**R**esidue **P**urge **A**gent (**E.X.T.I.R.P.A.**) é um desinstalador completo para Windows. Ele roda o desinstalador do próprio programa e depois caça tudo o que ficou para trás: pastas, arquivos, chaves e valores do Registro, serviços, tarefas agendadas, regras do firewall, itens de inicialização, atalhos, itens do menu de contexto, tipos de arquivo e entradas do PATH. Escrito do zero em C, sem runtime e sem biblioteca C: um executável só, de uns 250 KB.
+O **EX**haustive **T**race & **I**nstalled-**R**esidue **P**urge **A**gent (**E.X.T.I.R.P.A.**) é um desinstalador completo para Windows. Ele roda o desinstalador do próprio programa e depois caça tudo o que ficou para trás: pastas, arquivos, chaves e valores do Registro, serviços, tarefas agendadas, regras do firewall, itens de inicialização, atalhos, itens do menu de contexto, tipos de arquivo e entradas do PATH. Escrito do zero em C, sem runtime e sem biblioteca C: um executável só, de uns 270 KB.
 
 [English](../../README.md) · **Português (Brasil)** · [Español](README.es-ES.md) · [Français](README.fr-FR.md) · [中文](README.zh-CN.md) · [हिन्दी](README.hi-IN.md) · [العربية](README.ar.md) · [বাংলা](README.bn-BD.md)
 
@@ -23,7 +23,7 @@ O EXTIRPA primeiro remove o programa do jeito certo, com o desinstalador dele, e
 - **Completo:** procura em todos os lugares onde um programa costuma escrever, do AppData às tarefas agendadas e regras do firewall (a lista completa está abaixo).
 - **Seguro:** nunca mexe no que é do Windows ou de outro programa instalado, faz backup do Registro antes de apagar e manda os arquivos para a Lixeira.
 - **Transparente:** cada item vem com o tipo, um nível de confiança e o motivo de ter sido encontrado. Só os de confiança alta vêm marcados.
-- **Leve:** um executável nativo de uns 250 KB, sem instalador, sem serviço, sem telemetria. Faz o trabalho e fecha.
+- **Leve:** um executável nativo de uns 270 KB, sem instalador, sem serviço, sem telemetria. Faz o trabalho e fecha.
 - **Open Source:** o código é totalmente auditável, e você mesmo pode compilar sua própria versão e mudar o que quiser.
 
 ## Por que esse nome
@@ -43,7 +43,7 @@ Juntando as iniciais: **E.X.T.I.R.P.A.**
 
 - **Desinstalar:** roda o desinstalador do programa e espera ele e todos os processos que ele abrir terminarem (job object); depois procura as sobras.
 - **Três modos de busca:** Seguro (nomes exatos e a pasta de instalação), Moderado (também inicialização, serviços, atalhos, tarefas agendadas, regras do firewall, tipos de arquivo e tudo o que aponta para a pasta do programa; recomendado) e Avançado (também nomes parecidos e uma varredura profunda do Registro atrás de qualquer valor que aponte para o programa).
-- **Onde ele procura:** a pasta de instalação (e a do editor em volta dela, se ficar vazia); Arquivos de Programas, ProgramData, AppData (Roaming, Local, LocalLow) e as pastas do editor; chaves do Registro em SOFTWARE (64 e 32 bits, máquina e usuário); Run, RunOnce e os botões de inicialização do Gerenciador de Tarefas; serviços; tarefas agendadas; regras do Firewall do Windows; a variável PATH (do sistema e do usuário); App Paths e SharedDLLs; tipos de arquivo (ProgIDs), listas "Abrir com" e associações padrão; componentes COM e bibliotecas de tipos; itens do menu de contexto e extensões do Explorer (handlers, ícones sobrepostos, extensões aprovadas); reprodução automática (AutoPlay); pacotes do Windows registrados pelo programa (como o do menu de contexto do Windows 11); Software\Clients e RegisteredApplications; atalhos na área de trabalho, no menu Iniciar, na pasta Inicializar e fixados na barra de tarefas; rastros de uso que o Windows guarda por programa (MuiCache, configurações de compatibilidade, UserAssist, Jump Lists, a lista de atalhos usados do menu Iniciar). Caminhos gravados no formato curto 8.3 (`C:\PROGRA~1\...`) também são reconhecidos. Em programas do Windows Installer (MSI) que não gravam a pasta de instalação, o EXTIRPA a descobre pelos registros de componentes do instalador, pelo App Paths e pelos atalhos do menu Iniciar.
+- **Onde ele procura:** a pasta de instalação (e a do editor em volta dela, se ficar vazia); Arquivos de Programas, ProgramData, AppData (Roaming, Local, LocalLow) e as pastas do editor; chaves do Registro em SOFTWARE (64 e 32 bits, máquina e usuário); Run, RunOnce e os botões de inicialização do Gerenciador de Tarefas; serviços; tarefas agendadas; regras do Firewall do Windows; a variável PATH (do sistema e do usuário); App Paths e SharedDLLs; tipos de arquivo (ProgIDs), listas "Abrir com" e associações padrão; componentes COM e bibliotecas de tipos; itens do menu de contexto e extensões do Explorer (handlers, ícones sobrepostos, extensões aprovadas); reprodução automática (AutoPlay); pacotes do Windows registrados pelo programa (como o do menu de contexto do Windows 11); Software\Clients e RegisteredApplications; atalhos na área de trabalho, no menu Iniciar, na pasta Inicializar e fixados na barra de tarefas; rastros de uso que o Windows guarda por programa (MuiCache, configurações de compatibilidade, UserAssist, Jump Lists, a lista de atalhos usados do menu Iniciar). Caminhos gravados no formato curto 8.3 (`C:\PROGRA~1\...`) também são reconhecidos. Em programas do Windows Installer (MSI) que não gravam a pasta de instalação, o EXTIRPA a descobre pelos registros de componentes do instalador, pelo App Paths e pelos atalhos do menu Iniciar. Também acha o que o Windows guarda com o nome do executável do programa (arquivos do Prefetch, despejos de falha, relatórios de erro, chaves de rastreamento de rede) e o que o Windows Installer guarda de um programa MSI (o registro dele, o pacote em cache e as pastas registradas).
 - **Desinstalação rápida e em lote:** selecione vários programas e desinstale todos em sequência. Quando o desinstalador permite, ele roda em modo silencioso: Windows Installer (MSI), Inno Setup e NSIS são reconhecidos sozinhos, além do `QuietUninstallString` que alguns programas registram.
 - **Desinstalação forçada:** remove as sobras de um programa que já saiu, quebrou ou não tem desinstalador. Informe o nome, a pasta ou os dois.
 - **Rastreamento de instalação:** tira uma foto do Registro e das pastas, roda o instalador, tira outra foto e salva o que a instalação criou. Depois, "Desinstalar pelo rastreamento" remove exatamente isso.
@@ -59,7 +59,7 @@ Juntando as iniciais: **E.X.T.I.R.P.A.**
 1. Baixe o `extirpa.exe` da [release mais recente](https://github.com/MatheusRFC/extirpa/releases/latest) e salve onde quiser, por exemplo `C:\Ferramentas`. Não há nada para instalar.
 2. Execute. O Windows pede permissão de administrador (necessária para remover programas instalados para todos os usuários) e o SmartScreen avisa porque o programa não é assinado digitalmente: escolha **Mais informações → Executar assim mesmo**.
 3. Escolha um programa e clique em **Desinstalar**. Escolha o modo de busca, confirme e siga o desinstalador do próprio programa.
-4. No fim, o EXTIRPA mostra as sobras que encontrou. Confira a lista, desmarque o que quiser manter e clique em **Excluir marcados**.
+4. No fim, o EXTIRPA mostra as sobras em duas etapas: primeiro o Registro e o sistema (chaves, valores, serviços, tarefas agendadas, regras do firewall, PATH), depois os arquivos e pastas. Em cada etapa, confira a lista, desmarque o que quiser manter, clique em **Excluir marcados** e depois em **Próximo**.
 
 O EXTIRPA não inicia com o Windows, não tem serviço rodando por trás e não deixa nada aberto: fechou, acabou. Os dados dele (backups, rastreamentos, log e configurações) ficam em `%LOCALAPPDATA%\EXTIRPA`.
 
@@ -86,7 +86,7 @@ flowchart LR
 ```
 
 1. Antes de desinstalar, o EXTIRPA lê tudo o que identifica o programa: o nome sem versão e arquitetura, o editor, as pastas (também no formato curto 8.3) e os nomes dos executáveis. Depois que o desinstalador roda, a entrada do programa some, então isso precisa vir antes.
-2. Roda o desinstalador e espera ele e todos os processos que ele abrir.
+2. Roda o desinstalador e espera ele e todos os processos que ele abrir. Logo antes, ele analisa o programa ainda instalado: o que essa análise achar e o desinstalador deixar para trás também conta como sobra.
 3. Procura as sobras. Cada item recebe um nível de confiança: **alta** (nome exato, a pasta do próprio programa ou algo que aponta para dentro dela; vem marcado), **média** (nome parecido, referência indireta; desmarcado) ou **baixa** (ambíguo; desmarcado).
 4. Apaga só o que você deixar marcado: primeiro o backup do Registro, depois serviços e tarefas agendadas, regras do firewall e PATH, Registro e, por fim, os arquivos pela Lixeira. Pastas em uso podem ser agendadas para a próxima reinicialização.
 
@@ -94,7 +94,7 @@ flowchart LR
 
 Apagar demais é pior que apagar de menos, então o EXTIRPA foi construído em torno de regras que protegem o resto do sistema:
 
-- **Lista de proteção:** pastas do sistema (Windows, a própria Arquivos de Programas, pastas do usuário, o próprio AppData, menu Iniciar...) e as áreas do Registro que são do Windows (`HKLM\SYSTEM`, dados do Windows Installer, políticas, as raízes de tipos de arquivo e COM...) nunca são apagadas, nem qualquer pasta ou chave que as contenha. A proteção é conferida quando o item entra na lista e de novo logo antes de apagar.
+- **Lista de proteção:** pastas do sistema (Windows, a própria Arquivos de Programas, pastas do usuário, o próprio AppData, menu Iniciar...) e as áreas do Registro que são do Windows (`HKLM\SYSTEM`, dados do Windows Installer, políticas, as raízes de tipos de arquivo e COM...) nunca são apagadas, nem qualquer pasta ou chave que as contenha. A proteção é conferida quando o item entra na lista e de novo logo antes de apagar. As únicas exceções são os itens do próprio programa, identificados com exatidão: o registro dele no Windows Installer (pelo código do produto), o pacote do instalador em cache e os arquivos dele no Prefetch.
 - **A pasta mais específica ganha:** um caminho dentro de `C:\Program Files\Editor\Outro` é do programa instalado ali, não de um instalado em `C:\Program Files\Editor`.
 - **Nomes compartilhados com outro programa instalado** (duas versões do Python dividem "Python", por exemplo) vêm desmarcados, e o EXTIRPA procura dentro deles a parte que é só do programa que está saindo.
 - **Pastas que contêm outro programa instalado** saem item por item, preservando o outro programa.
