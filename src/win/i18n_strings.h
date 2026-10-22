@@ -144,9 +144,9 @@ X(S_LEFT_STEP_REG, u"Registro e sistema: %u sobras de %s", u"Registry and system
 X(S_LEFT_STEP_REG_NONE, u"Registro e sistema: nenhuma sobra pendente de %s", u"Registry and system: no pending leftovers of %s")
 X(S_LEFT_STEP_FILES, u"Arquivos e pastas: %u sobras de %s", u"Files and folders: %u leftovers of %s")
 X(S_LEFT_STEP_FILES_NONE, u"Arquivos e pastas: nenhuma sobra pendente de %s", u"Files and folders: no pending leftovers of %s")
-X(S_LEFT_REG_COUNTS, u"%u chaves, %u valores e %u outros itens do sistema (serviços, tarefas agendadas, firewall, PATH, pacotes)",
-  u"%u keys, %u values and %u other system items (services, scheduled tasks, firewall, PATH, packages)")
-X(S_LEFT_FILE_COUNTS, u"%u pastas e %u arquivos, %s no total", u"%u folders and %u files, %s in total")
+X(S_LEFT_REG_COUNTS, u"Chaves: %u · valores: %u · outros itens do sistema (serviços, tarefas agendadas, firewall, PATH, pacotes): %u",
+  u"Keys: %u · values: %u · other system items (services, scheduled tasks, firewall, PATH, packages): %u")
+X(S_LEFT_FILE_COUNTS, u"Pastas: %u · arquivos: %u · tamanho total: %s", u"Folders: %u · files: %u · total size: %s")
 X(S_LEFT_BACK, u"< Voltar", u"< Back")
 X(S_LEFT_NEXT, u"Próximo >", u"Next >")
 X(S_LEFT_FINISH, u"Concluir", u"Finish")

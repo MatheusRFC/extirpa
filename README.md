@@ -4,7 +4,7 @@
 
 # EXTIRPA
 
-The **EX**haustive **T**race & **I**nstalled-**R**esidue **P**urge **A**gent (**E.X.T.I.R.P.A.**) is a complete uninstaller for Windows. It runs a program's own uninstaller and then hunts down everything the program left behind: folders, files, registry keys and values, services, scheduled tasks, firewall rules, startup entries, shortcuts, context menu entries, file types and PATH entries. Written from scratch in C, with no runtime and no C library: one executable of about 250 KB.
+The **EX**haustive **T**race & **I**nstalled-**R**esidue **P**urge **A**gent (**E.X.T.I.R.P.A.**) is a complete uninstaller for Windows. It runs a program's own uninstaller and then hunts down everything the program left behind: folders, files, registry keys and values, services, scheduled tasks, firewall rules, startup entries, shortcuts, context menu entries, file types and PATH entries. Written from scratch in C, with no runtime and no C library: one executable of about 270 KB.
 
 **English** · [Português (Brasil)](docs/i18n/README.pt-BR.md) · [Español](docs/i18n/README.es-ES.md) · [Français](docs/i18n/README.fr-FR.md) · [中文](docs/i18n/README.zh-CN.md) · [हिन्दी](docs/i18n/README.hi-IN.md) · [العربية](docs/i18n/README.ar.md) · [বাংলা](docs/i18n/README.bn-BD.md)
 
@@ -23,7 +23,7 @@ EXTIRPA removes the program the right way first, with the program's own uninstal
 - **Thorough:** it looks in every place a program usually writes to, from AppData to scheduled tasks and firewall rules (the full list is below).
 - **Safe:** it never touches what belongs to Windows or to another installed program, backs up the registry before deleting, and sends files to the Recycle Bin.
 - **Transparent:** every item comes with its type, a confidence level and the reason it was found. Only high-confidence items come checked.
-- **Light:** one native executable of about 250 KB, no installer, no services, no telemetry. It does its job and closes.
+- **Light:** one native executable of about 270 KB, no installer, no services, no telemetry. It does its job and closes.
 - **Open source:** the code is fully auditable, and you can build your own version and change whatever you want.
 
 ## Why the name
@@ -43,7 +43,7 @@ Put the initials together: **E.X.T.I.R.P.A.**
 
 - **Uninstall:** runs the program's uninstaller and waits for it and every process it starts to finish (job object), then searches for leftovers.
 - **Three search modes:** Safe (exact names and the install folder), Moderate (also startup entries, services, shortcuts, scheduled tasks, firewall rules, file types and everything that points to the program's folder; recommended), Advanced (also similar names and a deep scan of the registry for any value that points to the program).
-- **Where it looks:** the install folder (and the publisher's folder around it, if left empty); Program Files, ProgramData, AppData (Roaming, Local, LocalLow) and the publisher's folders; registry keys under SOFTWARE (64 and 32 bits, machine and user); Run, RunOnce and the Task Manager's startup switches; services; scheduled tasks; Windows Firewall rules; the PATH variable (system and user); App Paths and SharedDLLs; file types (ProgIDs), "Open with" lists and default associations; COM components and type libraries; context menu entries and Explorer extensions (handlers, icon overlays, approved extensions); AutoPlay handlers; Windows packages the program registered (such as the Windows 11 context menu package); Software\Clients and RegisteredApplications; shortcuts on the desktop, Start menu, Startup folder and taskbar pins; usage traces Windows keeps per program (MuiCache, compatibility settings, UserAssist, Jump Lists, the Start menu's list of used shortcuts). Paths written in short 8.3 form (`C:\PROGRA~1\...`) are recognized too. For Windows Installer (MSI) programs that don't record their install folder, EXTIRPA finds it from the installer's component records, App Paths and Start menu shortcuts.
+- **Where it looks:** the install folder (and the publisher's folder around it, if left empty); Program Files, ProgramData, AppData (Roaming, Local, LocalLow) and the publisher's folders; registry keys under SOFTWARE (64 and 32 bits, machine and user); Run, RunOnce and the Task Manager's startup switches; services; scheduled tasks; Windows Firewall rules; the PATH variable (system and user); App Paths and SharedDLLs; file types (ProgIDs), "Open with" lists and default associations; COM components and type libraries; context menu entries and Explorer extensions (handlers, icon overlays, approved extensions); AutoPlay handlers; Windows packages the program registered (such as the Windows 11 context menu package); Software\Clients and RegisteredApplications; shortcuts on the desktop, Start menu, Startup folder and taskbar pins; usage traces Windows keeps per program (MuiCache, compatibility settings, UserAssist, Jump Lists, the Start menu's list of used shortcuts). Paths written in short 8.3 form (`C:\PROGRA~1\...`) are recognized too. For Windows Installer (MSI) programs that don't record their install folder, EXTIRPA finds it from the installer's component records, App Paths and Start menu shortcuts. It also finds what Windows keeps under the program's executable name (Prefetch files, crash dumps, error reports, network tracing keys) and what Windows Installer keeps of an MSI program (its registration, the cached package and its folder entries).
 - **Quick and batch uninstall:** select several programs and uninstall them in a row. When the uninstaller supports it, it runs silently: Windows Installer (MSI), Inno Setup and NSIS are recognized automatically, besides the `QuietUninstallString` some programs register.
 - **Forced uninstall:** removes the leftovers of a program that is already gone, broken or has no uninstaller. Give its name, its folder or both.
 - **Install tracing:** takes a snapshot of the registry and folders, runs the installer, takes another snapshot and saves what the installation created. Later, "Uninstall using trace" removes exactly that.
@@ -59,7 +59,7 @@ Put the initials together: **E.X.T.I.R.P.A.**
 1. Download `extirpa.exe` from the [latest release](https://github.com/MatheusRFC/extirpa/releases/latest) and save it anywhere, for example `C:\Tools`. There is nothing to install.
 2. Run it. Windows asks for administrator rights (needed to remove programs installed for all users) and SmartScreen warns because the program is not code-signed: choose **More info → Run anyway**.
 3. Pick a program and click **Uninstall**. Choose the search mode, confirm, and follow the program's own uninstaller.
-4. When it finishes, EXTIRPA shows the leftovers it found. Review the list, uncheck anything you want to keep and click **Delete checked**.
+4. When it finishes, EXTIRPA shows the leftovers in two steps: first the registry and system items (keys, values, services, scheduled tasks, firewall rules, PATH), then the files and folders. On each step, review the list, uncheck anything you want to keep and click **Delete checked**, then **Next**.
 
 EXTIRPA does not start with Windows, has no background service and leaves nothing running: close it and it is gone. Its data (backups, traces, log and settings) lives in `%LOCALAPPDATA%\EXTIRPA`.
 
@@ -86,7 +86,7 @@ flowchart LR
 ```
 
 1. Before uninstalling, EXTIRPA reads everything that identifies the program: its name without version and architecture, the publisher, its folders (also in short 8.3 form) and the names of its executables. After the uninstaller runs, the program's entry is gone, so this has to happen first.
-2. It runs the uninstaller and waits for it and every process it starts.
+2. It runs the uninstaller and waits for it and every process it starts. Right before, it analyzes the program while it is still installed: anything that analysis found and the uninstaller left behind also counts as a leftover.
 3. It searches for leftovers. Every item gets a confidence level: **high** (exact name, the program's own folder or something that points into it; comes checked), **medium** (similar name, indirect reference; unchecked) or **low** (ambiguous; unchecked).
 4. It deletes only what you leave checked: registry backup first, then services and scheduled tasks, firewall rules and PATH, registry, and finally files through the Recycle Bin. Folders that are in use can be scheduled for deletion at the next restart.
 
@@ -94,7 +94,7 @@ flowchart LR
 
 Removing too much is worse than removing too little, so EXTIRPA is built around rules that protect the rest of the system:
 
-- **Protection list:** system folders (Windows, Program Files itself, user folders, AppData itself, Start menu...) and the registry areas that belong to Windows (`HKLM\SYSTEM`, Windows Installer data, policies, the roots of file types and COM...) are never deleted, nor is any folder or key that contains them. The protection is checked when an item enters the list and again right before deletion.
+- **Protection list:** system folders (Windows, Program Files itself, user folders, AppData itself, Start menu...) and the registry areas that belong to Windows (`HKLM\SYSTEM`, Windows Installer data, policies, the roots of file types and COM...) are never deleted, nor is any folder or key that contains them. The protection is checked when an item enters the list and again right before deletion. The only exceptions are the program's own entries, matched exactly: its Windows Installer registration (by product code), its cached installer package and its Prefetch files.
 - **The most specific folder wins:** a path inside `C:\Program Files\Vendor\Other` belongs to the program installed there, not to one installed in `C:\Program Files\Vendor`.
 - **Names shared with another installed program** (two versions of Python share "Python", for example) come unchecked, and EXTIRPA looks inside them for the part that belongs only to the program being removed.
 - **Folders that contain another installed program** are removed item by item, keeping the other program.

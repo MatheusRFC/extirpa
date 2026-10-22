@@ -835,6 +835,58 @@ static WCHAR *any_command(HKEY k) {
     return r;
 }
 
+// A chave tem comando ou ícone que NÃO é do programa (um verbo de outro, o ícone do Windows)?
+static bool shared_class(Scan *sc, HKEY k) {
+    bool other = false;
+    HKEY ic = reg_open_sub(k, u"DefaultIcon");
+    if (ic) {
+        WCHAR *v = value_text(ic, u"");
+        RegCloseKey(ic);
+        other = v && v[0] && !owns(sc, v);
+        xfree(v);
+    }
+    HKEY shell = reg_open_sub(k, u"shell");
+    if (shell) {
+        PtrVec verbs = reg_subkeys(shell);
+        for (size_t i = 0; i < verbs.n && !other && i < 64; i++) {
+            WCHAR *sub = path_join(verbs.items[i], u"command");
+            HKEY c = reg_open_sub(shell, sub);
+            xfree(sub);
+            if (!c) continue;
+            WCHAR *v = value_text(c, u"");
+            RegCloseKey(c);
+            other = v && v[0] && !owns(sc, v);
+            xfree(v);
+        }
+        strings_free(&verbs);
+        RegCloseKey(shell);
+    }
+    return other;
+}
+
+// Os verbos (shell\<verbo>) do programa dentro de uma classe que não é dele.
+static void add_owned_verbs(Scan *sc, HKEY k, const WCHAR *root, const WCHAR *cls) {
+    HKEY shell = reg_open_sub(k, u"shell");
+    if (!shell) return;
+    PtrVec verbs = reg_subkeys(shell);
+    for (size_t i = 0; i < verbs.n && i < 64; i++) {
+        WCHAR *sub = path_join(verbs.items[i], u"command");
+        HKEY c = reg_open_sub(shell, sub);
+        xfree(sub);
+        if (!c) continue;
+        WCHAR *v = value_text(c, u"");
+        RegCloseKey(c);
+        if (owns(sc, v)) {
+            WCHAR *full = wfmt(u"%s\\%s\\shell\\%s", root, cls, verbs.items[i]);
+            left_add(sc->out, LK_KEY, full, NULL, CONF_HIGH, LR_SHELL_EXT, v);
+            xfree(full);
+        }
+        xfree(v);
+    }
+    strings_free(&verbs);
+    RegCloseKey(shell);
+}
+
 static bool skip_class(const WCHAR *name) {
     static const WCHAR *const SKIP[] = {u"CLSID", u"Interface", u"TypeLib", u"AppID", u"Installer", u"Local Settings", u"WOW6432Node", u"*", u"Directory",
                                         u"Folder", u"Drive", u"AllFilesystemObjects", u"SystemFileAssociations", u"Applications", u"MIME", u"Protocols"};
@@ -857,7 +909,14 @@ static void scan_classes(Scan *sc) {
             if (!k) continue;
             WCHAR *hit = owned_command(sc, k);
             int conf = hit ? CONF_HIGH : CONF_NONE;
-            if (!hit && progid_named(sc, name)) {
+            if (hit && !progid_named(sc, name) && shared_class(sc, k)) {
+                // classe de outro dono (AudioCD, DVD...) em que o programa pôs um verbo: só o verbo sai
+                add_owned_verbs(sc, k, CLASSES_ROOTS[r], name);
+                xfree(hit);
+                hit = NULL;
+                conf = CONF_NONE;
+            }
+            if (!hit && conf == CONF_NONE && progid_named(sc, name)) {
                 // tipo de arquivo com o nome do programa ("GridCraft.Workbook"): marcado se o
                 // executável dele não existe mais (ou se não tem comando), senão só sugerido
                 hit = any_command(k);
@@ -1295,7 +1354,10 @@ static int exe_name_conf(const Scan *sc, const WCHAR *exe_leaf) {
         bool weak = wlen(nb) < 4 || is_generic_word(nb) || wistarts(nb, u"unins") || wistarts(nb, u"setup") || wistarts(nb, u"install") ||
                     wistarts(nb, u"update") || wistarts(nb, u"uninst");
         for (size_t j = 0; j < sc->others.n && !weak; j++) weak = vec_has_i(&((const Identity *)sc->others.items[j])->exes, exe_leaf);
-        c = weak ? CONF_LOW : CONF_MEDIUM;
+        // executável da pasta do programa com o nome dele ("Greenshot.exe" do Greenshot, cujo nome
+        // também é o do editor e por isso não conta como nome exato)
+        bool own_name = sc->id->name_norm && weq(nb, sc->id->name_norm);
+        c = weak ? CONF_LOW : own_name ? CONF_HIGH : CONF_MEDIUM;
         xfree(nb);
     }
     xfree(base);
@@ -2190,11 +2252,49 @@ bool leftover_exists(const Leftover *it) {
     return false;
 }
 
+// Texto atual de um valor do Registro (como regvalue_text), ou NULL.
+static WCHAR *current_value_text(const WCHAR *key, const WCHAR *name) {
+    HKEY k = reg_open(key, KEY_READ);
+    if (!k) return NULL;
+    WCHAR *r = NULL;
+    PtrVec vals = reg_values(k);
+    for (size_t i = 0; i < vals.n && !r; i++) {
+        RegValue *v = vals.items[i];
+        if (wieq(v->name, name ? name : u"")) r = regvalue_text(v);
+    }
+    reg_values_free(&vals);
+    RegCloseKey(k);
+    return r;
+}
+
+// Um item da análise de antes do desinstalador ainda é do programa? Existir não basta para o que
+// foi achado pelo conteúdo: o desinstalador pode ter devolvido a associação de um tipo de
+// arquivo a outro programa (".mp3" = "WMP11.AssocFile.MP3") ou tirado só o verbo dele de uma
+// chave do Windows. Por isso só voltam os itens achados pelo nome (pastas, arquivos, chaves com o
+// nome do programa, valores cujo nome é o rastro) e os valores com o mesmo conteúdo de antes.
+static bool still_ours(const Leftover *it) {
+    if (!leftover_exists(it)) return false;
+    switch (it->kind) {
+    case LK_KEY:
+    case LK_KEY_IF_EMPTY:
+        return it->reason == LR_NAME || it->reason == LR_PUBLISHER || it->reason == LR_APP_PATHS || it->reason == LR_UNINSTALL_KEY ||
+               it->reason == LR_MSI || it->reason == LR_EXE_TRACE;
+    case LK_VALUE: {
+        if (!it->detail || !it->detail[0]) return it->value && it->value[0];  // o nome do valor é o rastro
+        WCHAR *now = current_value_text(it->path, it->value);
+        bool same = now && wifind(now, it->detail);
+        xfree(now);
+        return same;
+    }
+    default: return true;  // pastas, arquivos, serviços, tarefas, regras, pacotes: pelo nome ou caminho
+    }
+}
+
 size_t leftovers_add_existing(LeftList *dst, const LeftList *src) {
     size_t added = 0;
     for (size_t i = 0; i < src->items.n; i++) {
         const Leftover *it = src->items.items[i];
-        if (!leftover_exists(it)) continue;
+        if (!still_ours(it)) continue;
         size_t n0 = dst->items.n;
         left_add(dst, it->kind, it->path, it->value, it->conf, it->reason, it->detail);
         added += dst->items.n > n0;

@@ -1090,6 +1090,10 @@ static void test_real_cases(void) {
     fake_dword(USERASSIST, ua_other, 1);
     fake_str(JUMPLIST, u"{6D809377-6AF0-444B-8957-A3773F02200E}\\VideoLAN\\VLC\\vlc.exe", u"x");
     fake_str(JUMPLIST, u"Microsoft.Windows.Explorer", u"x");
+    // classe do Windows (AudioCD) em que o VLC pôs um verbo: só o verbo dele sai
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\AudioCD\\DefaultIcon", u"", u"%SystemRoot%\\system32\\shell32.dll,40");
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\AudioCD\\shell\\play\\command", u"", u"\"%ProgramFiles%\\Windows Media Player\\wmplayer.exe\" /prefetch:3 /Play %L");
+    fake_str(u"HKLM\\SOFTWARE\\Classes\\AudioCD\\shell\\PlayWithVLC\\command", u"", u"\"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe\" --started-from-file cdda:///%1");
     v = programs_load();
     p = find_program(&v, u"VLC media player");
     CHECK(p != NULL);
@@ -1118,6 +1122,9 @@ static void test_real_cases(void) {
         if (it) it->checked = true;  // o usuário marca
         it = find_item(&l, LK_VALUE, FILEEXTS u"\\.mp3\\OpenWithProgids", u"VLC.mp3");
         CHECK(it && it->checked);
+        it = find_item(&l, LK_KEY, u"HKLM\\SOFTWARE\\Classes\\AudioCD\\shell\\PlayWithVLC", NULL);
+        CHECK(it && it->checked);
+        CHECK(!find_item(&l, LK_KEY, u"HKLM\\SOFTWARE\\Classes\\AudioCD", NULL));
         it = find_item(&l, LK_VALUE, USERASSIST, ua_vlc);
         CHECK(it && it->checked);
         it = find_item(&l, LK_VALUE, USERASSIST, ua_appid);
@@ -1139,6 +1146,7 @@ static void test_real_cases(void) {
         CHECK(!fake_val_exists(FILEEXTS u"\\.mp3\\OpenWithProgids", u"VLC.mp3") && fake_val_exists(FILEEXTS u"\\.mp3\\OpenWithProgids", u"WMP11.AssocFile.MP3"));
         CHECK(!fake_val_exists(USERASSIST, ua_vlc) && fake_val_exists(USERASSIST, ua_np));
         CHECK(fake_val_exists(JUMPLIST, u"Microsoft.Windows.Explorer"));
+        CHECK(!fake_key_exists(u"HKLM\\SOFTWARE\\Classes\\AudioCD\\shell\\PlayWithVLC") && fake_key_exists(u"HKLM\\SOFTWARE\\Classes\\AudioCD\\shell\\play\\command"));
         del_result_free(&r);
         left_free(&l);
         identity_free(id);
@@ -1146,6 +1154,39 @@ static void test_real_cases(void) {
     }
     programs_free(&v);
     xfree(ua_vlc), xfree(ua_np), xfree(ua_appid), xfree(ua_other);
+
+    // Greenshot: o nome do programa é também o do editor (não conta como nome exato), mas o
+    // executável com esse nome estava na pasta dele: as chaves de rastreamento de rede são dele
+    base_system();
+    const WCHAR GS[] = u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Greenshot_is1";
+    fake_str(GS, u"DisplayName", u"Greenshot 1.3.328");
+    fake_str(GS, u"Publisher", u"Greenshot");
+    fake_str(GS, u"InstallLocation", u"C:\\Users\\ana\\AppData\\Local\\Programs\\Greenshot\\");
+    fake_str(GS, u"UninstallString", u"\"C:\\Users\\ana\\AppData\\Local\\Programs\\Greenshot\\unins000.exe\"");
+    fake_file(u"C:\\Users\\ana\\AppData\\Local\\Programs\\Greenshot\\Greenshot.exe", "MZ", 2);
+    fake_file(u"C:\\Users\\ana\\AppData\\Local\\Programs\\Greenshot\\unins000.exe", "MZ", 2);
+    fake_key(u"HKLM\\SOFTWARE\\Microsoft\\Tracing\\Greenshot_RASAPI32");
+    fake_file(u"C:\\Windows\\Prefetch\\UNINS000.EXE-1A2B3C4D.pf", "x", 1);  // nome genérico: de qualquer Inno Setup
+    v = programs_load();
+    p = find_program(&v, u"Greenshot 1.3.328");
+    CHECK(p != NULL);
+    if (p) {
+        Identity *id = program_identity_target(p);
+        WCHAR *key = wdup(p->key_path);
+        reg_delete_key(key);
+        DeleteFileW(u"C:\\Users\\ana\\AppData\\Local\\Programs\\Greenshot\\Greenshot.exe");
+        LeftList l = {0};
+        scan_leftovers(&l, id, key, SCAN_MODERATE, NULL);
+        left_finalize(&l);
+        Leftover *t = find_item(&l, LK_KEY, u"HKLM\\SOFTWARE\\Microsoft\\Tracing\\Greenshot_RASAPI32", NULL);
+        CHECK(t && t->conf == CONF_HIGH && t->checked);
+        CHECK(!any_path_contains(&l, u"UNINS000.EXE"));  // baixa: nem aparece no modo moderado
+        if (g_fail) dump(&l);
+        left_free(&l);
+        identity_free(id);
+        xfree(key);
+    }
+    programs_free(&v);
 
     // Notepad++: o atalho do Bloco de Notas do Windows ("Notepad.lnk", sem destino) não é dele
     base_system();
@@ -1667,7 +1708,14 @@ static void test_gridcraft_real_flow(void) {
     left_add(&pre, LK_KEY, u"HKLM\\SOFTWARE\\GridCraft", NULL, CONF_HIGH, LR_NAME, NULL);
     left_add(&pre, LK_DIR, u"C:\\Program Files\\GridCraft", NULL, CONF_HIGH, LR_INSTALL_DIR, NULL);
     left_add(&pre, LK_DIR, u"C:\\Users\\ana\\.gridcraft", NULL, CONF_HIGH, LR_NAME, NULL);
-    CHECK(leftovers_add_existing(&dst, &pre) == 2);
+    // achados pelo conteúdo: só voltam se o conteúdo ainda for o mesmo
+    left_add(&pre, LK_VALUE, u"HKLM\\SOFTWARE\\Classes\\.csv", u"", CONF_MEDIUM, LR_REFERENCE, u"GridCraft.TextData");   // hoje: Excel.CSV
+    left_add(&pre, LK_KEY, u"HKLM\\SOFTWARE\\Classes\\Excel.Sheet.12", NULL, CONF_HIGH, LR_FILE_ASSOC, GC_EXE);         // existe, mas é do Excel
+    left_add(&pre, LK_VALUE, UFH_SHC, u"12", CONF_HIGH, LR_USAGE, GC_EXE);                                                  // mesmo conteúdo
+    left_add(&pre, LK_VALUE, UFH_SHC, u"13", CONF_HIGH, LR_USAGE, GC_EXE);                                                  // outro conteúdo
+    CHECK(leftovers_add_existing(&dst, &pre) == 3);
+    CHECK(find_item(&dst, LK_VALUE, UFH_SHC, u"12") && !find_item(&dst, LK_VALUE, UFH_SHC, u"13"));
+    CHECK(!any_path_contains(&dst, u"Excel") && !find_item(&dst, LK_VALUE, u"HKLM\\SOFTWARE\\Classes\\.csv", u""));
     CHECK(find_item(&dst, LK_KEY, u"HKLM\\SOFTWARE\\Microsoft\\Tracing\\gridcraft_RASAPI32", NULL) && find_item(&dst, LK_DIR, u"C:\\Users\\ana\\.gridcraft", NULL));
     left_free(&pre), left_free(&dst);
 
