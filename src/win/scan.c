@@ -2206,6 +2206,8 @@ void leftovers_measure(LeftList *l, Ctl *ctl) {
     }
 }
 
+static bool path_entry_present(const WCHAR *key, const WCHAR *entry);
+
 bool leftover_exists(const Leftover *it) {
     switch (it->kind) {
     case LK_KEY:
@@ -2241,7 +2243,7 @@ bool leftover_exists(const Leftover *it) {
         RegCloseKey(k);
         return ok;
     }
-    case LK_PATHENTRY: return true;  // entradas de PATH não vêm de rastreamentos
+    case LK_PATHENTRY: return path_entry_present(it->path, it->value);
     case LK_APPX: {
         WCHAR *k = path_join(APPX_PACKAGES_KEY, it->path);
         bool ok = reg_exists(k);
@@ -2269,7 +2271,7 @@ static WCHAR *current_value_text(const WCHAR *key, const WCHAR *name) {
 
 // Um item da análise de antes do desinstalador ainda é do programa? Existir não basta para o que
 // foi achado pelo conteúdo: o desinstalador pode ter devolvido a associação de um tipo de
-// arquivo a outro programa (".mp3" = "WMP11.AssocFile.MP3") ou tirado só o verbo dele de uma
+// arquivo a outro programa (".mp3" apontando de novo para outro player) ou tirado só o verbo dele de uma
 // chave do Windows. Por isso só voltam os itens achados pelo nome (pastas, arquivos, chaves com o
 // nome do programa, valores cujo nome é o rastro) e os valores com o mesmo conteúdo de antes.
 static bool still_ours(const Leftover *it) {

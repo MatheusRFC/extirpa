@@ -1713,6 +1713,10 @@ static void test_gridcraft_real_flow(void) {
     left_add(&pre, LK_KEY, u"HKLM\\SOFTWARE\\Classes\\Excel.Sheet.12", NULL, CONF_HIGH, LR_FILE_ASSOC, GC_EXE);         // existe, mas é do Excel
     left_add(&pre, LK_VALUE, UFH_SHC, u"12", CONF_HIGH, LR_USAGE, GC_EXE);                                                  // mesmo conteúdo
     left_add(&pre, LK_VALUE, UFH_SHC, u"13", CONF_HIGH, LR_USAGE, GC_EXE);                                                  // outro conteúdo
+    // entrada do PATH que o desinstalador já tirou: não volta
+    fake_str(u"HKCU\\Environment", u"Path", u"C:\\Tools;C:\\Users\\ana\\bin");
+    left_add(&pre, LK_PATHENTRY, u"HKCU\\Environment", u"C:\\Program Files\\GridCraft", CONF_HIGH, LR_PATH_VAR, NULL);
+    CHECK(find_item(&pre, LK_PATHENTRY, u"HKCU\\Environment", u"C:\\Program Files\\GridCraft") != NULL);
     CHECK(leftovers_add_existing(&dst, &pre) == 3);
     CHECK(find_item(&dst, LK_VALUE, UFH_SHC, u"12") && !find_item(&dst, LK_VALUE, UFH_SHC, u"13"));
     CHECK(!any_path_contains(&dst, u"Excel") && !find_item(&dst, LK_VALUE, u"HKLM\\SOFTWARE\\Classes\\.csv", u""));
