@@ -682,6 +682,16 @@ static int realtest(int argc, WCHAR **argv) {
         DelResult r;
         delete_leftovers(&l, t->name, NULL, &r);
         linef(wfmt(u"  exclusão: %d apagados, %d falharam, %d mantidos, %d sem Lixeira", r.deleted, r.failed, r.kept, r.permanent));
+        // apagou algo que já existia antes de instalar os programas do teste? (seria de outro dono)
+        for (size_t i = 0; i < l.items.n; i++) {
+            Leftover *it = l.items.items[i];
+            if (it->status != LS_DELETED) continue;
+            TraceKind tk = it->kind == LK_VALUE ? TR_VALUE : left_is_registry(it->kind) ? TR_KEY : it->kind == LK_FILE ? TR_FILE : it->kind == LK_DIR || it->kind == LK_DIR_IF_EMPTY ? TR_DIR : (TraceKind)0;
+            if (tk && hs_has(&s.before, hash_entry(tk, it->path, tk == TR_VALUE ? it->value : NULL))) {
+                linef(wfmt(u"    JÁ EXISTIA ANTES DE INSTALAR e foi apagado: %s %s", it->path, it->value ? it->value : u""));
+                problems++;
+            }
+        }
         for (size_t i = 0; i < l.items.n; i++) {
             Leftover *it = l.items.items[i];
             if (it->status == LS_FAILED) {
