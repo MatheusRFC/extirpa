@@ -1,0 +1,71 @@
+2026-10-22 02:22:09    foto: HKLM\SOFTWARE\Classes levou 3953 ms (187052 entradas)
+2026-10-22 02:22:11    foto: 262144 entradas, 5937 ms, em HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\SideBySide\Winners\wow64_microsoft-windows-security-ngc-utils_31bf3856ad364e35_none_0ccebc96b70beeaa\10.0
+2026-10-22 02:22:11    foto: HKLM\SOFTWARE\Microsoft levou 2828 ms (93446 entradas)
+2026-10-22 02:22:14    foto: HKLM\SOFTWARE\Wow6432Node levou 2328 ms (101389 entradas)
+2026-10-22 02:22:14    foto: HKLM\SOFTWARE pronto, 382213 entradas, 9125 ms
+2026-10-22 02:22:14    foto: HKCU\Software pronto, 384047 entradas, 9187 ms
+2026-10-22 02:22:17    foto: C:\Program Files\Amazon\AWSCLIV2 levou 3375 ms (7126 entradas)
+2026-10-22 02:22:19    foto: C:\Program Files\Amazon levou 4734 ms (9480 entradas)
+2026-10-22 02:22:22    foto: C:\Program Files\CMake levou 2109 ms (8949 entradas)
+2026-10-22 02:22:27    foto: C:\Program Files\dotnet\packs levou 4406 ms (9245 entradas)
+2026-10-22 02:22:41    foto: C:\Program Files\dotnet\sdk levou 13891 ms (23927 entradas)
+2026-10-22 02:22:43    foto: C:\Program Files\dotnet\shared levou 2093 ms (5063 entradas)
+2026-10-22 02:22:43    foto: C:\Program Files\dotnet levou 20750 ms (38715 entradas)
+2026-10-22 02:22:45    foto: C:\Program Files\Git levou 2281 ms (8866 entradas)
+2026-10-22 02:22:54    foto: C:\Program Files pronto, 482642 entradas, 49765 ms
+2026-10-22 02:22:59    foto: 524288 entradas, 54609 ms, em C:\Program Files (x86)\Android\android-sdk\platforms\android-37.1\data\res\values-lo
+2026-10-22 02:23:00    foto: C:\Program Files (x86)\Android\android-sdk levou 6016 ms (56569 entradas)
+2026-10-22 02:23:01    foto: C:\Program Files (x86)\Android levou 6516 ms (57469 entradas)
+2026-10-22 02:23:13    foto: C:\Program Files (x86)\Microsoft SDKs\NuGetPackages levou 10047 ms (12142 entradas)
+2026-10-22 02:23:19    foto: C:\Program Files (x86)\Microsoft SDKs\UWPNuGetPackages levou 5719 ms (8744 entradas)
+2026-10-22 02:23:19    foto: C:\Program Files (x86)\Microsoft SDKs levou 16109 ms (21832 entradas)
+2026-10-22 02:23:25    foto: C:\Program Files (x86)\Windows Kits\10 levou 2891 ms (9813 entradas)
+2026-10-22 02:23:25    foto: C:\Program Files (x86)\Windows Kits levou 2953 ms (9953 entradas)
+2026-10-22 02:23:26    foto: C:\Program Files (x86) pronto, 585956 entradas, 80922 ms
+2026-10-22 02:23:34    foto: C:\ProgramData\Microsoft\VisualStudio levou 6922 ms (3431 entradas)
+2026-10-22 02:23:34    foto: C:\ProgramData\Microsoft levou 7156 ms (5072 entradas)
+2026-10-22 02:23:34    foto: C:\ProgramData pronto, 593146 entradas, 89265 ms
+2026-10-22 02:23:34    foto: C:\Users\runneradmin\AppData\Roaming pronto, 593298 entradas, 89328 ms
+2026-10-22 02:23:35    foto: C:\Users\runneradmin\AppData\Local pronto, 596905 entradas, 90625 ms
+2026-10-22 02:23:35    foto: C:\Users\runneradmin\AppData\LocalLow pronto, 596935 entradas, 90625 ms
+2026-10-22 02:23:35    foto: C:\Users\runneradmin\Desktop pronto, 596936 entradas, 90625 ms
+2026-10-22 02:23:35    foto: C:\Users\Public\Desktop pronto, 596942 entradas, 90625 ms
+2026-10-22 02:23:35  Foto do sistema (antes): 596942 entradas lidas em 90625 ms
+2026-10-22 02:30:23  Windows Installer: 175539 componentes lidos em 4844 ms (361 produtos com arquivos só deles)
+2026-10-22 02:30:23  Busca de sobras: "GridCraft" (modo 1, 1 pastas do programa)
+2026-10-22 02:30:28  Busca de sobras: 34 itens encontrados
+2026-10-22 02:30:28  Busca de sobras: "GridCraft" (modo 2, 1 pastas do programa)
+2026-10-22 02:30:33  Busca de sobras: 35 itens encontrados
+2026-10-22 02:30:38  Windows Installer: 175539 componentes lidos em 4781 ms (361 produtos com arquivos só deles)
+2026-10-22 02:30:38  Busca de sobras: "GridCraft" (modo 1, 1 pastas do programa)
+2026-10-22 02:30:39  Busca de sobras: 30 itens encontrados
+2026-10-22 02:30:39  Executando: "C:\Windows\system32\msiexec.exe" /X{923A99B5-32DE-4270-ABCE-026019B0C12F} /passive /norestart
+2026-10-22 02:30:40    terminou: código 0
+2026-10-22 02:30:43  Busca de sobras: "GridCraft" (modo 1, 1 pastas do programa)
+2026-10-22 02:30:48  Windows Installer: 175535 componentes lidos em 4969 ms (360 produtos com arquivos só deles)
+2026-10-22 02:30:48  Busca de sobras: 6 itens encontrados
+2026-10-22 02:30:49  Exclusão de sobras: "GridCraft"
+2026-10-22 02:30:49    backup do Registro: C:\Users\runneradmin\AppData\Local\EXTIRPA\Backups\20261022-023049 - GridCraft.reg
+2026-10-22 02:30:49    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\TevqPensg\tevqpensg.rkr
+2026-10-22 02:30:49    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{F4E57C4B-2036-45F0-A9AB-443BCFE33D9F}\Count -> {0139Q44R-6NSR-49S2-8690-3QNSPNR6SSO8}\TevqPensg.yax
+2026-10-22 02:30:49    apagado: valor HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 64
+2026-10-22 02:30:49    apagado: valor HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\Folders -> C:\Windows\Installer\{923A99B5-32DE-4270-ABCE-026019B0C12F}\
+2026-10-22 02:30:49    apagado: pasta C:\Users\runneradmin\AppData\Roaming\GridCraft
+2026-10-22 02:30:49    apagado: pasta C:\Windows\Installer\{923A99B5-32DE-4270-ABCE-026019B0C12F}
+2026-10-22 02:30:49  Exclusão de sobras: 6 apagados, 0 falharam, 0 mantidos
+2026-10-22 02:30:53    foto: HKLM\SOFTWARE\Classes levou 4000 ms (187051 entradas)
+2026-10-22 02:30:55    foto: 262144 entradas, 6234 ms, em HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\SideBySide\Winners\wow64_microsoft-windows-security-popkey-cli_31bf3856ad364e35_none_e320671964164143
+2026-10-22 02:30:56    foto: HKLM\SOFTWARE\Microsoft levou 3156 ms (93438 entradas)
+2026-10-22 02:30:59    foto: HKLM\SOFTWARE\Wow6432Node levou 2672 ms (101390 entradas)
+2026-10-22 02:30:59    foto: HKLM\SOFTWARE pronto, 382205 entradas, 9828 ms
+2026-10-22 02:30:59    foto: HKCU\Software pronto, 384058 entradas, 9875 ms
+2026-10-22 02:30:59    foto: C:\Program Files pronto, 482653 entradas, 10515 ms
+2026-10-22 02:30:59    foto: 524288 entradas, 10609 ms, em C:\Program Files (x86)\Android\android-sdk\platforms\android-37.1\data\res\values-kn-watch
+2026-10-22 02:31:00    foto: C:\Program Files (x86) pronto, 585967 entradas, 11297 ms
+2026-10-22 02:31:00    foto: C:\ProgramData pronto, 593151 entradas, 11468 ms
+2026-10-22 02:31:00    foto: C:\Users\runneradmin\AppData\Roaming pronto, 593304 entradas, 11468 ms
+2026-10-22 02:31:00    foto: C:\Users\runneradmin\AppData\Local pronto, 596911 entradas, 11500 ms
+2026-10-22 02:31:00    foto: C:\Users\runneradmin\AppData\LocalLow pronto, 596947 entradas, 11500 ms
+2026-10-22 02:31:00    foto: C:\Users\runneradmin\Desktop pronto, 596948 entradas, 11500 ms
+2026-10-22 02:31:00    foto: C:\Users\Public\Desktop pronto, 596954 entradas, 11500 ms
+2026-10-22 02:31:00  Foto do sistema (depois): 596954 entradas lidas em 11515 ms

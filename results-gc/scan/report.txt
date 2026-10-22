@@ -1,0 +1,78 @@
+programa: GridCraft (Learning Machines LLC), entrada HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{923A99B5-32DE-4270-ABCE-026019B0C12F}, identidade em 4844 ms
+  pasta: C:\Program Files\GridCraft
+  nome exato: gridcraft
+
+==== moderado ====
+  34 itens em 4922 ms
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\TevqPensg\tevqpensg.rkr  (C:\Program Files\GridCraft\gridcraft.exe)
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{F4E57C4B-2036-45F0-A9AB-443BCFE33D9F}\Count -> {0139Q44R-6NSR-49S2-8690-3QNSPNR6SSO8}\TevqPensg.yax  (C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GridCraft.lnk)
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 64  (C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GridCraft.lnk|C:\Program Files\GridCraft\gridcraft.exe)
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.csv\OpenWithProgids -> GridCraft.TextData
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.ods\OpenWithProgids -> GridCraft.Workbook
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.tsv\OpenWithProgids -> GridCraft.TextData
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.xlsb\OpenWithProgids -> GridCraft.Workbook
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.xlsm\OpenWithProgids -> GridCraft.Workbook
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.xlsx\OpenWithProgids -> GridCraft.Workbook
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\GridCraft.TextData  ("C:\Program Files\GridCraft\gridcraft.exe",0)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\GridCraft.Workbook  ("C:\Program Files\GridCraft\gridcraft.exe",0)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\Installer\Features\5B99A329ED230724BAEC2006910B1CF2  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\Installer\Products\5B99A329ED230724BAEC2006910B1CF2  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\Installer\UpgradeCodes\B7231155503FEB14290DBE4849E4C7D4  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\GridCraft
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\gridcraft.exe  (C:\Program Files\GridCraft\gridcraft.exe)
+    [valor conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\Folders -> C:\Program Files\GridCraft\  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [valor conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\Folders -> C:\Windows\Installer\{923A99B5-32DE-4270-ABCE-026019B0C12F}\  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UpgradeCodes\B7231155503FEB14290DBE4849E4C7D4  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\55136EFD4D4B08055AACA66AB2029FE9  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\6B4D7050FF212884481E9580E3474ABE  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\98AC8716F44705E5A927EAA901F3C364  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\AF3D7C0EA1BAA015A868441C6DAD907E  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products\5B99A329ED230724BAEC2006910B1CF2  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{923A99B5-32DE-4270-ABCE-026019B0C12F}
+    [valor conf=3 x] HKLM\SOFTWARE\RegisteredApplications -> GridCraft  (Software\GridCraft\Capabilities)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\gridcraft.exe  (C:\Program Files\GridCraft\gridcraft.exe)
+    [valor conf=3 x] HKLM\SOFTWARE\WOW6432Node\RegisteredApplications -> GridCraft  (Software\GridCraft\Capabilities)
+    [pasta conf=3 x] C:\Program Files\GridCraft
+    [arquivo conf=3 x] C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GridCraft.lnk  (C:\Program Files\GridCraft\)
+    [pasta conf=3 x] C:\Users\runneradmin\AppData\Roaming\GridCraft
+    [arquivo conf=3 x] C:\Windows\Installer\72a6d.msi  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [arquivo conf=3 x] C:\Windows\Installer\SourceHash{923A99B5-32DE-4270-ABCE-026019B0C12F}  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [pasta conf=3 x] C:\Windows\Installer\{923A99B5-32DE-4270-ABCE-026019B0C12F}  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+
+==== avançado ====
+  35 itens em 4828 ms
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count -> {6Q809377-6NS0-444O-8957-N3773S02200R}\TevqPensg\tevqpensg.rkr  (C:\Program Files\GridCraft\gridcraft.exe)
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{F4E57C4B-2036-45F0-A9AB-443BCFE33D9F}\Count -> {0139Q44R-6NSR-49S2-8690-3QNSPNR6SSO8}\TevqPensg.yax  (C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GridCraft.lnk)
+    [valor conf=3 x] HKCU\Software\Microsoft\Windows\CurrentVersion\UFH\SHC -> 64  (C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GridCraft.lnk|C:\Program Files\GridCraft\gridcraft.exe)
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.csv\OpenWithProgids -> GridCraft.TextData
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.ods\OpenWithProgids -> GridCraft.Workbook
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.tsv\OpenWithProgids -> GridCraft.TextData
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.xlsb\OpenWithProgids -> GridCraft.Workbook
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.xlsm\OpenWithProgids -> GridCraft.Workbook
+    [valor conf=3 x] HKLM\SOFTWARE\Classes\.xlsx\OpenWithProgids -> GridCraft.Workbook
+    [chave conf=1  ] HKLM\SOFTWARE\Classes\Applications\msiexec.exe
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\GridCraft.TextData  ("C:\Program Files\GridCraft\gridcraft.exe",0)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\GridCraft.Workbook  ("C:\Program Files\GridCraft\gridcraft.exe",0)
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\Installer\Features\5B99A329ED230724BAEC2006910B1CF2  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\Installer\Products\5B99A329ED230724BAEC2006910B1CF2  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Classes\Installer\UpgradeCodes\B7231155503FEB14290DBE4849E4C7D4  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\GridCraft
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\gridcraft.exe  (C:\Program Files\GridCraft\gridcraft.exe)
+    [valor conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\Folders -> C:\Program Files\GridCraft\  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [valor conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\Folders -> C:\Windows\Installer\{923A99B5-32DE-4270-ABCE-026019B0C12F}\  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UpgradeCodes\B7231155503FEB14290DBE4849E4C7D4  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\55136EFD4D4B08055AACA66AB2029FE9  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\6B4D7050FF212884481E9580E3474ABE  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\98AC8716F44705E5A927EAA901F3C364  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\AF3D7C0EA1BAA015A868441C6DAD907E  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products\5B99A329ED230724BAEC2006910B1CF2  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [chave conf=3 x] HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{923A99B5-32DE-4270-ABCE-026019B0C12F}
+    [valor conf=3 x] HKLM\SOFTWARE\RegisteredApplications -> GridCraft  (Software\GridCraft\Capabilities)
+    [chave conf=3 x] HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\gridcraft.exe  (C:\Program Files\GridCraft\gridcraft.exe)
+    [valor conf=3 x] HKLM\SOFTWARE\WOW6432Node\RegisteredApplications -> GridCraft  (Software\GridCraft\Capabilities)
+    [pasta conf=3 x] C:\Program Files\GridCraft
+    [arquivo conf=3 x] C:\ProgramData\Microsoft\Windows\Start Menu\Programs\GridCraft.lnk  (C:\Program Files\GridCraft\)
+    [pasta conf=3 x] C:\Users\runneradmin\AppData\Roaming\GridCraft
+    [arquivo conf=3 x] C:\Windows\Installer\72a6d.msi  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [arquivo conf=3 x] C:\Windows\Installer\SourceHash{923A99B5-32DE-4270-ABCE-026019B0C12F}  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
+    [pasta conf=3 x] C:\Windows\Installer\{923A99B5-32DE-4270-ABCE-026019B0C12F}  ({923A99B5-32DE-4270-ABCE-026019B0C12F})
