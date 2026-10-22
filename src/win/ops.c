@@ -30,6 +30,7 @@ typedef struct {
     UninstallOpts opts;
     bool run_uninstallers;
     LeftList list;
+    LeftList before;  // análise antes do desinstalador: o que era do programa com ele instalado
     StrBuf notes;
     bool cancelled;  // a busca de sobras foi cancelada
 } UninstallJob;
@@ -56,6 +57,15 @@ static void uninstall_work(Progress *pg, void *arg) {
             add_note(job, t);
             xfree(e), xfree(t);
         }
+    }
+    // Análise inicial, com o programa ainda instalado: tudo o que aponta para ele agora. O que
+    // disso continuar existindo depois do desinstalador é sobra, mesmo que a busca de depois
+    // (sem a pasta e sem a entrada do programa) não consiga mais ligar ao programa.
+    for (size_t i = 0; job->run_uninstallers && i < job->n; i++) {
+        WCHAR *step = wfmt(T(S_STEP_ANALYZING), job->t[i].name);
+        pg_step(pg, step);
+        xfree(step);
+        scan_leftovers_ex(&job->before, job->t[i].id, job->t[i].key, job->opts.mode, SCANF_BEFORE, NULL);
     }
     for (size_t i = 0; job->run_uninstallers && i < job->n; i++) {
         Target *t = &job->t[i];
@@ -98,6 +108,10 @@ static void uninstall_work(Progress *pg, void *arg) {
         any_still = any_still || job->t[i].still_registered;
     }
     job->cancelled = pg_cancelled(pg);
+    // o que a análise inicial achou e o desinstalador deixou para trás
+    size_t kept_before = job->cancelled ? 0 : leftovers_add_existing(&job->list, &job->before);
+    if (job->before.items.n) log_fmt(u"Análise inicial: %u itens, %u ainda existem e não tinham sido achados depois", (unsigned)job->before.items.n, (unsigned)kept_before);
+    left_free(&job->before);
     left_finalize(&job->list);
     leftovers_measure(&job->list, pg_ctl(pg));
     if (any_still) {
@@ -179,6 +193,7 @@ bool op_forced(HWND owner, Program *prog, const WCHAR *name, const WCHAR *folder
         identity_add_dir(job.t[0].id, f, true);  // escolhida pelo usuário: o nome da pasta conta
         identity_add_exact(job.t[0].id, path_leaf(f));
         identity_add_short_names(job.t[0].id);
+        identity_collect_exes(job.t[0].id);
     }
     log_fmt(u"Desinstalação forçada: nome \"%s\", pasta \"%s\"", n, f);
     progress_run(owner, T(S_FORCED_TITLE), uninstall_work, &job);
@@ -294,52 +309,6 @@ bool op_trace_install(HWND owner) {
 
 // ---------------------------------------------------------------- desinstalar pelo rastreamento
 
-static bool item_exists(const Leftover *it) {
-    switch (it->kind) {
-    case LK_KEY:
-    case LK_KEY_IF_EMPTY: return reg_exists(it->path);
-    case LK_VALUE: {
-        HKEY k = reg_open(it->path, KEY_QUERY_VALUE);
-        if (!k) return false;
-        DWORD t, sz = 0;
-        bool ok = RegQueryValueExW(k, it->value, NULL, &t, NULL, &sz) == ERROR_SUCCESS;
-        RegCloseKey(k);
-        return ok;
-    }
-    case LK_SERVICE: {
-        WCHAR *k = wcat(u"HKLM\\SYSTEM\\CurrentControlSet\\Services\\", it->path);
-        bool ok = reg_exists(k);
-        xfree(k);
-        return ok;
-    }
-    case LK_DIR:
-    case LK_FILE:
-    case LK_DIR_IF_EMPTY: return file_exists(it->path);
-    case LK_TASK: {
-        WCHAR *f = g_paths.system32 ? wcat3(g_paths.system32, u"\\Tasks", it->path) : wdup(u"");
-        bool ok = file_exists(f);
-        xfree(f);
-        return ok;
-    }
-    case LK_FWRULE: {
-        HKEY k = reg_open(FIREWALL_RULES_KEY, KEY_QUERY_VALUE);
-        if (!k) return false;
-        DWORD t, sz = 0;
-        bool ok = RegQueryValueExW(k, it->path, NULL, &t, NULL, &sz) == ERROR_SUCCESS;
-        RegCloseKey(k);
-        return ok;
-    }
-    case LK_PATHENTRY: return true;  // entradas de PATH não vêm de rastreamentos
-    case LK_APPX: {
-        WCHAR *k = path_join(APPX_PACKAGES_KEY, it->path);
-        bool ok = reg_exists(k);
-        xfree(k);
-        return ok;
-    }
-    }
-    return false;
-}
-
 typedef struct {
     UninstallJob base;
     Trace *trace;
@@ -354,7 +323,7 @@ static void trace_uninstall_work(Progress *pg, void *arg) {
     left_add_trace(&extra, job->trace);
     for (size_t i = 0; i < extra.items.n; i++) {
         Leftover *it = extra.items.items[i];
-        if (!item_exists(it)) continue;
+        if (!leftover_exists(it)) continue;
         left_add(&job->base.list, it->kind, it->path, it->value, it->conf, it->reason, it->detail);
     }
     left_free(&extra);

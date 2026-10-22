@@ -46,6 +46,8 @@ Identity *program_identity(const Program *p);
 // pasta, as pistas do App Paths e dos atalhos do menu Iniciar com o nome exato do programa.
 // Precisa ser montada antes de desinstalar.
 Identity *program_identity_target(Program *p);
+// Nomes dos executáveis que estão nas pastas da identidade (precisa que as pastas existam).
+void identity_collect_exes(Identity *id);
 // Acrescenta o nome curto 8.3 de cada pasta da identidade (precisa que a pasta exista).
 void identity_add_short_names(Identity *id);
 // O programa a que pertence um executável (pela pasta de instalação), ou NULL.

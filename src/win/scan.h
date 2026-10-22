@@ -21,6 +21,13 @@ bool ctl_cancelled(const Ctl *c);
 
 // uninstall_key: a entrada do programa em Uninstall (NULL na desinstalação forçada).
 void scan_leftovers(LeftList *out, const Identity *id, const WCHAR *uninstall_key, ScanMode mode, Ctl *ctl);
+enum { SCANF_BEFORE = 1 };  // análise antes de rodar o desinstalador: pula o que só ele resolve
+void scan_leftovers_ex(LeftList *out, const Identity *id, const WCHAR *uninstall_key, ScanMode mode, unsigned flags, Ctl *ctl);
+// O item ainda existe (no Registro, no disco, no Gerenciador de Serviços...)?
+bool leftover_exists(const Leftover *it);
+// Acrescenta a dst os itens de src que ainda existem (a análise de antes do desinstalador);
+// devolve quantos eram novos.
+size_t leftovers_add_existing(LeftList *dst, const LeftList *src);
 // Pastas da lista que contêm a pasta de instalação de outro programa registrado descem
 // para confiança baixa (desmarcadas). own_key: a entrada do próprio programa, ignorada.
 void leftovers_guard_others(LeftList *l, const WCHAR *own_key);

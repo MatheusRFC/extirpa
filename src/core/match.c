@@ -272,12 +272,21 @@ void identity_add_dir(Identity *id, const WCHAR *dir, bool leaf_is_name) {
     if (leaf_is_name || match_name(id, path_leaf(d)) >= CONF_LOW) identity_add_exact(id, path_leaf(d));
 }
 
+void identity_add_exe_name(Identity *id, const WCHAR *file_name) {
+    if (!file_name || wlen(file_name) < 5 || !wiends(file_name, u".exe") || wfindc(file_name, '\\')) return;
+    WCHAR *l = wdup(file_name);
+    for (WCHAR *c = l; *c; c++) *c = wfold(*c);
+    if (!vec_has(&id->exes, l)) pv_push(&id->exes, l);
+    else xfree(l);
+}
+
 void identity_add_exe(Identity *id, const WCHAR *exe_path) {
     if (!exe_path || !*exe_path) return;
     WCHAR *p = path_norm(exe_path);
     // "C:\x\app.exe,0" (ícone com índice)
     WCHAR *comma = (WCHAR *)wrfindc(p, ',');
     if (comma && wifind(p, u".exe") && comma > wifind(p, u".exe")) *comma = 0;
+    identity_add_exe_name(id, path_leaf(p));
     WCHAR *parent = path_parent(p);
     if (parent && !protect_dir_blocked(parent)) {
         WCHAR *base = path_strip_ext(path_leaf(p)), *nb = norm_alnum(base);
@@ -296,7 +305,8 @@ void identity_free(Identity *id) {
     for (size_t i = 0; i < id->exact.n; i++) xfree(id->exact.items[i]);
     for (size_t i = 0; i < id->dirs.n; i++) xfree(id->dirs.items[i]);
     for (size_t i = 0; i < id->alt_dirs.n; i++) xfree(id->alt_dirs.items[i]);
-    pv_free(&id->tokens), pv_free(&id->exact), pv_free(&id->dirs), pv_free(&id->alt_dirs);
+    for (size_t i = 0; i < id->exes.n; i++) xfree(id->exes.items[i]);
+    pv_free(&id->tokens), pv_free(&id->exact), pv_free(&id->dirs), pv_free(&id->alt_dirs), pv_free(&id->exes);
     xfree(id->vtag);
     xfree(id);
 }

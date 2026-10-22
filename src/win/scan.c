@@ -16,6 +16,7 @@
 
 #include "appx.h"
 
+#include "../core/cmdline.h"
 #include "../core/lnk.h"
 #include "../core/pathx.h"
 #include "../core/protect.h"
@@ -42,10 +43,12 @@ typedef struct {
     PtrVec others;      // Identity*: outros programas instalados
     PtrVec progids;     // WCHAR*: nomes de tipos de arquivo (ProgIDs) do programa
     PtrVec clsids;      // WCHAR*: componentes COM do programa ("{GUID}")
+    unsigned flags;     // SCANF_*
 } Scan;
 
 static bool name_is_ours(const Scan *sc, const WCHAR *name);
 static bool progid_named(const Scan *sc, const WCHAR *progid);
+static int exe_name_conf(const Scan *sc, const WCHAR *exe_leaf);
 
 static int threshold(ScanMode m) { return m == SCAN_SAFE ? CONF_HIGH : m == SCAN_MODERATE ? CONF_MEDIUM : CONF_LOW; }
 
@@ -475,6 +478,7 @@ static void scan_usage(Scan *sc) {
     static const WCHAR *const KEYS[] = {
         u"HKCU\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\MuiCache",
         u"HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Compatibility Assistant\\Store",
+        u"HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Compatibility Assistant\\Persisted",
         u"HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers",
         u"HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers",
     };
@@ -876,10 +880,17 @@ static void scan_classes(Scan *sc) {
                 HKEY k = reg_open_sub(apps, names.items[i]);
                 if (!k) continue;
                 WCHAR *hit = owned_command(sc, k);
+                int conf = hit ? CONF_HIGH : CONF_NONE;
+                if (!hit && (conf = exe_name_conf(sc, names.items[i]))) {
+                    // "Applications\gridcraft.exe" de um executável do programa: com o comando
+                    // apontando para um executável que ainda existe (e não é da pasta dele), só sugerido
+                    hit = any_command(k);
+                    if (hit && !exe_missing(hit)) conf = MIN(conf, CONF_MEDIUM);
+                }
                 RegCloseKey(k);
-                if (hit) {
+                if (conf && conf >= sc->thr) {
                     WCHAR *base = path_join(CLASSES_ROOTS[r], u"Applications"), *full = path_join(base, names.items[i]);
-                    left_add(sc->out, LK_KEY, full, NULL, CONF_HIGH, LR_FILE_ASSOC, hit);
+                    left_add(sc->out, LK_KEY, full, NULL, conf, LR_FILE_ASSOC, hit);
                     xfree(base), xfree(full);
                 }
                 xfree(hit);
@@ -1268,6 +1279,316 @@ static void scan_registered_apps(Scan *sc) {
     }
 }
 
+// ---------------------------------------------------------------- rastros pelo nome do executável
+
+// Confiança de um rastro que o Windows guarda só com o nome do executável ("gridcraft.exe"):
+// alta se o nome é o do programa (e de nenhum outro instalado); média se é de um executável que
+// estava na pasta dele; baixa se o nome é genérico ou outro programa tem um executável igual.
+static int exe_name_conf(const Scan *sc, const WCHAR *exe_leaf) {
+    if (!exe_leaf || !wiends(exe_leaf, u".exe") || wlen(exe_leaf) < 5) return CONF_NONE;
+    WCHAR *base = path_strip_ext(exe_leaf);
+    int c = CONF_NONE;
+    if (name_is_ours(sc, base)) {
+        c = CONF_HIGH;
+    } else if (vec_has_i(&sc->id->exes, exe_leaf)) {
+        WCHAR *nb = norm_alnum(base);
+        bool weak = wlen(nb) < 4 || is_generic_word(nb) || wistarts(nb, u"unins") || wistarts(nb, u"setup") || wistarts(nb, u"install") ||
+                    wistarts(nb, u"update") || wistarts(nb, u"uninst");
+        for (size_t j = 0; j < sc->others.n && !weak; j++) weak = vec_has_i(&((const Identity *)sc->others.items[j])->exes, exe_leaf);
+        c = weak ? CONF_LOW : CONF_MEDIUM;
+        xfree(nb);
+    }
+    xfree(base);
+    return c;
+}
+
+// Nome do executável no começo de um texto, até ".exe" (inclusive), em minúsculas; ou NULL.
+static WCHAR *exe_prefix(const WCHAR *s) {
+    const WCHAR *e = s ? wifind(s, u".exe") : NULL;
+    if (!e || e == s) return NULL;
+    WCHAR *r = wdupn(s, (size_t)(e + 4 - s));
+    for (WCHAR *c = r; *c; c++) *c = wfold(*c);
+    if (wfindc(r, '\\')) {
+        xfree(r);
+        return NULL;
+    }
+    return r;
+}
+
+static void add_exe_trace(Scan *sc, LeftKind kind, const WCHAR *path, const WCHAR *value, const WCHAR *exe_leaf) {
+    int c = exe_name_conf(sc, exe_leaf);
+    if (c && c >= sc->thr) left_add(sc->out, kind, path, value, c, LR_EXE_TRACE, exe_leaf);
+}
+
+// No Registro: Tracing (gridcraft_RASAPI32 e _RASMANCS, criadas por quem usa a rede),
+// RADAR\HeapLeakDetection (diagnóstico de vazamento de memória) e DirectInput (GRIDCRAFT.EXE
+// seguido de data e tamanho).
+static void scan_exe_registry(Scan *sc) {
+    static const WCHAR *const TRACING[] = {u"HKLM\\SOFTWARE\\Microsoft\\Tracing", u"HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Tracing"};
+    for (size_t r = 0; r < COUNT(TRACING); r++) {
+        HKEY root = reg_open(TRACING[r], KEY_READ);
+        if (!root) continue;
+        PtrVec subs = reg_subkeys(root);
+        for (size_t i = 0; i < subs.n; i++) {
+            const WCHAR *n = subs.items[i];
+            size_t len = wlen(n);
+            if (len <= 9 || (!wiends(n, u"_RASAPI32") && !wiends(n, u"_RASMANCS"))) continue;
+            WCHAR *base = wdupn(n, len - 9), *leaf = wcat(base, u".exe"), *full = path_join(TRACING[r], n);
+            for (WCHAR *c = leaf; *c; c++) *c = wfold(*c);
+            add_exe_trace(sc, LK_KEY, full, NULL, leaf);
+            xfree(base), xfree(leaf), xfree(full);
+        }
+        strings_free(&subs);
+        RegCloseKey(root);
+    }
+    static const WCHAR *const BY_EXE[] = {u"HKLM\\SOFTWARE\\Microsoft\\RADAR\\HeapLeakDetection\\DiagnosedApplications",
+                                          u"HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\RADAR\\HeapLeakDetection\\DiagnosedApplications",
+                                          u"HKCU\\Software\\Microsoft\\DirectInput"};
+    for (size_t r = 0; r < COUNT(BY_EXE); r++) {
+        HKEY root = reg_open(BY_EXE[r], KEY_READ);
+        if (!root) continue;
+        PtrVec subs = reg_subkeys(root);
+        for (size_t i = 0; i < subs.n; i++) {
+            const WCHAR *n = subs.items[i];
+            WCHAR *leaf = exe_prefix(n);
+            if (!leaf) continue;
+            // DirectInput: depois do nome só vêm dígitos hexadecimais (data e tamanho do executável)
+            bool ok = true;
+            for (const WCHAR *c = n + wlen(leaf); *c && ok; c++) ok = (*c >= '0' && *c <= '9') || ((*c | 32) >= 'a' && (*c | 32) <= 'f');
+            if (ok) {
+                WCHAR *full = path_join(BY_EXE[r], n);
+                add_exe_trace(sc, LK_KEY, full, NULL, leaf);
+                xfree(full);
+            }
+            xfree(leaf);
+        }
+        strings_free(&subs);
+        RegCloseKey(root);
+    }
+}
+
+// Em pastas: Prefetch (C:\Windows\Prefetch\GRIDCRAFT.EXE-1A2B3C4D.pf), despejos de falha
+// (%LOCALAPPDATA%\CrashDumps\gridcraft.exe.1234.dmp) e relatórios de erro do Windows
+// (WER\ReportArchive e ReportQueue, pastas AppCrash_gridcraft.exe_...).
+static void scan_exe_files(Scan *sc) {
+    const Paths *p = &g_paths;
+    if (p->windows) {
+        WCHAR *pf = path_join(p->windows, u"Prefetch");
+        PtrVec v = fs_list(pf);
+        for (size_t i = 0; i < v.n; i++) {
+            DirEntry *e = v.items[i];
+            size_t n = wlen(e->name);
+            if (e->is_dir || n < 17 || !wiends(e->name, u".pf") || e->name[n - 12] != '-') continue;
+            WCHAR *leaf = wdupn(e->name, n - 12), *full = path_join(pf, e->name);
+            for (WCHAR *c = leaf; *c; c++) *c = wfold(*c);
+            add_exe_trace(sc, LK_FILE, full, NULL, leaf);
+            xfree(leaf), xfree(full);
+        }
+        fs_list_free(&v);
+        xfree(pf);
+    }
+    if (p->local_appdata) {
+        WCHAR *cd = path_join(p->local_appdata, u"CrashDumps");
+        PtrVec v = fs_list(cd);
+        for (size_t i = 0; i < v.n; i++) {
+            DirEntry *e = v.items[i];
+            WCHAR *leaf = e->is_dir || !wiends(e->name, u".dmp") ? NULL : exe_prefix(e->name);
+            if (leaf) {
+                WCHAR *full = path_join(cd, e->name);
+                add_exe_trace(sc, LK_FILE, full, NULL, leaf);
+                xfree(full);
+            }
+            xfree(leaf);
+        }
+        fs_list_free(&v);
+        xfree(cd);
+    }
+    const WCHAR *wer_roots[] = {p->local_appdata, p->program_data};
+    for (size_t r = 0; r < COUNT(wer_roots); r++) {
+        if (!wer_roots[r]) continue;
+        static const WCHAR *const SUBS[] = {u"Microsoft\\Windows\\WER\\ReportArchive", u"Microsoft\\Windows\\WER\\ReportQueue"};
+        for (size_t s = 0; s < COUNT(SUBS); s++) {
+            WCHAR *dir = path_join(wer_roots[r], SUBS[s]);
+            PtrVec v = fs_list(dir);
+            for (size_t i = 0; i < v.n; i++) {
+                DirEntry *e = v.items[i];
+                const WCHAR *us = e->is_dir ? wfindc(e->name, '_') : NULL;
+                if (!us || (!wistarts(e->name, u"AppCrash_") && !wistarts(e->name, u"AppHang_"))) continue;
+                WCHAR *leaf = exe_prefix(us + 1);
+                if (leaf) {
+                    WCHAR *full = path_join(dir, e->name);
+                    add_exe_trace(sc, LK_DIR, full, NULL, leaf);
+                    xfree(full);
+                }
+                xfree(leaf);
+            }
+            fs_list_free(&v);
+            xfree(dir);
+        }
+    }
+}
+
+// Uso pelo Explorer: FeatureUsage (barra de tarefas: programas alternados, abertos, com lista
+// de atalhos ou com selo) e os avisos de "novo aplicativo para este tipo de arquivo"
+// (ApplicationAssociationToasts, valores "<ProgID>_<.ext>").
+static void scan_feature_usage(Scan *sc) {
+    static const WCHAR *const FU[] = {u"AppSwitched", u"AppLaunch", u"ShowJumpView", u"AppBadgeUpdated"};
+    for (size_t f = 0; f < COUNT(FU); f++) {
+        WCHAR *key = path_join(u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FeatureUsage", FU[f]);
+        HKEY k = reg_open(key, KEY_READ);
+        if (k) {
+            PtrVec names = reg_value_names(k);
+            for (size_t i = 0; i < names.n; i++) {
+                WCHAR *x = expand_known_folder(names.items[i]);
+                if (owns(sc, x) || exe_gone_named(sc, x) || (!wfindc(x, '\\') && progid_named(sc, x))) left_add(sc->out, LK_VALUE, key, names.items[i], CONF_HIGH, LR_USAGE, x);
+                xfree(x);
+            }
+            strings_free(&names);
+            RegCloseKey(k);
+        }
+        xfree(key);
+    }
+    static const WCHAR TOASTS[] = u"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\ApplicationAssociationToasts";
+    HKEY k = reg_open(TOASTS, KEY_READ);
+    if (!k) return;
+    PtrVec names = reg_value_names(k);
+    for (size_t i = 0; i < names.n; i++) {
+        const WCHAR *n = names.items[i], *us = wrfindc(n, '_');
+        if (!us || us == n) continue;
+        WCHAR *head = wdupn(n, (size_t)(us - n));
+        int c = CONF_NONE;
+        if (wistarts(head, u"Applications\\")) c = exe_name_conf(sc, head + 13);
+        else if (vec_has_i(&sc->progids, head)) c = CONF_HIGH;
+        else if (progid_named(sc, head)) c = progid_conf(head);
+        if (c && c >= sc->thr) left_add(sc->out, LK_VALUE, TOASTS, n, c, LR_FILE_ASSOC, head);
+        xfree(head);
+    }
+    strings_free(&names);
+    RegCloseKey(k);
+}
+
+// ---------------------------------------------------------------- Windows Installer
+
+#define MSI_ROOT u"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer"
+
+// O que o Windows Installer guarda de um produto, pelo código dele (a entrada de desinstalação
+// de um MSI tem o código entre chaves como nome). Depois de um msiexec /x que deu certo sobra
+// pouco (o registro da pasta {código} do cache, às vezes a própria pasta); numa desinstalação
+// forçada, ou que falhou, sobra o produto inteiro registrado, que o Windows continuaria
+// achando instalado.
+static void scan_msi(Scan *sc, const WCHAR *uninstall_key) {
+    const WCHAR *code = uninstall_key ? path_leaf(uninstall_key) : NULL;
+    WCHAR packed[33];
+    if (!code || !guid_pack(code, packed)) return;
+    static const WCHAR *const PROD[] = {u"HKLM\\SOFTWARE\\Classes\\Installer\\Products", u"HKLM\\SOFTWARE\\Classes\\Installer\\Features",
+                                        u"HKCU\\Software\\Classes\\Installer\\Products", u"HKCU\\Software\\Classes\\Installer\\Features",
+                                        u"HKCU\\Software\\Microsoft\\Installer\\Products", u"HKCU\\Software\\Microsoft\\Installer\\Features"};
+    bool registered = false;
+    for (size_t i = 0; i < COUNT(PROD); i++) {
+        WCHAR *k = path_join(PROD[i], packed);
+        if (reg_exists(k)) {
+            left_add(sc->out, LK_KEY, k, NULL, CONF_HIGH, LR_MSI, code);
+            registered = true;
+        }
+        xfree(k);
+    }
+    // códigos de atualização: um valor por produto (a chave sai junto se for o único)
+    static const WCHAR *const UPG[] = {u"HKLM\\SOFTWARE\\Classes\\Installer\\UpgradeCodes", u"HKCU\\Software\\Classes\\Installer\\UpgradeCodes",
+                                       u"HKCU\\Software\\Microsoft\\Installer\\UpgradeCodes", MSI_ROOT u"\\UpgradeCodes"};
+    for (size_t r = 0; r < COUNT(UPG); r++) {
+        HKEY root = reg_open(UPG[r], KEY_READ);
+        if (!root) continue;
+        PtrVec subs = reg_subkeys(root);
+        for (size_t i = 0; i < subs.n; i++) {
+            HKEY k = reg_open_sub(root, subs.items[i]);
+            if (!k) continue;
+            PtrVec names = reg_value_names(k);
+            RegCloseKey(k);
+            bool has = false;
+            for (size_t j = 0; j < names.n && !has; j++) has = wieq(names.items[j], packed);
+            if (has) {
+                WCHAR *full = path_join(UPG[r], subs.items[i]);
+                if (names.n == 1) left_add(sc->out, LK_KEY, full, NULL, CONF_HIGH, LR_MSI, code);
+                else left_add(sc->out, LK_VALUE, full, packed, CONF_HIGH, LR_MSI, code);
+                xfree(full);
+            }
+            strings_free(&names);
+        }
+        strings_free(&subs);
+        RegCloseKey(root);
+    }
+    // UserData\<usuário>\Products\<código> (com o pacote .msi em cache) e os componentes
+    HKEY ud = reg_open(MSI_ROOT u"\\UserData", KEY_READ);
+    PtrVec sids = ud ? reg_subkeys(ud) : (PtrVec){0};
+    WCHAR *inst = g_paths.windows ? path_join(g_paths.windows, u"Installer") : NULL;
+    for (size_t s = 0; s < sids.n; s++) {
+        WCHAR *rel = wfmt(u"%s\\Products\\%s", sids.items[s], packed);
+        HKEY pk = reg_open_sub(ud, rel);
+        if (pk) {
+            HKEY ip = reg_open_sub(pk, u"InstallProperties");
+            WCHAR *pkg = ip ? value_text(ip, u"LocalPackage") : NULL;
+            if (ip) RegCloseKey(ip);
+            WCHAR *pkgn = pkg ? path_norm(pkg) : NULL, *pkgp = pkgn ? path_parent(pkgn) : NULL;
+            if (pkgn && inst && pkgp && path_eq(pkgp, inst) && file_exists(pkgn)) left_add(sc->out, LK_FILE, pkgn, NULL, CONF_HIGH, LR_MSI, code);
+            xfree(pkg), xfree(pkgn), xfree(pkgp);
+            RegCloseKey(pk);
+            WCHAR *full = wfmt(MSI_ROOT u"\\UserData\\%s", rel);
+            left_add(sc->out, LK_KEY, full, NULL, CONF_HIGH, LR_MSI, code);
+            xfree(full);
+            registered = true;
+        }
+        xfree(rel);
+    }
+    // componentes: só com o produto ainda registrado (são milhares de chaves) e fora da análise
+    // de antes da desinstalação (o próprio msiexec tira)
+    for (size_t s = 0; registered && !(sc->flags & SCANF_BEFORE) && s < sids.n && !ctl_cancelled(sc->ctl); s++) {
+        WCHAR *rel = path_join(sids.items[s], u"Components");
+        HKEY ck = reg_open_sub(ud, rel);
+        if (ck) {
+            PtrVec comps = reg_subkeys(ck);
+            for (size_t c = 0; c < comps.n; c++) {
+                HKEY k = reg_open_sub(ck, comps.items[c]);
+                if (!k) continue;
+                DWORD t, sz = 0, nvals = 0;
+                bool has = RegQueryValueExW(k, packed, NULL, &t, NULL, &sz) == ERROR_SUCCESS;
+                if (has) RegQueryInfoKeyW(k, NULL, NULL, NULL, NULL, NULL, NULL, &nvals, NULL, NULL, NULL, NULL);
+                RegCloseKey(k);
+                if (!has) continue;
+                WCHAR *full = wfmt(MSI_ROOT u"\\UserData\\%s\\%s", rel, comps.items[c]);
+                if (nvals == 1) left_add(sc->out, LK_KEY, full, NULL, CONF_HIGH, LR_MSI, code);
+                else left_add(sc->out, LK_VALUE, full, packed, CONF_HIGH, LR_MSI, code);
+                xfree(full);
+            }
+            strings_free(&comps);
+            RegCloseKey(ck);
+        }
+        xfree(rel);
+    }
+    strings_free(&sids);
+    if (ud) RegCloseKey(ud);
+    // pastas registradas (Installer\Folders): as do programa e a do cache do produto
+    WCHAR *cache = inst ? path_join(inst, code) : NULL;
+    HKEY fk = reg_open(MSI_ROOT u"\\Folders", KEY_READ);
+    if (fk) {
+        PtrVec names = reg_value_names(fk);
+        for (size_t i = 0; i < names.n; i++) {
+            WCHAR *n = path_norm(names.items[i]);
+            if ((cache && path_eq(n, cache)) || owns(sc, n)) left_add(sc->out, LK_VALUE, MSI_ROOT u"\\Folders", names.items[i], CONF_HIGH, LR_MSI, code);
+            xfree(n);
+        }
+        strings_free(&names);
+        RegCloseKey(fk);
+    }
+    // cache do produto: C:\Windows\Installer\{código} (ícones) e SourceHash{código}
+    if (cache && file_exists(cache)) left_add(sc->out, LK_DIR, cache, NULL, CONF_HIGH, LR_MSI, code);
+    if (inst) {
+        WCHAR *leaf = wcat(u"SourceHash", code), *sh = path_join(inst, leaf);
+        if (file_exists(sh)) left_add(sc->out, LK_FILE, sh, NULL, CONF_HIGH, LR_MSI, code);
+        xfree(leaf), xfree(sh);
+    }
+    xfree(cache), xfree(inst);
+}
+
 // ---------------------------------------------------------------- tarefas agendadas
 
 static WCHAR *xml_text(const WCHAR *xml, const WCHAR *tag, const WCHAR **from) {
@@ -1508,6 +1829,22 @@ static void scan_files(Scan *sc) {
             xfree(d);
         }
     }
+    if (sc->mode >= SCAN_MODERATE && p->profile) {
+        // pastas com ponto na pasta do usuário (".gridcraft"), comuns em programas multiplataforma
+        PtrVec v = fs_list(p->profile);
+        for (size_t i = 0; i < v.n; i++) {
+            DirEntry *e = v.items[i];
+            if (e->name[0] != '.' || !e->name[1] || e->is_link) continue;
+            int c = name_is_ours(sc, e->name + 1) ? CONF_HIGH : match_name(id, e->name + 1);
+            if (c && c >= sc->thr) {
+                WCHAR *path = path_join(p->profile, e->name);
+                left_add(sc->out, e->is_dir ? LK_DIR : LK_FILE, path, NULL, c, LR_NAME, NULL);
+                xfree(path);
+            }
+        }
+        fs_list_free(&v);
+    }
+    if (sc->mode >= SCAN_MODERATE) scan_exe_files(sc);
     if (sc->mode >= SCAN_MODERATE && p->windows) {
         // pastas na raiz da unidade do sistema (C:\Python312, C:\Tools\...): só nome exato
         WCHAR drive[4] = {p->windows[0], ':', '\\', 0};
@@ -1722,9 +2059,13 @@ static void protect_others(Scan *sc) {
 // ---------------------------------------------------------------- busca completa
 
 void scan_leftovers(LeftList *out, const Identity *id, const WCHAR *uninstall_key, ScanMode mode, Ctl *ctl) {
+    scan_leftovers_ex(out, id, uninstall_key, mode, 0, ctl);
+}
+
+void scan_leftovers_ex(LeftList *out, const Identity *id, const WCHAR *uninstall_key, ScanMode mode, unsigned flags, Ctl *ctl) {
     Scan sc;
     mem_set(&sc, 0, sizeof(sc));
-    sc.out = out, sc.id = id, sc.mode = mode, sc.thr = threshold(mode), sc.ctl = ctl;
+    sc.out = out, sc.id = id, sc.mode = mode, sc.thr = threshold(mode), sc.ctl = ctl, sc.flags = flags;
     log_fmt(u"Busca de sobras: \"%s\" (modo %d, %u pastas do programa)", id->display, (int)mode, (unsigned)id->dirs.n);
     ctl_progress(ctl, T(S_SCAN_REGISTRY));
     scan_uninstall_entries(&sc, uninstall_key);
@@ -1738,6 +2079,8 @@ void scan_leftovers(LeftList *out, const Identity *id, const WCHAR *uninstall_ke
         scan_services(&sc);
         scan_usage(&sc);
         scan_usage_named(&sc);
+        scan_exe_registry(&sc);
+        scan_msi(&sc, uninstall_key);
         scan_path_var(&sc);
         scan_firewall(&sc);
         scan_shortcuts(&sc);
@@ -1747,6 +2090,7 @@ void scan_leftovers(LeftList *out, const Identity *id, const WCHAR *uninstall_ke
         scan_clsid_refs(&sc);
         scan_progid_refs(&sc);
         scan_fileexts(&sc);
+        scan_feature_usage(&sc);  // depois dos tipos de arquivo: usa os ProgIDs que vão sair
         scan_autoplay(&sc);
         scan_clients(&sc);
         scan_appx(&sc);
@@ -1798,6 +2142,64 @@ void leftovers_measure(LeftList *l, Ctl *ctl) {
         if (it->kind == LK_DIR || it->kind == LK_DIR_IF_EMPTY) it->size = fs_dir_size(it->path, 50000);
         else if (it->kind == LK_FILE) it->size = file_size(it->path);
     }
+}
+
+bool leftover_exists(const Leftover *it) {
+    switch (it->kind) {
+    case LK_KEY:
+    case LK_KEY_IF_EMPTY: return reg_exists(it->path);
+    case LK_VALUE: {
+        HKEY k = reg_open(it->path, KEY_QUERY_VALUE);
+        if (!k) return false;
+        DWORD t, sz = 0;
+        bool ok = RegQueryValueExW(k, it->value, NULL, &t, NULL, &sz) == ERROR_SUCCESS;
+        RegCloseKey(k);
+        return ok;
+    }
+    case LK_SERVICE: {
+        WCHAR *k = wcat(u"HKLM\\SYSTEM\\CurrentControlSet\\Services\\", it->path);
+        bool ok = reg_exists(k);
+        xfree(k);
+        return ok;
+    }
+    case LK_DIR:
+    case LK_FILE:
+    case LK_DIR_IF_EMPTY: return file_exists(it->path);
+    case LK_TASK: {
+        WCHAR *f = g_paths.system32 ? wcat3(g_paths.system32, u"\\Tasks", it->path) : wdup(u"");
+        bool ok = file_exists(f);
+        xfree(f);
+        return ok;
+    }
+    case LK_FWRULE: {
+        HKEY k = reg_open(FIREWALL_RULES_KEY, KEY_QUERY_VALUE);
+        if (!k) return false;
+        DWORD t, sz = 0;
+        bool ok = RegQueryValueExW(k, it->path, NULL, &t, NULL, &sz) == ERROR_SUCCESS;
+        RegCloseKey(k);
+        return ok;
+    }
+    case LK_PATHENTRY: return true;  // entradas de PATH não vêm de rastreamentos
+    case LK_APPX: {
+        WCHAR *k = path_join(APPX_PACKAGES_KEY, it->path);
+        bool ok = reg_exists(k);
+        xfree(k);
+        return ok;
+    }
+    }
+    return false;
+}
+
+size_t leftovers_add_existing(LeftList *dst, const LeftList *src) {
+    size_t added = 0;
+    for (size_t i = 0; i < src->items.n; i++) {
+        const Leftover *it = src->items.items[i];
+        if (!leftover_exists(it)) continue;
+        size_t n0 = dst->items.n;
+        left_add(dst, it->kind, it->path, it->value, it->conf, it->reason, it->detail);
+        added += dst->items.n > n0;
+    }
+    return added;
 }
 
 // ---------------------------------------------------------------- exclusão

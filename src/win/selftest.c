@@ -485,8 +485,12 @@ static void test_ui(PtrVec *progs) {
     g_shot_name = u"13-nome";
     WCHAR *r = dlg_input(main, T(S_TRACE_TITLE), u"A instalação criou 42 itens. Nome para este rastreamento:", u"Programa Exemplo 1.0");
     xfree(r);
-    g_shot_name = u"14-sobras";
+    g_shot_name = u"14-sobras-registro";
     leftovers_show(main, W_NAME, NULL, &g_sample);
+    g_shot_name = u"14b-sobras-arquivos";
+    leftovers_set_start_page(1);
+    leftovers_show(main, W_NAME, NULL, &g_sample);
+    leftovers_set_start_page(0);
     g_shot_name = u"15-progresso";
     g_shot_end = false;
     SleepJob job;
@@ -643,6 +647,11 @@ static int realtest(int argc, WCHAR **argv) {
         bool quiet;
         WCHAR *cmd = uninstall_command(p, true, &quiet);
         programs_free(&progs);
+        // análise inicial, como na desinstalação pela interface
+        LeftList before = {0};
+        ULONGLONG tb = GetTickCount64();
+        scan_leftovers_ex(&before, id, key, SCAN_MODERATE, SCANF_BEFORE, NULL);
+        linef(wfmt(u"  análise inicial: %u itens em %U ms", (unsigned)before.items.n, (uint64_t)(GetTickCount64() - tb)));
         linef(wfmt(u"  desinstalador: %s%s", cmd ? cmd : u"(nenhum)", quiet ? u"  [silencioso]" : u"  [NÃO SILENCIOSO]"));
         flush();
         if (cmd && quiet) {
@@ -665,8 +674,10 @@ static int realtest(int argc, WCHAR **argv) {
         LeftList l = {0};
         ULONGLONG t0 = GetTickCount64();
         scan_leftovers(&l, id, key, SCAN_MODERATE, NULL);
+        size_t extra = leftovers_add_existing(&l, &before);
+        left_free(&before);
         left_finalize(&l);
-        linef(wfmt(u"  sobras: %u itens em %U ms", (unsigned)l.items.n, (uint64_t)(GetTickCount64() - t0)));
+        linef(wfmt(u"  sobras: %u itens em %U ms (%u só pela análise inicial)", (unsigned)l.items.n, (uint64_t)(GetTickCount64() - t0), (unsigned)extra));
         dump_left(&l, 200);
         DelResult r;
         delete_leftovers(&l, t->name, NULL, &r);

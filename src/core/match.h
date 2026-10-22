@@ -25,6 +25,7 @@ typedef struct {
     PtrVec exact;           // nomes que contam como iguais ao programa (normalizados)
     PtrVec dirs;            // pastas do programa (normalizadas), nunca pastas protegidas
     PtrVec alt_dirs;        // as mesmas pastas em nome curto 8.3 (C:\PROGRA~1\...), só para referências
+    PtrVec exes;            // nomes dos executáveis do programa ("gridcraft.exe"), em minúsculas
     WCHAR *vtag;            // versão curta ("312" para 3.12.0), para separar versões do mesmo programa; ou NULL
 } Identity;
 
@@ -43,6 +44,9 @@ void identity_add_dir(Identity *id, const WCHAR *dir, bool leaf_is_name);
 void identity_add_alt_dir(Identity *id, const WCHAR *dir);   // nome curto 8.3 de uma pasta do programa
 void identity_set_version(Identity *id, const WCHAR *version);
 void identity_add_exe(Identity *id, const WCHAR *exe_path);   // o nome do executável vira nome exato
+// Executável que estava na pasta do programa: o nome entra na lista de executáveis (rastros que o
+// Windows guarda pelo nome do .exe, como o Prefetch), sem virar nome exato do programa.
+void identity_add_exe_name(Identity *id, const WCHAR *file_name);
 void identity_add_exact(Identity *id, const WCHAR *name);     // qualquer outro nome exato
 void identity_free(Identity *id);
 

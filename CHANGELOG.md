@@ -10,7 +10,7 @@ Leftover search for Windows Installer (MSI) programs that don't record their ins
 
 ### Fixed
 - **Install folder of MSI programs** is now read from the installer's own component records (`Installer\UserData\<user>\Components`): the deepest folder shared by the program's files under Program Files (or `%LOCALAPPDATA%\Programs`). Components shared with another product are ignored. When there are no component records, the folder comes from App Paths and from Start menu shortcuts with the program's exact name. This also applies to forced uninstall, tracing and "Open folder".
-- With the folder known, App Paths, file types (ProgIDs), "Open with" lists, Start menu shortcuts (including Windows Installer "advertised" shortcuts, which have only a working folder), compatibility settings and UserAssist entries of such programs are found and come checked.
+- With the folder known, App Paths, file types (ProgIDs), "Open with" lists, Start menu shortcuts (including Windows Installer "advertised" shortcuts, which have only a working folder), compatibility settings, MuiCache and UserAssist entries of such programs are found and come checked.
 - Other installed MSI programs are now known by their folders too, so their files are never taken for the program being removed.
 
 ### Added

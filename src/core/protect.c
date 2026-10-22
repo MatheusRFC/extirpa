@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 #include "protect.h"
 
+#include "cmdline.h"
 #include "pathx.h"
 
 static PtrVec g_dirs, g_dir_trees;
+static WCHAR *g_windows;  // pasta do Windows: exceções do Windows Installer e do Prefetch
 
 // Chaves que nunca são apagadas nem servem de alvo (igual ou ancestral bloqueia).
 // "%S" representa as quatro raízes de software: HKLM\SOFTWARE, HKLM\SOFTWARE\WOW6432Node,
@@ -38,6 +40,17 @@ static const char *const KEYS[] = {
     "%S\\Microsoft\\Windows\\CurrentVersion\\RunNotification",
     "%S\\Microsoft\\Windows\\CurrentVersion\\UFH",
     "%S\\Microsoft\\Windows\\CurrentVersion\\UFH\\SHC",
+    "%S\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FeatureUsage",
+    "%S\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FeatureUsage\\AppSwitched",
+    "%S\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FeatureUsage\\AppLaunch",
+    "%S\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FeatureUsage\\ShowJumpView",
+    "%S\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FeatureUsage\\AppBadgeUpdated",
+    "%S\\Microsoft\\Windows\\CurrentVersion\\ApplicationAssociationToasts",
+    "%S\\Microsoft\\Tracing",
+    "%S\\Microsoft\\RADAR",
+    "%S\\Microsoft\\RADAR\\HeapLeakDetection",
+    "%S\\Microsoft\\RADAR\\HeapLeakDetection\\DiagnosedApplications",
+    "%S\\Microsoft\\DirectInput",
     "%S\\Microsoft\\Windows\\CurrentVersion\\Search",
     "%S\\Microsoft\\Windows\\CurrentVersion\\Search\\JumplistData",
     "%S\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions",
@@ -123,6 +136,7 @@ static const char *const KEY_TREES[] = {
 static const char *const USAGE_VALUE_KEYS[] = {
     "HKCU\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\MuiCache",
     "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Compatibility Assistant\\Store",
+    "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Compatibility Assistant\\Persisted",
     "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers",
     "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers",
 };
@@ -134,6 +148,11 @@ static const char *const CLASSES_ROOTS[] = {"HKLM\\SOFTWARE\\Classes", "HKLM\\SO
 void protect_add_dir(const WCHAR *path) { pv_push(&g_dirs, path_norm(path)); }
 void protect_add_dir_tree(const WCHAR *path) { pv_push(&g_dir_trees, path_norm(path)); }
 
+void protect_set_windows(const WCHAR *dir) {
+    xfree(g_windows);
+    g_windows = dir ? path_norm(dir) : NULL;
+}
+
 void protect_reset(void) {
     for (size_t i = 0; i < g_dirs.n; i++) xfree(g_dirs.items[i]);
     for (size_t i = 0; i < g_dir_trees.n; i++) xfree(g_dir_trees.items[i]);
@@ -141,7 +160,45 @@ void protect_reset(void) {
     pv_free(&g_dir_trees);
 }
 
+static bool is_hex_n(const WCHAR *s, size_t n) {
+    for (size_t i = 0; i < n; i++) {
+        WCHAR c = s[i] | 32;
+        if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'))) return false;
+    }
+    return true;
+}
+
+// Arquivos que o Windows guarda por programa dentro da pasta do Windows e que podem sair com
+// ele: o cache do Windows Installer de um produto (C:\Windows\Installer\{código}, o
+// SourceHash{código} e o pacote .msi/.msp em cache) e os arquivos do Prefetch
+// (C:\Windows\Prefetch\PROGRAMA.EXE-1A2B3C4D.pf). Só esses nomes, só direto nessas pastas.
+bool protect_windows_exception(const WCHAR *path) {
+    if (!g_windows) return false;
+    WCHAR *p = path_norm(path), *parent = path_parent(p);
+    const WCHAR *leaf = path_leaf(p);
+    bool ok = false;
+    if (parent) {
+        WCHAR *inst = path_join(g_windows, u"Installer"), *pf = path_join(g_windows, u"Prefetch");
+        size_t n = wlen(leaf);
+        if (path_eq(parent, inst)) {
+            if (guid_valid(leaf)) ok = true;
+            else if (wistarts(leaf, u"SourceHash") && guid_valid(leaf + 10)) ok = true;
+            else if (n >= 5 && n <= 20 && (wiends(leaf, u".msi") || wiends(leaf, u".msp"))) {
+                ok = true;
+                for (size_t i = 0; i + 4 < n && ok; i++) ok = w_is_alnum(leaf[i]);
+            }
+        } else if (path_eq(parent, pf) && n > 16 && wiends(leaf, u".pf")) {
+            // NOME.EXE-XXXXXXXX.pf
+            ok = leaf[n - 12] == '-' && is_hex_n(leaf + n - 11, 8) && !wfindc(leaf, '\\');
+        }
+        xfree(inst), xfree(pf);
+    }
+    xfree(p), xfree(parent);
+    return ok;
+}
+
 bool protect_dir_blocked(const WCHAR *path) {
+    if (protect_windows_exception(path)) return false;
     WCHAR *p = path_norm(path);
     bool blocked = false;
     size_t n = wlen(p);
@@ -181,7 +238,52 @@ static bool eq_or_ancestor(const WCHAR *protected_key, const WCHAR *target) { re
 static bool in_tree(const WCHAR *tree, const WCHAR *target) { return path_is_under_or_eq(target, tree) || path_is_under(tree, target); }
 static bool in_tree_strict(const WCHAR *tree, const WCHAR *target) { return path_is_under_or_eq(target, tree); }
 
+// Resto do caminho depois de base + '\', ou NULL.
+static const WCHAR *after_base(const WCHAR *k, const char *base_ascii) {
+    WCHAR *base = w_from_ascii(base_ascii);
+    size_t lb = wlen(base);
+    const WCHAR *r = wlen(k) > lb + 1 && wistarts(k, base) && k[lb] == '\\' ? k + lb + 1 : NULL;
+    xfree(base);
+    return r;
+}
+
+// O trecho até a próxima '\' é um código compactado do Windows Installer (32 hexadecimais)?
+static bool packed_segment(const WCHAR *s) { return s && is_hex_n(s, 32) && (s[32] == 0 || s[32] == '\\'); }
+
+// Registro de um produto do Windows Installer pelo código compactado: a chave do produto (e o
+// que há dentro) nos lugares onde o Windows Installer registra produtos, recursos, códigos de
+// atualização e componentes. As chaves que agrupam tudo continuam protegidas.
+bool protect_msi_product_key(const WCHAR *key) {
+    static const char *const BASES[] = {
+        "HKLM\\SOFTWARE\\Classes\\Installer\\Products",
+        "HKLM\\SOFTWARE\\Classes\\Installer\\Features",
+        "HKLM\\SOFTWARE\\Classes\\Installer\\UpgradeCodes",
+        "HKCU\\Software\\Classes\\Installer\\Products",
+        "HKCU\\Software\\Classes\\Installer\\Features",
+        "HKCU\\Software\\Classes\\Installer\\UpgradeCodes",
+        "HKCU\\Software\\Microsoft\\Installer\\Products",
+        "HKCU\\Software\\Microsoft\\Installer\\Features",
+        "HKCU\\Software\\Microsoft\\Installer\\UpgradeCodes",
+        "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UpgradeCodes",
+    };
+    WCHAR *k = path_norm(key);
+    bool ok = false;
+    for (size_t i = 0; i < COUNT(BASES) && !ok; i++) ok = packed_segment(after_base(k, BASES[i]));
+    // UserData\<SID>\Products\<código> (com tudo dentro) e UserData\<SID>\Components\<componente>
+    const WCHAR *r = ok ? NULL : after_base(k, "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UserData");
+    if (r && wistarts(r, u"S-1-")) {
+        const WCHAR *sl = wfindc(r, '\\');
+        if (sl && wistarts(sl + 1, u"Products\\")) ok = packed_segment(sl + 10);
+        else if (sl && wistarts(sl + 1, u"Components\\")) ok = packed_segment(sl + 12) && !sl[12 + 32];
+    }
+    xfree(k);
+    return ok;
+}
+
+#define MSI_FOLDERS_KEY "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\Folders"
+
 bool protect_key_blocked(const WCHAR *key) {
+    if (protect_msi_product_key(key)) return false;
     WCHAR *k = path_norm(key);
     bool blocked = !wfindc(k, '\\');  // uma raiz sozinha
     for (size_t i = 0; !blocked && i < COUNT(KEYS); i++) blocked = each_expansion(KEYS[i], eq_or_ancestor, k);
@@ -235,7 +337,11 @@ bool protect_usage_key(const WCHAR *key) {
 
 bool protect_value_blocked(const WCHAR *key) {
     WCHAR *k = path_norm(key);
-    if (protect_usage_key(k)) {
+    WCHAR *folders = w_from_ascii(MSI_FOLDERS_KEY);
+    // pastas registradas pelo Windows Installer: um valor por pasta, e só valores saem
+    bool msi = path_eq(k, folders) || protect_msi_product_key(k);
+    xfree(folders);
+    if (msi || protect_usage_key(k)) {
         xfree(k);
         return false;
     }

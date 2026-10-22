@@ -10,14 +10,25 @@
 #include "scan.h"
 #include "ui.h"
 
-enum { ID_HEADER = 100, ID_NOTE, ID_HINT, ID_LIST, ID_ALL, ID_NONE, ID_DELETE, ID_MENU_OPEN = 300, ID_MENU_CHECK, ID_MENU_UNCHECK };
+enum { ID_HEADER = 100, ID_NOTE, ID_COUNTS, ID_HINT, ID_LIST, ID_ALL, ID_NONE, ID_DELETE, ID_BACK, ID_NEXT, ID_MENU_OPEN = 300, ID_MENU_CHECK, ID_MENU_UNCHECK };
+
+// Duas etapas, como no Revo: primeiro o Registro (e o que mais é do sistema: serviços, tarefas,
+// regras do firewall, PATH, pacotes), depois os arquivos e pastas.
+enum { PAGE_REGISTRY = 0, PAGE_FILES = 1 };
 
 typedef struct {
     ModalState ms;
     LeftList *list;
     const WCHAR *label, *note;
-    HWND header, note_lbl, hint, lv, all, none, del, close;
+    int page;
+    HWND header, note_lbl, counts, hint, lv, all, none, del, back, next, close;
 } LeftState;
+
+static int g_start_page;  // autoteste: abre direto numa etapa
+
+void leftovers_set_start_page(int page) { g_start_page = page; }
+
+static int page_of(const Leftover *it) { return left_is_file(it->kind) ? PAGE_FILES : PAGE_REGISTRY; }
 
 static const WCHAR *kind_text(LeftKind k) {
     switch (k) {
@@ -43,8 +54,8 @@ static const WCHAR *reason_text(LeftReason r) {
                                 S_REASON_RUN,           S_REASON_APP_PATHS,   S_REASON_SHARED, S_REASON_SERVICE,   S_REASON_SHORTCUT,
                                 S_REASON_COM,           S_REASON_FILE_ASSOC,  S_REASON_TRACE,  S_REASON_USER,      S_REASON_TASK,
                                 S_REASON_FIREWALL,      S_REASON_PATH_VAR,    S_REASON_USAGE,  S_REASON_SHELL_EXT, S_REASON_REFERENCE,
-                                S_REASON_PACKAGE};
-    _Static_assert(COUNT(ids) == LR_PACKAGE + 1, "um texto para cada LeftReason");
+                                S_REASON_PACKAGE,       S_REASON_MSI,         S_REASON_EXE_TRACE};
+    _Static_assert(COUNT(ids) == LR_EXE_TRACE + 1, "um texto para cada LeftReason");
     return (unsigned)r < COUNT(ids) ? T(ids[r]) : u"";
 }
 
@@ -68,21 +79,53 @@ static WCHAR *status_text(const Leftover *it) {
 }
 
 static void update_header(LeftState *st) {
-    size_t pending = 0;
-    for (size_t i = 0; i < st->list->items.n; i++)
-        if (((Leftover *)st->list->items.items[i])->status != LS_DELETED) pending++;
-    WCHAR *t = st->list->items.n ? wfmt(T(S_LEFT_HEADER), (unsigned)pending, st->label) : wfmt(T(S_LEFT_NONE), st->label);
+    size_t pending = 0, keys = 0, values = 0, system = 0, dirs = 0, files = 0;
+    uint64_t bytes = 0;
+    for (size_t i = 0; i < st->list->items.n; i++) {
+        Leftover *it = st->list->items.items[i];
+        if (page_of(it) != st->page || it->status == LS_DELETED) continue;
+        pending++;
+        switch (it->kind) {
+        case LK_KEY:
+        case LK_KEY_IF_EMPTY: keys++; break;
+        case LK_VALUE: values++; break;
+        case LK_DIR:
+        case LK_DIR_IF_EMPTY: dirs++, bytes += it->size; break;
+        case LK_FILE: files++, bytes += it->size; break;
+        default: system++;
+        }
+    }
+    bool reg = st->page == PAGE_REGISTRY;
+    WCHAR *t = pending ? wfmt(T(reg ? S_LEFT_STEP_REG : S_LEFT_STEP_FILES), (unsigned)pending, st->label)
+                       : wfmt(T(reg ? S_LEFT_STEP_REG_NONE : S_LEFT_STEP_FILES_NONE), st->label);
     SetWindowTextW(st->header, t);
     xfree(t);
+    WCHAR *c;
+    if (reg) {
+        c = wfmt(T(S_LEFT_REG_COUNTS), (unsigned)keys, (unsigned)values, (unsigned)system);
+    } else {
+        WCHAR *sz = fmt_size(bytes, &g_fmt);
+        c = wfmt(T(S_LEFT_FILE_COUNTS), (unsigned)dirs, (unsigned)files, sz);
+        xfree(sz);
+    }
+    SetWindowTextW(st->counts, c);
+    xfree(c);
     EnableWindow(st->del, pending > 0);
+    ShowWindow(st->back, reg ? SW_HIDE : SW_SHOW);
+    SetWindowTextW(st->next, T(reg ? S_LEFT_NEXT : S_LEFT_FINISH));
+    WCHAR *title = wfmt(T(S_LEFT_TITLE_STEP), T(S_LEFT_TITLE), reg ? 1u : 2u);
+    SetWindowTextW(GetParent(st->header), title);
+    xfree(title);
 }
 
 static void fill(LeftState *st) {
     lv_clear(st->lv);
+    int r = 0;
     for (size_t i = 0; i < st->list->items.n; i++) {
         Leftover *it = st->list->items.items[i];
+        if (page_of(it) != st->page) continue;
         WCHAR *txt = item_text(it);
-        int row = lv_insert(st->lv, (int)i, txt, (LPARAM)i);
+        int row = lv_insert(st->lv, r++, txt, (LPARAM)i);
         xfree(txt);
         lv_text(st->lv, row, 1, kind_text(it->kind));
         lv_text(st->lv, row, 2, conf_text(it->conf));
@@ -106,6 +149,8 @@ static void layout(LeftState *st, HWND h) {
     int m = S(14), w = r.right - 2 * m, y = m;
     ui_place(st->header, m, y, w, S(26));
     y += S(30);
+    ui_place(st->counts, m, y, w, S(20));
+    y += S(24);
     if (st->note) {
         ui_place(st->note_lbl, m, y, w, S(36));
         y += S(40);
@@ -118,9 +163,22 @@ static void layout(LeftState *st, HWND h) {
     int w1 = ui_button_width(T(S_CHECK_ALL)), w2 = ui_button_width(T(S_UNCHECK_ALL));
     ui_place(st->all, x, by, w1, bh);
     ui_place(st->none, x + w1 + S(8), by, w2, bh);
-    int wc = ui_button_width(T(S_CLOSE)), wd = ui_button_width(T(S_DELETE_CHECKED));
-    ui_place(st->close, r.right - m - wc, by, wc, bh);
-    ui_place(st->del, r.right - m - wc - S(8) - wd, by, wd, bh);
+    // da direita para a esquerda: Fechar, Próximo/Concluir, Excluir marcados, Voltar
+    int wc = ui_button_width(T(S_CLOSE)), wn = MAX(ui_button_width(T(S_LEFT_NEXT)), ui_button_width(T(S_LEFT_FINISH)));
+    int wd = ui_button_width(T(S_DELETE_CHECKED)), wb = ui_button_width(T(S_LEFT_BACK));
+    int xr = r.right - m - wc;
+    ui_place(st->close, xr, by, wc, bh);
+    xr -= S(8) + wn;
+    ui_place(st->next, xr, by, wn, bh);
+    xr -= S(16) + wd;
+    ui_place(st->del, xr, by, wd, bh);
+    xr -= S(8) + wb;
+    ui_place(st->back, xr, by, wb, bh);
+}
+
+static void go_page(LeftState *st, int page) {
+    st->page = page;
+    fill(st);
 }
 
 typedef struct {
@@ -136,6 +194,8 @@ static void delete_work(Progress *pg, void *arg) {
     delete_leftovers(job->list, job->label, pg_ctl(pg), &job->res);
 }
 
+static bool run_delete(LeftState *st, HWND h, bool *failed);
+
 static void do_delete(LeftState *st, HWND h) {
     size_t n = 0;
     for (int i = 0; i < lv_count(st->lv); i++) {
@@ -143,15 +203,38 @@ static void do_delete(LeftState *st, HWND h) {
         it->checked = lv_checked(st->lv, i) && it->status != LS_DELETED;
         if (it->checked) n++;
     }
+    // só os itens desta etapa: os da outra ficam como estão (a marcação deles volta depois)
+    size_t total = st->list->items.n;
+    bool *other = xalloc(total ? total : 1);
+    for (size_t i = 0; i < total; i++) {
+        Leftover *it = st->list->items.items[i];
+        if (page_of(it) != st->page) {
+            other[i] = it->checked;
+            it->checked = false;
+        }
+    }
+    bool deleted = false, failed = false;
     if (!n) {
         msg(h, T(S_NOTHING_CHECKED), MB_OK | MB_ICONINFORMATION);
-        return;
+    } else {
+        WCHAR *q = wfmt(T(S_CONFIRM_DELETE), (unsigned)n);
+        int ans = msg(h, q, MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2);
+        xfree(q);
+        if (ans == IDYES) {
+            deleted = run_delete(st, h, &failed);
+        }
     }
-    WCHAR *q = wfmt(T(S_CONFIRM_DELETE), (unsigned)n);
-    int ans = msg(h, q, MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2);
-    xfree(q);
-    if (ans != IDYES) return;
+    for (size_t i = 0; i < total; i++) {
+        Leftover *it = st->list->items.items[i];
+        if (page_of(it) != st->page) it->checked = other[i];
+    }
+    xfree(other);
+    // Registro apagado sem falhas: segue para os arquivos e pastas
+    if (deleted && !failed && st->page == PAGE_REGISTRY) go_page(st, PAGE_FILES);
+}
 
+// Apaga os marcados da etapa atual; false se o usuário desistiu (programas abertos).
+static bool run_delete(LeftState *st, HWND h, bool *failed) {
     // programas abertos a partir das pastas que vão sair seguram os arquivos: oferece fechar
     PtrVec paths = {0};
     for (size_t i = 0; i < st->list->items.n; i++) {
@@ -174,7 +257,7 @@ static void do_delete(LeftState *st, HWND h) {
         sb_free(&list);
         if (a == IDCANCEL) {
             processes_free(&procs);
-            return;
+            return false;
         }
         if (a == IDYES)
             for (size_t i = 0; i < procs.n; i++) {
@@ -213,6 +296,7 @@ static void do_delete(LeftState *st, HWND h) {
     }
     msg(h, sb_str(&b), MB_OK | (job.res.failed ? MB_ICONWARNING : MB_ICONINFORMATION));
     sb_free(&b);
+    *failed = job.res.failed > 0;
 
     // arquivos presos (em uso): oferece apagar na próxima reinicialização
     size_t locked = 0;
@@ -238,6 +322,7 @@ static void do_delete(LeftState *st, HWND h) {
         xfree(t);
     }
     del_result_free(&job.res);
+    return true;
 }
 
 static void context_menu(LeftState *st, HWND h) {
@@ -277,6 +362,7 @@ static LRESULT CALLBACK proc(HWND h, UINT m, WPARAM wp, LPARAM lp) {
             st->note_lbl = ui_label(h, st->note, ID_NOTE);
             SendMessageW(st->note_lbl, WM_SETFONT, (WPARAM)ui_font_bold(), TRUE);
         }
+        st->counts = ui_label(h, u"", ID_COUNTS);
         st->hint = ui_label(h, T(S_LEFT_HINT), ID_HINT);
         st->lv = lv_create(h, ID_LIST, 0, LVS_EX_CHECKBOXES);
         lv_column(st->lv, 0, T(S_COL_ITEM), S(430), false);
@@ -288,7 +374,10 @@ static LRESULT CALLBACK proc(HWND h, UINT m, WPARAM wp, LPARAM lp) {
         st->all = ui_button(h, T(S_CHECK_ALL), ID_ALL);
         st->none = ui_button(h, T(S_UNCHECK_ALL), ID_NONE);
         st->del = ui_button(h, T(S_DELETE_CHECKED), ID_DELETE);
+        st->back = ui_button(h, T(S_LEFT_BACK), ID_BACK);
+        st->next = ui_button(h, T(S_LEFT_NEXT), ID_NEXT);
         st->close = ui_button(h, T(S_CLOSE), IDCANCEL);
+        st->page = g_start_page == PAGE_FILES ? PAGE_FILES : PAGE_REGISTRY;
         fill(st);
         return 0;
     case WM_SIZE:
@@ -310,6 +399,11 @@ static LRESULT CALLBACK proc(HWND h, UINT m, WPARAM wp, LPARAM lp) {
             }
             break;
         case ID_DELETE: do_delete(st, h); break;
+        case ID_BACK: go_page(st, PAGE_REGISTRY); break;
+        case ID_NEXT:
+            if (st->page == PAGE_REGISTRY) go_page(st, PAGE_FILES);
+            else ui_end(&st->ms, IDOK);
+            break;
         case IDCANCEL: ui_end(&st->ms, IDOK); break;  // Enter (IDOK) não fecha: só Esc e o botão Fechar
         }
         return 0;

@@ -24,4 +24,11 @@ bool protect_value_blocked(const WCHAR *key);
 // Chave de rastros de uso do Windows (MuiCache, compatibilidade): valores podem sair.
 bool protect_usage_key(const WCHAR *key);
 
+// Exceções estreitas dentro das áreas proibidas, para o que o Windows guarda por programa:
+// a pasta do Windows (definida em src/win/platform.c) para o cache do Windows Installer e o
+// Prefetch; e o registro de um produto do Windows Installer pelo código compactado.
+void protect_set_windows(const WCHAR *dir);
+bool protect_windows_exception(const WCHAR *path);
+bool protect_msi_product_key(const WCHAR *key);
+
 #endif
